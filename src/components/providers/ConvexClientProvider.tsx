@@ -10,9 +10,11 @@ const convexUrl = process.env.NEXT_PUBLIC_CONVEX_URL || "https://dummy-url.conve
 const convex = new ConvexReactClient(convexUrl);
 
 export function ConvexClientProvider({ children }: { children: ReactNode }) {
-  // Use a fallback dummy key for build-time stability if the real key is missing
-  const clerkKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY || "pk_test_Y2xlcmsuYWNjb3VudHMuZGV2JA";
+  const clerkKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
 
+  // We wrap in ClerkProvider ALWAYS. If the key is missing (e.g. build environment without .env),
+  // Clerk will gracefully handle it or we'll see a clear error at runtime, 
+  // instead of silently skipping it and breaking the component tree structure.
   return (
     <ClerkProvider publishableKey={clerkKey}>
       <ConvexProviderWithClerk client={convex} useAuth={useAuth}>
