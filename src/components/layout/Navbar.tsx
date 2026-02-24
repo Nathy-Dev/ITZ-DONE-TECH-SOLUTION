@@ -2,8 +2,9 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { Search, ShoppingCart, Menu, X, Globe, User } from "lucide-react";
+import { Search, ShoppingCart, Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { SignInButton, UserButton, SignedIn, SignedOut } from "@clerk/nextjs";
 
 /**
  * Navbar component for ITZ-DONE TECH SOLUTION.
@@ -69,15 +70,22 @@ const Navbar = () => {
           </Link>
 
           <div className="hidden sm:flex items-center gap-3">
-            <Link href="/login" className="px-4 py-2 text-sm font-medium hover:text-indigo-600 transition-colors">
-              Log In
-            </Link>
-            <Link 
-              href="/register" 
-              className="px-5 py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-xl hover:bg-indigo-700 shadow-md shadow-indigo-500/20 transition-all active:scale-95"
-            >
-              Sign Up
-            </Link>
+            <SignedOut>
+              <SignInButton mode="modal">
+                <button className="px-4 py-2 text-sm font-medium hover:text-indigo-600 transition-colors">
+                  Log In
+                </button>
+              </SignInButton>
+              <Link 
+                href="/sign-up" 
+                className="px-5 py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-xl hover:bg-indigo-700 shadow-md shadow-indigo-500/20 transition-all active:scale-95"
+              >
+                Sign Up
+              </Link>
+            </SignedOut>
+            <SignedIn>
+              <UserButton afterSignOutUrl="/" />
+            </SignedIn>
           </div>
 
           {/* Mobile Menu Button */}
@@ -98,8 +106,16 @@ const Navbar = () => {
             <Link href="/mentorship" onClick={() => setMobileMenuOpen(false)}>Mentorship</Link>
             <Link href="/business" onClick={() => setMobileMenuOpen(false)}>For Business</Link>
             <div className="h-px bg-slate-100 dark:bg-slate-800 my-2" />
-            <Link href="/login" onClick={() => setMobileMenuOpen(false)}>Log In</Link>
-            <Link href="/register" className="text-indigo-600" onClick={() => setMobileMenuOpen(false)}>Sign Up</Link>
+            <SignedOut>
+              <Link href="/sign-in" onClick={() => setMobileMenuOpen(false)}>Log In</Link>
+              <Link href="/sign-up" className="text-indigo-600" onClick={() => setMobileMenuOpen(false)}>Sign Up</Link>
+            </SignedOut>
+            <SignedIn>
+              <div className="flex items-center gap-2 py-2">
+                <UserButton afterSignOutUrl="/" />
+                <span className="text-sm font-medium">Profile</span>
+              </div>
+            </SignedIn>
           </nav>
         </div>
       )}

@@ -4,6 +4,8 @@ import React, { useState } from "react";
 import { Search, Filter, ChevronDown, LayoutGrid, List } from "lucide-react";
 import CourseCard from "@/components/courses/CourseCard";
 import { cn } from "@/lib/utils";
+import { useQuery } from "convex/react";
+import { api } from "../../../convex/_generated/api";
 
 // Mock data for courses
 const MOCK_COURSES = [
@@ -93,6 +95,8 @@ const categories = ["Web Development", "AI & ML", "Data Science", "Mobile Dev", 
 export default function CoursesPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
+  
+  const courses = useQuery(api.courses.list) || [];
 
   return (
     <div className="pt-28 pb-20">
@@ -197,8 +201,19 @@ export default function CoursesPage() {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-              {MOCK_COURSES.map((course) => (
-                <CourseCard key={course.id} {...course} />
+              {courses.map((course) => (
+                <CourseCard 
+                  key={course._id} 
+                  id={course._id}
+                  title={course.title}
+                  instructor={course.instructorId}
+                  rating={course.rating}
+                  price={course.price}
+                  image={course.thumbnailUrl}
+                  level={course.level}
+                  duration={course.duration}
+                  reviews={Math.floor(Math.random() * 2000)} // Keeping mock for reviews for now
+                />
               ))}
             </div>
 
