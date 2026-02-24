@@ -10,8 +10,16 @@ const convexUrl = process.env.NEXT_PUBLIC_CONVEX_URL;
 const convex = convexUrl ? new ConvexReactClient(convexUrl) : null;
 
 export function ConvexClientProvider({ children }: { children: ReactNode }) {
+  const clerkKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
+
+  // If no Clerk key is found (e.g. during build/prerendering), 
+  // we skip the auth wrapping to prevent "Missing publishableKey" errors.
+  if (!clerkKey) {
+    return <>{children}</>;
+  }
+
   return (
-    <ClerkProvider publishableKey={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}>
+    <ClerkProvider publishableKey={clerkKey}>
       {convex ? (
         <ConvexProviderWithClerk client={convex} useAuth={useAuth}>
           {children}
