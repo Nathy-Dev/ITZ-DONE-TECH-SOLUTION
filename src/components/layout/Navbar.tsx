@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { Search, ShoppingCart, Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { SignInButton, UserButton, SignedIn, SignedOut } from "@clerk/nextjs";
+import { SignInButton, UserButton, SignedIn, SignedOut, useAuth } from "@clerk/nextjs";
 
 /**
  * Navbar component for ITZ-DONE TECH SOLUTION.
@@ -14,17 +14,20 @@ import { SignInButton, UserButton, SignedIn, SignedOut } from "@clerk/nextjs";
  * - Modern typography and hover effects
  */
 const Navbar = () => {
+  const { isLoaded, isSignedIn } = useAuth();
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // Handle scroll effect for glassmorphism
   useEffect(() => {
+    console.log("Navbar: Clerk State:", { isLoaded, isSignedIn });
+    console.log("Navbar: Clerk Key Check:", process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY ? "Found" : "Missing");
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);
     };
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [isLoaded, isSignedIn]);
 
   return (
     <header
@@ -70,6 +73,23 @@ const Navbar = () => {
           </Link>
 
           <div className="hidden sm:flex items-center gap-3">
+            {/* DEBUG INDICATOR - Remove after fixing production issue */}
+            <div className="px-2 py-1 bg-red-100 text-[8px] text-red-600 font-bold rounded uppercase flex flex-col gap-0.5 border border-red-200 shadow-sm">
+              <span className={cn(
+                process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY?.startsWith("pk_live_") ? "text-orange-600" : ""
+              )}>
+                Key: {process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY ? "OK" : "MISSING"}
+                {process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY?.startsWith("pk_live_") && " (LIVE)"}
+              </span>
+              <span className={!isLoaded ? "animate-pulse" : ""}>Loaded: {isLoaded ? "YES" : "NO"}</span>
+              <span>Signed In: {isSignedIn ? "YES" : "NO"}</span>
+              {!isLoaded && process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY?.startsWith("pk_live_") && (
+                <span className="text-[7px] leading-tight text-red-700 mt-1 italic">
+                  ⚠️ Clerk blocks LIVE keys on localhost in Prod Mode!
+                </span>
+              )}
+            </div>
+
             <SignedOut>
               <SignInButton mode="modal">
                 <button className="px-4 py-2 text-sm font-medium hover:text-indigo-600 transition-colors">
