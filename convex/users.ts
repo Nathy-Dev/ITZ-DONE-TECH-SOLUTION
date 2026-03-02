@@ -1,9 +1,19 @@
 import { v } from "convex/values";
-import { internalMutation } from "./_generated/server";
+import { mutation, query } from "./_generated/server";
 
-export const createOrUpdateUser = internalMutation({
+export const getUserByEmail = query({
+  args: { email: v.string() },
+  handler: async (ctx, args) => {
+    return await ctx.db
+      .query("users")
+      .withIndex("by_email", (q) => q.eq("email", args.email))
+      .unique();
+  },
+});
+
+export const createOrUpdateUser = mutation({
   args: {
-    clerkId: v.string(),
+    providerId: v.string(),
     email: v.string(),
     name: v.string(),
     profileImage: v.optional(v.string()),
@@ -11,7 +21,7 @@ export const createOrUpdateUser = internalMutation({
   handler: async (ctx, args) => {
     const user = await ctx.db
       .query("users")
-      .withIndex("by_clerk_id", (q) => q.eq("clerkId", args.clerkId))
+      .withIndex("by_provider_id", (q) => q.eq("providerId", args.providerId))
       .unique();
 
     if (user) {
@@ -22,7 +32,7 @@ export const createOrUpdateUser = internalMutation({
       });
     } else {
       await ctx.db.insert("users", {
-        clerkId: args.clerkId,
+        providerId: args.providerId,
         name: args.name,
         email: args.email,
         profileImage: args.profileImage,
@@ -31,12 +41,37 @@ export const createOrUpdateUser = internalMutation({
   },
 });
 
-export const deleteUser = internalMutation({
-  args: { clerkId: v.string() },
+export const registerUser = mutation({
+  args: {
+    email: v.string(),
+    password: v.string(),
+    name: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const existingUser = await ctx.db
+      .query("users")
+      .withIndex("by_email", (q) => q.eq("email", args.email))
+      .unique();
+
+    if (existingUser) {
+      throw new Error("User already exists");
+    }
+
+    return await ctx.db.insert("users", {
+      email: args.email,
+      password: args.password,
+      name: args.name,
+      providerId: "credentials", // Fixed provider ID for credentials users
+    });
+  },
+});
+
+export const deleteUser = mutation({
+  args: { providerId: v.string() },
   handler: async (ctx, args) => {
     const user = await ctx.db
       .query("users")
-      .withIndex("by_clerk_id", (q) => q.eq("clerkId", args.clerkId))
+      .withIndex("by_provider_id", (q) => q.eq("providerId", args.providerId))
       .unique();
 
     if (user) {

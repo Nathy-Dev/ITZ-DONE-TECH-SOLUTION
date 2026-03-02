@@ -4,30 +4,32 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { Search, ShoppingCart, Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { SignInButton, UserButton, SignedIn, SignedOut, useAuth } from "@clerk/nextjs";
+import { signOut, useSession } from "next-auth/react";
 
 /**
  * Navbar component for ITZ-DONE TECH SOLUTION.
- * Features:
- * - Responsive design (Mobile & Desktop)
- * - Sticky header with glassmorphism
- * - Modern typography and hover effects
  */
 const Navbar = () => {
-  const { isLoaded, isSignedIn } = useAuth();
+  const { data: session, status } = useSession();
+  const [mounted, setMounted] = useState(false);
+  
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const isLoaded = status !== "loading" && mounted;
+  const isSignedIn = !!session && mounted;
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // Handle scroll effect for glassmorphism
   useEffect(() => {
-    console.log("Navbar: Clerk State:", { isLoaded, isSignedIn });
-    console.log("Navbar: Clerk Key Check:", process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY ? "Found" : "Missing");
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);
     };
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [isLoaded, isSignedIn]);
+  }, []);
 
   return (
     <header
@@ -73,39 +75,34 @@ const Navbar = () => {
           </Link>
 
           <div className="hidden sm:flex items-center gap-3">
-            {/* DEBUG INDICATOR - Remove after fixing production issue */}
-            <div className="px-2 py-1 bg-red-100 text-[8px] text-red-600 font-bold rounded uppercase flex flex-col gap-0.5 border border-red-200 shadow-sm">
-              <span className={cn(
-                process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY?.startsWith("pk_live_") ? "text-orange-600" : ""
-              )}>
-                Key: {process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY ? "OK" : "MISSING"}
-                {process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY?.startsWith("pk_live_") && " (LIVE)"}
-              </span>
-              <span className={!isLoaded ? "animate-pulse" : ""}>Loaded: {isLoaded ? "YES" : "NO"}</span>
-              <span>Signed In: {isSignedIn ? "YES" : "NO"}</span>
-              {!isLoaded && process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY?.startsWith("pk_live_") && (
-                <span className="text-[7px] leading-tight text-red-700 mt-1 italic">
-                  ⚠️ Clerk blocks LIVE keys on localhost in Prod Mode!
-                </span>
-              )}
-            </div>
-
-            <SignedOut>
-              <SignInButton mode="modal">
-                <button className="px-4 py-2 text-sm font-medium hover:text-indigo-600 transition-colors">
+            {!isSignedIn ? (
+              <>
+                <Link 
+                  href="/login"
+                  className="px-4 py-2 text-sm font-medium hover:text-indigo-600 transition-colors"
+                >
                   Log In
+                </Link>
+                <Link 
+                  href="/register" 
+                  className="px-5 py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-xl hover:bg-indigo-700 shadow-md shadow-indigo-500/20 transition-all active:scale-95"
+                >
+                  Sign Up
+                </Link>
+              </>
+            ) : (
+              <div className="flex items-center gap-4">
+                {session?.user?.image && (
+                  <img src={session.user.image} alt="User" className="w-8 h-8 rounded-full" />
+                )}
+                <button 
+                  onClick={() => signOut()}
+                  className="text-sm font-medium bg-slate-100 hover:bg-slate-200 px-4 py-2 rounded-xl transition-colors"
+                >
+                  Sign Out
                 </button>
-              </SignInButton>
-              <Link 
-                href="/sign-up" 
-                className="px-5 py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-xl hover:bg-indigo-700 shadow-md shadow-indigo-500/20 transition-all active:scale-95"
-              >
-                Sign Up
-              </Link>
-            </SignedOut>
-            <SignedIn>
-              <UserButton afterSignOutUrl="/" />
-            </SignedIn>
+              </div>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -126,16 +123,44 @@ const Navbar = () => {
             <Link href="/mentorship" onClick={() => setMobileMenuOpen(false)}>Mentorship</Link>
             <Link href="/business" onClick={() => setMobileMenuOpen(false)}>For Business</Link>
             <div className="h-px bg-slate-100 dark:bg-slate-800 my-2" />
-            <SignedOut>
-              <Link href="/sign-in" onClick={() => setMobileMenuOpen(false)}>Log In</Link>
-              <Link href="/sign-up" className="text-indigo-600" onClick={() => setMobileMenuOpen(false)}>Sign Up</Link>
-            </SignedOut>
-            <SignedIn>
-              <div className="flex items-center gap-2 py-2">
-                <UserButton afterSignOutUrl="/" />
-                <span className="text-sm font-medium">Profile</span>
-              </div>
-            </SignedIn>
+            {!isSignedIn ? (
+              <>
+                <Link 
+                  href="/login"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Log In
+                </Link>
+                <Link 
+                  href="/register" 
+                  className="text-indigo-600" 
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Sign Up
+                </Link>
+              </>
+            ) : (
+              <>
+                <div className="flex items-center gap-3 py-2 border-b border-slate-100 dark:border-slate-800 mb-2">
+                  {session?.user?.image && (
+                    <img src={session.user.image} alt="User" className="w-10 h-10 rounded-full" />
+                  )}
+                  <div className="flex flex-col">
+                    <span className="text-sm font-bold">{session?.user?.name}</span>
+                    <span className="text-xs text-muted-foreground">{session?.user?.email}</span>
+                  </div>
+                </div>
+                <button 
+                  onClick={() => {
+                    signOut();
+                    setMobileMenuOpen(false);
+                  }}
+                  className="text-left text-red-600"
+                >
+                  Sign Out
+                </button>
+              </>
+            )}
           </nav>
         </div>
       )}
