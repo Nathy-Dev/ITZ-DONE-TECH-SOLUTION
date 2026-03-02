@@ -6,8 +6,8 @@ const steps = [
     title: "Choose Your Path",
     description: "Browse curated paths across high-growth domains like AI, Cloud, and Web Development.",
     icon: Target,
-    color: "text-indigo-600",
-    bg: "bg-indigo-600/10"
+    color: "text-blue-800",
+    bg: "bg-blue-800/10"
   },
   {
     title: "Learn by Doing",
@@ -37,7 +37,7 @@ const HowItWorks = () => {
     <section className="py-24 bg-white dark:bg-slate-950">
       <div className="max-w-7xl mx-auto px-6 md:px-12">
         <div className="text-center max-w-3xl mx-auto mb-20 space-y-4">
-          <h2 className="text-4xl font-bold tracking-tight">The <span className="text-indigo-600">ITZ-DONE</span> Way</h2>
+          <h2 className="text-4xl font-bold tracking-tight">The <span className="text-cyan-500">ITZ-DONE</span> Way</h2>
           <p className="text-lg text-muted-foreground">Our methodology is designed for maximum retention and job-readiness. Here's how it works.</p>
         </div>
 

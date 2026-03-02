@@ -57,7 +57,7 @@ export default function RegisterPage() {
             Your account has been successfully created. We&apos;re signing you in now...
           </p>
           <div className="flex justify-center">
-            <Loader2 className="w-8 h-8 animate-spin text-indigo-600" />
+            <Loader2 className="w-8 h-8 animate-spin text-blue-800" />
           </div>
         </div>
       </div>
@@ -67,10 +67,10 @@ export default function RegisterPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950 px-6 py-12">
       <div className="w-full max-w-md">
-        <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-xl shadow-indigo-500/5 border border-slate-100 dark:border-slate-800 p-8 md:p-12">
+        <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-xl shadow-blue-800/5 border border-slate-100 dark:border-slate-800 p-8 md:p-12">
           {/* Header */}
           <div className="text-center mb-10">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-indigo-600 rounded-2xl text-white font-bold text-2xl mb-6 shadow-lg shadow-indigo-500/20">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-800 rounded-2xl text-white font-bold text-2xl mb-6 shadow-lg shadow-blue-800/20">
               ITZ
             </div>
             <h1 className="text-3xl font-bold tracking-tight mb-2">Create Account</h1>
@@ -91,13 +91,13 @@ export default function RegisterPage() {
             <div className="space-y-2">
               <label className="text-sm font-medium px-1">Full Name</label>
               <div className="relative group">
-                <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-indigo-600 transition-colors" />
+                <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-blue-800 transition-colors" />
                 <input 
                   name="name"
                   type="text" 
                   required
                   placeholder="John Doe"
-                  className="w-full pl-12 pr-4 py-3 bg-slate-50 dark:bg-slate-800 border-none rounded-2xl outline-none focus:ring-2 focus:ring-indigo-600/20 transition-all"
+                  className="w-full pl-12 pr-4 py-3 bg-slate-50 dark:bg-slate-800 border-none rounded-2xl outline-none focus:ring-2 focus:ring-blue-800/20 transition-all"
                 />
               </div>
             </div>
@@ -105,13 +105,13 @@ export default function RegisterPage() {
             <div className="space-y-2">
               <label className="text-sm font-medium px-1">Email Address</label>
               <div className="relative group">
-                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-indigo-600 transition-colors" />
+                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-blue-800 transition-colors" />
                 <input 
                   name="email"
                   type="email" 
                   required
                   placeholder="name@example.com"
-                  className="w-full pl-12 pr-4 py-3 bg-slate-50 dark:bg-slate-800 border-none rounded-2xl outline-none focus:ring-2 focus:ring-indigo-600/20 transition-all"
+                  className="w-full pl-12 pr-4 py-3 bg-slate-50 dark:bg-slate-800 border-none rounded-2xl outline-none focus:ring-2 focus:ring-blue-800/20 transition-all"
                 />
               </div>
             </div>
@@ -119,13 +119,13 @@ export default function RegisterPage() {
             <div className="space-y-2">
               <label className="text-sm font-medium px-1">Password</label>
               <div className="relative group">
-                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-indigo-600 transition-colors" />
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-blue-800 transition-colors" />
                 <input 
                   name="password"
                   type="password" 
                   required
                   placeholder="••••••••"
-                  className="w-full pl-12 pr-4 py-3 bg-slate-50 dark:bg-slate-800 border-none rounded-2xl outline-none focus:ring-2 focus:ring-indigo-600/20 transition-all"
+                  className="w-full pl-12 pr-4 py-3 bg-slate-50 dark:bg-slate-800 border-none rounded-2xl outline-none focus:ring-2 focus:ring-blue-800/20 transition-all"
                 />
               </div>
             </div>
@@ -133,7 +133,7 @@ export default function RegisterPage() {
             <button 
               type="submit"
               disabled={loading}
-              className="w-full py-4 bg-indigo-600 text-white font-bold rounded-2xl hover:bg-indigo-700 shadow-lg shadow-indigo-600/20 transition-all active:scale-[0.98] disabled:opacity-70 flex items-center justify-center gap-2"
+              className="w-full py-4 bg-blue-800 text-white font-bold rounded-2xl hover:bg-blue-900 shadow-lg shadow-blue-800/20 transition-all active:scale-[0.98] disabled:opacity-70 flex items-center justify-center gap-2"
             >
               {loading ? (
                 <Loader2 className="w-5 h-5 animate-spin" />
@@ -191,7 +191,7 @@ export default function RegisterPage() {
 
           <p className="mt-10 text-center text-sm text-slate-500 dark:text-slate-400">
             Already have an account?{" "}
-            <Link href="/login" className="text-indigo-600 font-bold hover:underline">
+            <Link href="/login" className="text-blue-800 font-bold hover:underline">
               Log in instead
             </Link>
           </p>
