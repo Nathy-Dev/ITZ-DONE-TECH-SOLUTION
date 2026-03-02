@@ -33,12 +33,12 @@ const CourseCard = ({
       {/* Course Image */}
       <div className="relative aspect-video overflow-hidden bg-slate-100 dark:bg-slate-800">
         {/* Simplified color block instead of image since we don't have real images yet */}
-        <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/20 to-cyan-500/20 group-hover:scale-110 transition-transform duration-500 flex items-center justify-center">
-          <span className="text-4xl font-bold text-indigo-600/10 dark:text-indigo-400/5 select-none">ITZ-DONE</span>
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-800/20 to-cyan-500/20 group-hover:scale-110 transition-transform duration-500 flex items-center justify-center">
+          <span className="text-4xl font-bold text-blue-800/10 dark:text-blue-400/5 select-none">ITZ-DONE</span>
         </div>
         
         {badge && (
-          <div className="absolute top-3 left-3 px-2 py-1 bg-white/90 dark:bg-slate-950/90 backdrop-blur-sm rounded-lg text-[10px] font-bold uppercase tracking-wider text-indigo-600 shadow-sm">
+          <div className="absolute top-3 left-3 px-2 py-1 bg-white/90 dark:bg-slate-950/90 backdrop-blur-sm rounded-lg text-[10px] font-bold uppercase tracking-wider text-blue-800 shadow-sm">
             {badge}
           </div>
         )}
@@ -46,7 +46,7 @@ const CourseCard = ({
 
       {/* Content */}
       <div className="p-5 flex flex-col flex-grow space-y-3">
-        <h3 className="font-bold text-lg leading-tight group-hover:text-indigo-600 transition-colors line-clamp-2">
+        <h3 className="font-bold text-lg leading-tight group-hover:text-blue-800 transition-colors line-clamp-2">
           {title}
         </h3>
         

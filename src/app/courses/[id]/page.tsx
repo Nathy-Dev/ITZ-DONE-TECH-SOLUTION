@@ -62,7 +62,7 @@ export default function CourseDetailPage() {
             <nav className="text-xs font-medium text-slate-400 flex gap-2">
               <Link href="/courses">Courses</Link>
               <span>/</span>
-              <span className="text-indigo-400">Development</span>
+              <span className="text-cyan-400">Development</span>
               <span>/</span>
               <span>Next.js</span>
             </nav>
@@ -81,7 +81,7 @@ export default function CourseDetailPage() {
                 <div className="flex">
                   {[1, 2, 3, 4, 5].map((i) => <Star key={i} className="w-4 h-4 fill-current" />)}
                 </div>
-                <span className="text-indigo-400 underline ml-1">({course.reviews} reviews)</span>
+                <span className="text-cyan-400 underline ml-1">({course.reviews} reviews)</span>
               </div>
               <div className="flex items-center gap-1.5">
                 <Users className="w-4 h-4" />
@@ -91,7 +91,7 @@ export default function CourseDetailPage() {
 
             <div className="flex flex-wrap items-center gap-6 text-sm text-slate-300">
               <div className="flex items-center gap-1.5 font-medium">
-                Created by <span className="text-indigo-400 underline">{course.instructor.name}</span>
+                Created by <span className="text-cyan-400 underline">{course.instructor.name}</span>
               </div>
               <div className="flex items-center gap-1.5">
                 <ShieldCheck className="w-4 h-4" />
@@ -115,7 +115,7 @@ export default function CourseDetailPage() {
             <div className="grid sm:grid-cols-2 gap-6">
               {whatYouWillLearn.map((item, idx) => (
                 <div key={idx} className="flex gap-4">
-                  <CheckCircle2 className="w-5 h-5 text-indigo-600 shrink-0" />
+                  <CheckCircle2 className="w-5 h-5 text-blue-800 shrink-0" />
                   <p className="text-sm dark:text-slate-300 leading-relaxed">{item}</p>
                 </div>
               ))}
@@ -133,7 +133,7 @@ export default function CourseDetailPage() {
                 <span>•</span>
                 <span>24h 45m total length</span>
               </div>
-              <button className="text-indigo-600 font-bold hover:underline">Expand all sections</button>
+              <button className="text-cyan-500 font-bold hover:underline">Expand all sections</button>
             </div>
             
             <div className="border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden">
@@ -160,11 +160,11 @@ export default function CourseDetailPage() {
             <h2 className="text-2xl font-bold mb-8">Instructor</h2>
             <div className="space-y-6">
               <div className="flex items-center gap-6">
-                <div className="w-20 h-20 bg-indigo-100 dark:bg-indigo-900 rounded-full flex items-center justify-center text-indigo-600 font-bold text-2xl">
+                <div className="w-20 h-20 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center text-blue-800 font-bold text-2xl">
                   ND
                 </div>
                 <div>
-                  <h3 className="text-xl font-bold text-indigo-600">{course.instructor.name}</h3>
+                  <h3 className="text-xl font-bold text-blue-800">{course.instructor.name}</h3>
                   <p className="text-sm text-muted-foreground">{course.instructor.role}</p>
                 </div>
               </div>
@@ -178,7 +178,7 @@ export default function CourseDetailPage() {
                   <span>{course.instructor.studentsCount} Students</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <PlayCircle className="w-4 h-4 text-indigo-500" />
+                  <PlayCircle className="w-4 h-4 text-blue-800" />
                   <span>{course.instructor.coursesCount} Courses</span>
                 </div>
               </div>
@@ -194,7 +194,7 @@ export default function CourseDetailPage() {
           <div className="sticky top-32 p-1 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-[2.5rem] shadow-2xl overflow-hidden">
             {/* Preview Placeholder */}
             <div className="relative aspect-video bg-slate-900 rounded-[2.25rem] flex items-center justify-center group overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-br from-indigo-600/20 to-cyan-500/20" />
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-800/20 to-cyan-500/20" />
               <PlayCircle className="w-20 h-20 text-white fill-white/10 opacity-80 group-hover:scale-110 transition-transform cursor-pointer" />
               <p className="absolute bottom-6 text-white text-sm font-medium uppercase tracking-widest">Preview this course</p>
             </div>
@@ -203,11 +203,11 @@ export default function CourseDetailPage() {
               <div className="flex items-center gap-4">
                 <span className="text-4xl font-extrabold">${course.price}</span>
                 <span className="text-xl text-muted-foreground line-through">${course.originalPrice}</span>
-                <span className="text-indigo-600 font-bold px-2 py-1 bg-indigo-50 dark:bg-indigo-950 rounded-lg text-sm">62% OFF</span>
+                <span className="text-blue-800 font-bold px-2 py-1 bg-blue-50 dark:bg-blue-950 rounded-lg text-sm">62% OFF</span>
               </div>
 
               <div className="space-y-4">
-                <button className="w-full py-5 bg-indigo-600 text-white font-extrabold rounded-2xl hover:bg-indigo-700 shadow-xl shadow-indigo-500/20 transition-all active:scale-[0.98]">
+                <button className="w-full py-5 bg-blue-800 text-white font-extrabold rounded-2xl hover:bg-blue-900 shadow-xl shadow-blue-800/20 transition-all active:scale-[0.98]">
                   Buy Now
                 </button>
                 <button className="w-full py-4 border-2 border-slate-200 dark:border-slate-800 font-bold rounded-2xl hover:bg-slate-50 dark:hover:bg-slate-900 transition-all">
@@ -228,8 +228,8 @@ export default function CourseDetailPage() {
               </div>
 
               <div className="flex justify-between items-center pt-4">
-                <button className="flex items-center gap-2 text-sm font-bold hover:text-indigo-600 transition-all"><Share2 className="w-4 h-4" /> Share</button>
-                <button className="flex items-center gap-2 text-sm font-bold hover:text-indigo-600 transition-all"><Heart className="w-4 h-4" /> Favorite</button>
+                <button className="flex items-center gap-2 text-sm font-bold hover:text-cyan-500 transition-all"><Share2 className="w-4 h-4" /> Share</button>
+                <button className="flex items-center gap-2 text-sm font-bold hover:text-cyan-500 transition-all"><Heart className="w-4 h-4" /> Favorite</button>
                 <button className="flex items-center gap-2 text-sm font-bold hover:text-red-500 transition-all"><Flag className="w-4 h-4" /> Report</button>
               </div>
             </div>

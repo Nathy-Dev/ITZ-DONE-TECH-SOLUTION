@@ -19,7 +19,7 @@ const TrustSection = () => {
         <div className="flex flex-wrap justify-center items-center gap-12 md:gap-20 opacity-40 grayscale hover:grayscale-0 transition-all duration-700">
            {companies.map((company) => (
              <div key={company.name} className="flex items-center gap-2 group cursor-default">
-                <div className="w-8 h-8 rounded-lg bg-slate-200 dark:bg-slate-800 flex items-center justify-center font-bold text-slate-400 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+                <div className="w-8 h-8 rounded-lg bg-slate-200 dark:bg-slate-800 flex items-center justify-center font-bold text-slate-400 group-hover:bg-blue-800 group-hover:text-white transition-colors">
                   {company.icon}
                 </div>
                 <span className="font-bold text-lg text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white transition-colors">

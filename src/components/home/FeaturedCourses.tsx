@@ -63,7 +63,7 @@ const FeaturedCourses = () => {
       <div className="max-w-7xl mx-auto px-6 md:px-12">
         <div className="flex flex-col md:flex-row justify-between items-end gap-6 mb-16">
           <div className="max-w-xl space-y-4">
-            <h2 className="text-4xl font-bold tracking-tight">Most <span className="text-indigo-600">Popular</span> Courses</h2>
+            <h2 className="text-4xl font-bold tracking-tight">Most <span className="text-cyan-500">Popular</span> Courses</h2>
             <p className="text-muted-foreground">Expertly crafted lessons to help you master the most in-demand tech skills in today's market.</p>
           </div>
           <Link href="/courses" className="px-6 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl font-semibold shadow-sm hover:shadow-md transition-all flex items-center gap-2">

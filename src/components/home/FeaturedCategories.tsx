@@ -9,7 +9,7 @@ const categories = [
   { name: "Cloud Computing", icon: Cloud, count: 42, color: "text-cyan-500", bg: "bg-cyan-500/10" },
   { name: "Cybersecurity", icon: Shield, count: 31, color: "text-emerald-500", bg: "bg-emerald-500/10" },
   { name: "UI/UX Design", icon: Layout, count: 65, color: "text-orange-500", bg: "bg-orange-500/10" },
-  { name: "DevOps", icon: Terminal, count: 29, color: "text-indigo-500", bg: "bg-indigo-500/10" },
+  { name: "DevOps", icon: Terminal, count: 29, color: "text-blue-800", bg: "bg-blue-800/10" },
   { name: "AI & ML", icon: Cpu, count: 48, color: "text-rose-500", bg: "bg-rose-500/10" },
 ];
 
@@ -23,10 +23,10 @@ const FeaturedCategories = () => {
       <div className="max-w-7xl mx-auto px-6 md:px-12">
         <div className="flex flex-col md:flex-row justify-between items-end gap-6 mb-16">
           <div className="max-w-xl space-y-4">
-            <h2 className="text-4xl font-bold tracking-tight">Top <span className="text-indigo-600">Categories</span></h2>
+            <h2 className="text-4xl font-bold tracking-tight">Top <span className="text-cyan-500">Categories</span></h2>
             <p className="text-muted-foreground">Dive into specialized paths designed to take you from beginner to job-ready professional.</p>
           </div>
-          <Link href="/courses" className="text-indigo-600 font-semibold hover:underline flex items-center gap-2">
+          <Link href="/courses" className="text-cyan-500 font-semibold hover:underline flex items-center gap-2">
             View all courses
           </Link>
         </div>
@@ -36,7 +36,7 @@ const FeaturedCategories = () => {
             <Link 
               key={idx} 
               href={`/courses?category=${cat.name.toLowerCase()}`}
-              className="p-8 rounded-3xl border border-slate-100 dark:border-slate-800 hover:border-indigo-500/30 hover:shadow-xl hover:shadow-indigo-500/5 transition-all group relative overflow-hidden shrink-0"
+              className="p-8 rounded-3xl border border-slate-100 dark:border-slate-800 hover:border-blue-800/30 hover:shadow-xl hover:shadow-blue-800/5 transition-all group relative overflow-hidden shrink-0"
             >
               <div className={`w-14 h-14 ${cat.bg} rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform`}>
                 <cat.icon className={`w-7 h-7 ${cat.color}`} />

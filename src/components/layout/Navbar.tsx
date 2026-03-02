@@ -43,19 +43,19 @@ const Navbar = () => {
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2 group">
-          <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white font-bold text-xl group-hover:rotate-12 transition-transform">
+          <div className="w-10 h-10 bg-blue-800 rounded-xl flex items-center justify-center text-white font-bold text-xl group-hover:rotate-12 transition-transform">
             ITZ
           </div>
           <span className="font-bold text-xl tracking-tight hidden sm:block">
-            ITZ-DONE <span className="text-indigo-600">TECH</span>
+            ITZ-DONE <span className="text-blue-800">TECH</span>
           </span>
         </Link>
 
         {/* Desktop Navigation */}
         <nav className="hidden lg:flex items-center gap-8 text-sm font-medium">
-          <Link href="/courses" className="hover:text-indigo-600 transition-colors">Courses</Link>
-          <Link href="/mentorship" className="hover:text-indigo-600 transition-colors">Mentorship</Link>
-          <Link href="/business" className="hover:text-indigo-600 transition-colors">For Business</Link>
+          <Link href="/courses" className="hover:text-cyan-600 transition-colors">Courses</Link>
+          <Link href="/mentorship" className="hover:text-cyan-600 transition-colors">Mentorship</Link>
+          <Link href="/business" className="hover:text-cyan-600 transition-colors">For Business</Link>
         </nav>
 
         {/* Right Actions */}
@@ -65,13 +65,13 @@ const Navbar = () => {
             <input 
               type="text" 
               placeholder="Search courses..." 
-              className="pl-10 pr-4 py-2 bg-slate-100 dark:bg-slate-800 rounded-full text-sm w-48 focus:w-64 transition-all outline-none focus:ring-2 focus:ring-indigo-500/20"
+              className="pl-10 pr-4 py-2 bg-slate-100 dark:bg-slate-800 rounded-full text-sm w-48 focus:w-64 transition-all outline-none focus:ring-2 focus:ring-cyan-500/20"
             />
           </div>
 
           <Link href="/cart" className="p-2 relative hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors">
             <ShoppingCart className="w-5 h-5" />
-            <span className="absolute top-0 right-0 w-4 h-4 bg-indigo-600 text-[10px] text-white rounded-full flex items-center justify-center">0</span>
+            <span className="absolute top-0 right-0 w-4 h-4 bg-blue-800 text-[10px] text-white rounded-full flex items-center justify-center">0</span>
           </Link>
 
           <div className="hidden sm:flex items-center gap-3">
@@ -79,13 +79,13 @@ const Navbar = () => {
               <>
                 <Link 
                   href="/login"
-                  className="px-4 py-2 text-sm font-medium hover:text-indigo-600 transition-colors"
+                  className="px-4 py-2 text-sm font-medium hover:text-cyan-600 transition-colors"
                 >
                   Log In
                 </Link>
                 <Link 
                   href="/register" 
-                  className="px-5 py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-xl hover:bg-indigo-700 shadow-md shadow-indigo-500/20 transition-all active:scale-95"
+                  className="px-5 py-2.5 bg-blue-800 text-white text-sm font-medium rounded-xl hover:bg-blue-900 shadow-md shadow-blue-800/20 transition-all active:scale-95"
                 >
                   Sign Up
                 </Link>
@@ -133,7 +133,7 @@ const Navbar = () => {
                 </Link>
                 <Link 
                   href="/register" 
-                  className="text-indigo-600" 
+                  className="text-cyan-600" 
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   Sign Up
