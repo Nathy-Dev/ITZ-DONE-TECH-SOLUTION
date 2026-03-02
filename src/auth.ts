@@ -1,15 +1,14 @@
 import NextAuth from "next-auth";
-import GitHub from "next-auth/providers/github";
-import Google from "next-auth/providers/google";
 import Credentials from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import { ConvexHttpClient } from "convex/browser";
 import { api } from "convex/_generated/api";
+import authConfig from "./auth.config";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
+  ...authConfig,
   providers: [
-    GitHub, 
-    Google,
+    ...authConfig.providers,
     Credentials({
       name: "Credentials",
       credentials: {
@@ -48,13 +47,4 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       },
     }),
   ],
-  trustHost: true,
-  callbacks: {
-    async session({ session, token }) {
-      if (session.user && token.sub) {
-        session.user.id = token.sub;
-      }
-      return session;
-    },
-  },
 });
