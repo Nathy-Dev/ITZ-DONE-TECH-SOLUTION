@@ -23,13 +23,13 @@ export default function LoginPage() {
         email,
         password,
         redirect: false, // Changed to false to handle error locally
-        callbackUrl: "/",
+        callbackUrl: "/dashboard",
       });
 
       if (result?.error) {
         setError("Invalid email or password");
       } else {
-        window.location.href = "/";
+        window.location.href = "/dashboard";
       }
     } catch {
       setError("An unexpected error occurred");

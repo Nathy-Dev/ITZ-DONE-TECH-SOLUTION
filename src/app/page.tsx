@@ -73,7 +73,7 @@ export default function Home() {
                 Why thousands of students choose <span className="text-cyan-500">ITZ-DONE</span> every day.
               </h2>
               <p className="text-lg text-muted-foreground leading-relaxed">
-                We don't just provide content; we provide a career-focused learning ecosystem. Our platform is built by engineers, for engineers, with a focus on simplicity, quality, and results.
+                We don&apos;t just provide content; we provide a career-focused learning ecosystem. Our platform is built by engineers, for engineers, with a focus on simplicity, quality, and results.
               </p>
               <div className="pt-4">
                 <Link href="/register" className="px-10 py-4 bg-blue-800 text-white font-bold rounded-2xl hover:bg-blue-900 shadow-xl shadow-blue-800/20 transition-all active:scale-95 inline-block">

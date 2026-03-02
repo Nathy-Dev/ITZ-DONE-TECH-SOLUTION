@@ -34,7 +34,7 @@ export default function RegisterPage() {
             email,
             password,
             redirect: true,
-            callbackUrl: "/",
+            callbackUrl: "/dashboard",
           });
         }, 2000);
       }

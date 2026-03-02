@@ -32,12 +32,11 @@ const Hero = () => {
           </p>
           
           <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight leading-[1.1]">
-            Unlock Your <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-800 to-cyan-500">Tech Potential</span> with ITZ-DONE.
+            EMPOWERING THE <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-800 to-cyan-500">DIGITAL FUTURE</span>
           </h1>
           
           <p className="text-xl text-muted-foreground leading-relaxed">
-            Learn from industry experts through high-quality video courses. 
-            From coding to cloud architecture, we've got you covered.
+            Technology-Driven Learning. Practical Innovation. Real Results.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center gap-4">

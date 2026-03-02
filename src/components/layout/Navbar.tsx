@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Search, ShoppingCart, Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { signOut, useSession } from "next-auth/react";
@@ -10,15 +11,9 @@ import { signOut, useSession } from "next-auth/react";
  * Navbar component for ITZ-DONE TECH SOLUTION.
  */
 const Navbar = () => {
-  const { data: session, status } = useSession();
-  const [mounted, setMounted] = useState(false);
+  const { data: session } = useSession();
   
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  const isLoaded = status !== "loading" && mounted;
-  const isSignedIn = !!session && mounted;
+  const isSignedIn = !!session;
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -54,6 +49,7 @@ const Navbar = () => {
         {/* Desktop Navigation */}
         <nav className="hidden lg:flex items-center gap-8 text-sm font-medium">
           <Link href="/courses" className="hover:text-cyan-600 transition-colors">Courses</Link>
+          {isSignedIn && <Link href="/dashboard" className="hover:text-cyan-600 transition-colors font-bold text-blue-800">Dashboard</Link>}
           <Link href="/mentorship" className="hover:text-cyan-600 transition-colors">Mentorship</Link>
           <Link href="/business" className="hover:text-cyan-600 transition-colors">For Business</Link>
         </nav>
@@ -93,7 +89,13 @@ const Navbar = () => {
             ) : (
               <div className="flex items-center gap-4">
                 {session?.user?.image && (
-                  <img src={session.user.image} alt="User" className="w-8 h-8 rounded-full" />
+                  <Image 
+                    src={session.user.image} 
+                    alt="User" 
+                    width={32} 
+                    height={32} 
+                    className="rounded-full" 
+                  />
                 )}
                 <button 
                   onClick={() => signOut()}
@@ -143,7 +145,13 @@ const Navbar = () => {
               <>
                 <div className="flex items-center gap-3 py-2 border-b border-slate-100 dark:border-slate-800 mb-2">
                   {session?.user?.image && (
-                    <img src={session.user.image} alt="User" className="w-10 h-10 rounded-full" />
+                    <Image 
+                      src={session.user.image} 
+                      alt="User" 
+                      width={40} 
+                      height={40} 
+                      className="rounded-full" 
+                    />
                   )}
                   <div className="flex flex-col">
                     <span className="text-sm font-bold">{session?.user?.name}</span>
