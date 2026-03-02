@@ -11,12 +11,23 @@ export const getUserByEmail = query({
   },
 });
 
+export const getUserByProviderId = query({
+  args: { providerId: v.string() },
+  handler: async (ctx, args) => {
+    return await ctx.db
+      .query("users")
+      .withIndex("by_provider_id", (q) => q.eq("providerId", args.providerId))
+      .unique();
+  },
+});
+
 export const createOrUpdateUser = mutation({
   args: {
     providerId: v.string(),
     email: v.string(),
     name: v.string(),
     profileImage: v.optional(v.string()),
+    role: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const user = await ctx.db
@@ -36,6 +47,7 @@ export const createOrUpdateUser = mutation({
         name: args.name,
         email: args.email,
         profileImage: args.profileImage,
+        role: args.role ?? "learner",
       });
     }
   },
@@ -77,5 +89,28 @@ export const deleteUser = mutation({
     if (user) {
       await ctx.db.delete(user._id);
     }
+  },
+});
+
+export const updateUserRole = mutation({
+  args: { 
+    providerId: v.string(),
+    role: v.string() 
+  },
+  handler: async (ctx, args) => {
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_provider_id", (q) => q.eq("providerId", args.providerId))
+      .unique();
+
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    await ctx.db.patch(user._id, {
+      role: args.role,
+    });
+    
+    return args.role;
   },
 });

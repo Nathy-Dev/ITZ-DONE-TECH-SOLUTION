@@ -21,6 +21,7 @@ export default defineSchema({
     password: v.optional(v.string()),
     emailVerified: v.optional(v.string()),
     providerId: v.string(),
+    role: v.optional(v.string()), // "learner" or "instructor"
   })
     .index("by_provider_id", ["providerId"])
     .index("by_email", ["email"]),

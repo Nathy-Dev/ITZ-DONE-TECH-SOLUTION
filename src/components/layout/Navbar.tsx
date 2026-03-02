@@ -6,6 +6,9 @@ import Image from "next/image";
 import { Search, ShoppingCart, Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { signOut, useSession } from "next-auth/react";
+import { useQuery, useMutation } from "convex/react";
+import { api } from "../../../convex/_generated/api";
+import { GraduationCap, BookOpen, UserCircle } from "lucide-react";
 
 /**
  * Navbar component for ITZ-DONE TECH SOLUTION.
@@ -25,6 +28,21 @@ const Navbar = () => {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  const convexUser = useQuery(api.users.getUserByProviderId, 
+    session?.user?.id ? { providerId: session.user.id } : "skip"
+  );
+  
+  const updateUserRole = useMutation(api.users.updateUserRole);
+
+  const toggleRole = async () => {
+    if (!session?.user?.id || !convexUser) return;
+    const newRole = convexUser.role === "instructor" ? "learner" : "instructor";
+    await updateUserRole({
+      providerId: session.user.id,
+      role: newRole,
+    });
+  };
 
   return (
     <header
@@ -88,15 +106,45 @@ const Navbar = () => {
               </>
             ) : (
               <div className="flex items-center gap-4">
-                {session?.user?.image && (
+                {session?.user?.image ? (
                   <Image 
                     src={session.user.image} 
                     alt="User" 
                     width={32} 
                     height={32} 
-                    className="rounded-full" 
+                    className="rounded-full ring-2 ring-blue-800/10" 
                   />
+                ) : (
+                  <UserCircle className="w-8 h-8 text-slate-400" />
                 )}
+                
+                <div className="flex items-center gap-2 bg-slate-100 dark:bg-slate-800 p-1 rounded-xl">
+                  <button 
+                    onClick={toggleRole}
+                    className={cn(
+                      "flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold transition-all",
+                      convexUser?.role === "instructor" 
+                        ? "bg-blue-800 text-white shadow-sm" 
+                        : "text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700"
+                    )}
+                  >
+                    <GraduationCap className="w-3.5 h-3.5" />
+                    Instructor
+                  </button>
+                  <button 
+                    onClick={toggleRole}
+                    className={cn(
+                      "flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold transition-all",
+                      convexUser?.role !== "instructor" 
+                        ? "bg-blue-800 text-white shadow-sm" 
+                        : "text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700"
+                    )}
+                  >
+                    <BookOpen className="w-3.5 h-3.5" />
+                    Learner
+                  </button>
+                </div>
+
                 <button 
                   onClick={() => signOut()}
                   className="text-sm font-medium bg-slate-100 hover:bg-slate-200 px-4 py-2 rounded-xl transition-colors"
