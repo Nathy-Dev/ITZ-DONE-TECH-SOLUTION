@@ -15,6 +15,16 @@ export const getById = query({
   },
 });
 
+export const listByInstructor = query({
+  args: { instructorId: v.string() },
+  handler: async (ctx, args) => {
+    return await ctx.db
+      .query("courses")
+      .filter((q) => q.eq(q.field("instructorId"), args.instructorId))
+      .collect();
+  },
+});
+
 export const create = mutation({
   args: {
     title: v.string(),

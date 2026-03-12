@@ -30,4 +30,18 @@ export default defineSchema({
     courseId: v.id("courses"),
     status: v.string(), // "active", "completed", "cancelled"
   }),
+  sections: defineTable({
+    courseId: v.id("courses"),
+    title: v.string(),
+    order: v.number(),
+  }).index("by_course", ["courseId"]),
+  lessons: defineTable({
+    sectionId: v.id("sections"),
+    title: v.string(),
+    content: v.optional(v.string()), // Markdown or HTML content
+    videoUrl: v.optional(v.string()),
+    duration: v.optional(v.string()),
+    order: v.number(),
+    isFree: v.boolean(),
+  }).index("by_section", ["sectionId"]),
 });

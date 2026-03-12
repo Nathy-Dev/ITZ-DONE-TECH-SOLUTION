@@ -97,6 +97,11 @@ export default function DashboardPage() {
 
   const isInstructor = convexUser?.role === "instructor";
 
+  const allCourses = useQuery(api.courses.list);
+  const instructorCourses = useQuery(api.courses.listByInstructor, 
+    session?.user?.id ? { instructorId: session.user.id } : "skip"
+  );
+
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pt-24 pb-20">
       <div className="max-w-7xl mx-auto px-6 md:px-12">
@@ -109,7 +114,7 @@ export default function DashboardPage() {
             <p className="text-muted-foreground mt-2">
               {isInstructor 
                 ? "Manage your courses and track your students' progress." 
-                : "You've completed 65% of your current goal. Keep it up!"}
+                : "Explore new courses and continue your learning journey."}
             </p>
           </div>
           <div className="flex items-center gap-3">
@@ -135,16 +140,17 @@ export default function DashboardPage() {
         </div>
 
         {isInstructor ? (
-          <InstructorDashboard />
+          <InstructorDashboard courses={instructorCourses} />
         ) : (
-          <LearnerDashboard />
+          <LearnerDashboard courses={allCourses} />
         )}
       </div>
     </div>
   );
 }
 
-function LearnerDashboard() {
+function LearnerDashboard({ courses }: { courses: any[] | undefined }) {
+  const displayCourses = courses || SAMPLE_COURSES; // Fallback to samples if no live data yet
   return (
     <div className="grid lg:grid-cols-3 gap-8">
       {/* Main Content Area */}
@@ -205,8 +211,12 @@ function LearnerDashboard() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {SAMPLE_COURSES.slice(0, 2).map((course) => (
-              <CourseCard key={course.id} {...course} />
+            {displayCourses.slice(0, 4).map((course) => (
+              <CourseCard 
+                key={course._id || course.id} 
+                {...course} 
+                image={course.thumbnailUrl || course.image}
+              />
             ))}
           </div>
         </div>
@@ -272,7 +282,7 @@ function LearnerDashboard() {
   );
 }
 
-function InstructorDashboard() {
+function InstructorDashboard({ courses }: { courses: any[] | undefined }) {
   return (
     <div className="grid lg:grid-cols-4 gap-6">
       {/* Stats Overview */}
@@ -304,25 +314,33 @@ function InstructorDashboard() {
           </div>
           
           <div className="space-y-4">
-            {[1, 2, 3].map((_, i) => (
-              <div key={i} className="flex flex-col md:flex-row items-center gap-6 p-4 border border-slate-50 dark:border-slate-800 rounded-2xl hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
-                <div className="w-full md:w-32 aspect-video bg-slate-100 dark:bg-slate-800 rounded-xl" />
+            {courses?.length === 0 && (
+              <div className="text-center py-12">
+                <p className="text-muted-foreground">You haven't created any courses yet.</p>
+                <Link href="/courses/create" className="text-blue-800 font-bold hover:underline mt-2 inline-block">Create your first course</Link>
+              </div>
+            )}
+            {courses?.map((course, i) => (
+              <div key={course._id} className="flex flex-col md:flex-row items-center gap-6 p-4 border border-slate-50 dark:border-slate-800 rounded-2xl hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                <div className="w-full md:w-32 aspect-video bg-slate-100 dark:bg-slate-800 rounded-xl overflow-hidden relative">
+                   <img src={course.thumbnailUrl} alt={course.title} className="w-full h-full object-cover" />
+                </div>
                 <div className="flex-grow">
-                  <h4 className="font-bold text-lg">Next.js 15 Deep Dive</h4>
-                  <p className="text-sm text-muted-foreground mt-1">Published on Oct 12, 2023</p>
+                  <h4 className="font-bold text-lg">{course.title}</h4>
+                  <p className="text-sm text-muted-foreground mt-1">Status: <span className="text-emerald-600 font-bold">Draft</span></p>
                 </div>
                 <div className="flex items-center gap-8">
                    <div className="text-center">
                      <p className="text-xs text-muted-foreground uppercase font-bold tracking-wider mb-1">Students</p>
-                     <p className="font-bold">124</p>
+                     <p className="font-bold">{course.studentsEnrolled || 0}</p>
                    </div>
                    <div className="text-center">
-                     <p className="text-xs text-muted-foreground uppercase font-bold tracking-wider mb-1">Revenue</p>
-                     <p className="font-bold text-emerald-600">$4,200</p>
+                     <p className="text-xs text-muted-foreground uppercase font-bold tracking-wider mb-1">Price</p>
+                     <p className="font-bold text-emerald-600">${course.price}</p>
                    </div>
-                   <button className="p-2 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-white transition-colors">
-                      <BarChart3 className="w-5 h-5 text-slate-600" />
-                   </button>
+                   <Link href={`/courses/manage/${course._id}`} className="p-2 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-white dark:hover:bg-slate-700 transition-colors">
+                      <BarChart3 className="w-5 h-5 text-slate-600 dark:text-slate-400" />
+                   </Link>
                 </div>
               </div>
             ))}

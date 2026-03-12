@@ -3,14 +3,17 @@ import Link from "next/link";
 import { Star, Clock, User, BarChart } from "lucide-react";
 
 interface CourseCardProps {
-  id: string;
+  id?: string;
+  _id?: string;
   title: string;
-  instructor: string;
+  instructor?: string;
+  instructorId?: string;
   rating: number;
-  reviews: number;
+  reviews?: number;
   price: number;
   originalPrice?: number;
-  image: string;
+  image?: string;
+  thumbnailUrl?: string;
   level: string;
   duration: string;
   badge?: string;
@@ -25,17 +28,27 @@ interface CourseCardProps {
  * - Price formatting with discounts
  */
 const CourseCard = ({ 
-  id, title, instructor, rating, reviews, price, 
-  originalPrice, level, duration, badge 
+  id, _id, title, instructor, instructorId, rating, reviews = 0, price, 
+  originalPrice, level, duration, badge, image, thumbnailUrl 
 }: CourseCardProps) => {
+  const courseId = _id || id;
+  const displayInstructor = instructor || "ITZ-DONE Instructor";
+  const displayImage = thumbnailUrl || image;
   return (
-    <Link href={`/courses/${id}`} className="group block bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl overflow-hidden hover:shadow-xl transition-all h-full flex flex-col">
+    <Link href={`/courses/${courseId}`} className="group block bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl overflow-hidden hover:shadow-xl transition-all h-full flex flex-col">
       {/* Course Image */}
       <div className="relative aspect-video overflow-hidden bg-slate-100 dark:bg-slate-800">
-        {/* Simplified color block instead of image since we don't have real images yet */}
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-800/20 to-cyan-500/20 group-hover:scale-110 transition-transform duration-500 flex items-center justify-center">
-          <span className="text-4xl font-bold text-blue-800/10 dark:text-blue-400/5 select-none">ITZ-DONE</span>
-        </div>
+        {displayImage ? (
+           <img 
+             src={displayImage} 
+             alt={title} 
+             className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" 
+           />
+        ) : (
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-800/20 to-cyan-500/20 group-hover:scale-110 transition-transform duration-500 flex items-center justify-center">
+            <span className="text-4xl font-bold text-blue-800/10 dark:text-blue-400/5 select-none">ITZ-DONE</span>
+          </div>
+        )}
         
         {badge && (
           <div className="absolute top-3 left-3 px-2 py-1 bg-white/90 dark:bg-slate-950/90 backdrop-blur-sm rounded-lg text-[10px] font-bold uppercase tracking-wider text-blue-800 shadow-sm">
@@ -52,7 +65,7 @@ const CourseCard = ({
         
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <User className="w-4 h-4" />
-          <span>{instructor}</span>
+          <span>{displayInstructor}</span>
         </div>
 
         <div className="flex items-center gap-1.5 py-1">
