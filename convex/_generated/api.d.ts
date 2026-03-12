@@ -9,6 +9,8 @@
  */
 
 import type * as courses from "../courses.js";
+import type * as debug from "../debug.js";
+import type * as migrations from "../migrations.js";
 import type * as seed from "../seed.js";
 import type * as users from "../users.js";
 
@@ -20,6 +22,8 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   courses: typeof courses;
+  debug: typeof debug;
+  migrations: typeof migrations;
   seed: typeof seed;
   users: typeof users;
 }>;

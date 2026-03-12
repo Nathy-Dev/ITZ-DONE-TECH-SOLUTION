@@ -30,18 +30,31 @@ export const createOrUpdateUser = mutation({
     role: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    const user = await ctx.db
+    // 1. Try to find user by providerId (OAuth case)
+    let user = await ctx.db
       .query("users")
       .withIndex("by_provider_id", (q) => q.eq("providerId", args.providerId))
       .unique();
 
+    // 2. If not found, try to find by email (Link OAuth to existing Credentials or vice-versa)
+    if (!user) {
+      user = await ctx.db
+        .query("users")
+        .withIndex("by_email", (q) => q.eq("email", args.email))
+        .unique();
+    }
+
     if (user) {
+      // Update existing user
       await ctx.db.patch(user._id, {
         name: args.name,
         email: args.email,
         profileImage: args.profileImage,
+        // If this is a new provider for this email, link it? 
+        // For now we trust Auth.js handles the mapping, but we ensure we don't duplicate.
       });
     } else {
+      // Create new user
       await ctx.db.insert("users", {
         providerId: args.providerId,
         name: args.name,
