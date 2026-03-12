@@ -83,6 +83,11 @@ export default function DashboardPage() {
     session?.user?.id ? { providerId: session.user.id } : "skip"
   );
 
+  const allCourses = useQuery(api.courses.list);
+  const instructorCourses = useQuery(api.courses.listByInstructor, 
+    session?.user?.id ? { instructorId: session.user.id } : "skip"
+  );
+
   if (status === "unauthenticated") {
     redirect("/login");
   }
@@ -96,11 +101,6 @@ export default function DashboardPage() {
   }
 
   const isInstructor = convexUser?.role === "instructor";
-
-  const allCourses = useQuery(api.courses.list);
-  const instructorCourses = useQuery(api.courses.listByInstructor, 
-    session?.user?.id ? { instructorId: session.user.id } : "skip"
-  );
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pt-24 pb-20">
