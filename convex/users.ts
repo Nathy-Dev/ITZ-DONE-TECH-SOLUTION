@@ -20,9 +20,10 @@ export const getUserByProviderId = query({
       .unique();
 
     if (!user && args.email) {
+      const email = args.email;
       user = await ctx.db
         .query("users")
-        .withIndex("by_email", (q) => q.eq("email", args.email))
+        .withIndex("by_email", (q) => q.eq("email", email))
         .unique();
     }
     return user;
