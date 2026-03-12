@@ -80,7 +80,10 @@ export default function DashboardPage() {
   const { data: session, status } = useSession();
   
   const convexUser = useQuery(api.users.getUserByProviderId, 
-    session?.user?.id ? { providerId: session.user.id } : "skip"
+    session?.user?.id ? { 
+      providerId: session.user.id,
+      email: session.user.email ?? undefined 
+    } : "skip"
   );
 
   const allCourses = useQuery(api.courses.list);

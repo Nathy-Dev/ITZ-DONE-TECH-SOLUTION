@@ -12,12 +12,20 @@ export const getUserByEmail = query({
 });
 
 export const getUserByProviderId = query({
-  args: { providerId: v.string() },
+  args: { providerId: v.string(), email: v.optional(v.string()) },
   handler: async (ctx, args) => {
-    return await ctx.db
+    let user = await ctx.db
       .query("users")
       .withIndex("by_provider_id", (q) => q.eq("providerId", args.providerId))
       .unique();
+
+    if (!user && args.email) {
+      user = await ctx.db
+        .query("users")
+        .withIndex("by_email", (q) => q.eq("email", args.email))
+        .unique();
+    }
+    return user;
   },
 });
 
@@ -50,8 +58,7 @@ export const createOrUpdateUser = mutation({
         name: args.name,
         email: args.email,
         profileImage: args.profileImage,
-        // If this is a new provider for this email, link it? 
-        // For now we trust Auth.js handles the mapping, but we ensure we don't duplicate.
+        providerId: args.providerId, // Sync provider ID (crucial for role switching)
       });
     } else {
       // Create new user
