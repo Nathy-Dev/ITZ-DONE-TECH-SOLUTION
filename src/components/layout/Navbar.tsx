@@ -55,15 +55,26 @@ const Navbar = () => {
     session?.user?.id ? { providerId: session.user.id } : "skip"
   );
   
+  const [isSwitching, setIsSwitching] = useState(false);
+  
   const updateUserRole = useMutation(api.users.updateUserRole);
 
-  const toggleRole = async () => {
-    if (!session?.user?.id || !convexUser) return;
-    const newRole = convexUser.role === "instructor" ? "learner" : "instructor";
-    await updateUserRole({
-      providerId: session.user.id,
-      role: newRole,
-    });
+  const handleSetRole = async (role: "learner" | "instructor") => {
+    if (!session?.user?.id || !convexUser || isSwitching) return;
+    if (convexUser.role === role) return;
+
+    setIsSwitching(true);
+    try {
+      await updateUserRole({
+        providerId: session.user.id,
+        role: role,
+      });
+      setUserMenuOpen(false);
+    } catch (error) {
+      console.error("Failed to update role:", error);
+    } finally {
+      setIsSwitching(false);
+    }
   };
 
   return (
@@ -161,29 +172,33 @@ const Navbar = () => {
                     {/* Role Toggle */}
                     <div className="p-1 mb-2">
                        <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground px-3 mb-2">Switch Account</p>
-                       <div className="grid grid-cols-2 gap-1 bg-slate-100/50 dark:bg-slate-800/50 p-1 rounded-xl">
+                        <div className="grid grid-cols-2 gap-1 bg-slate-100/50 dark:bg-slate-800/50 p-1 rounded-xl">
                           <button 
-                            onClick={() => { toggleRole(); setUserMenuOpen(false); }}
+                            onClick={() => handleSetRole("instructor")}
+                            disabled={isSwitching}
                             className={cn(
                               "flex items-center justify-center gap-2 py-1.5 rounded-lg text-[11px] font-bold transition-all",
                               convexUser?.role === "instructor" 
                                 ? "bg-white dark:bg-slate-900 text-blue-800 dark:text-cyan-400 shadow-sm" 
-                                : "text-slate-500 hover:text-slate-700 dark:text-slate-400"
+                                : "text-slate-500 hover:text-slate-700 dark:text-slate-400",
+                              isSwitching && "opacity-50 cursor-not-allowed"
                             )}
                           >
-                            <GraduationCap className="w-3 h-3" />
+                            <GraduationCap className={cn("w-3 h-3", isSwitching && convexUser?.role !== "instructor" && "animate-spin")} />
                             Instructor
                           </button>
                           <button 
-                            onClick={() => { toggleRole(); setUserMenuOpen(false); }}
+                            onClick={() => handleSetRole("learner")}
+                            disabled={isSwitching}
                             className={cn(
                               "flex items-center justify-center gap-2 py-1.5 rounded-lg text-[11px] font-bold transition-all",
                               convexUser?.role !== "instructor" 
                                 ? "bg-white dark:bg-slate-900 text-blue-800 dark:text-cyan-400 shadow-sm" 
-                                : "text-slate-500 hover:text-slate-700 dark:text-slate-400"
+                                : "text-slate-500 hover:text-slate-700 dark:text-slate-400",
+                              isSwitching && "opacity-50 cursor-not-allowed"
                             )}
                           >
-                            <BookOpen className="w-3 h-3" />
+                            <BookOpen className={cn("w-3 h-3", isSwitching && convexUser?.role === "instructor" && "animate-spin")} />
                             Learner
                           </button>
                        </div>
@@ -287,12 +302,16 @@ const Navbar = () => {
                 <div className="flex flex-col gap-2 mt-4">
                   <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground px-1">Switch Role</p>
                   <button 
-                    onClick={toggleRole}
-                    className="flex items-center gap-3 p-3 bg-slate-50 dark:bg-slate-900 rounded-xl"
+                    onClick={() => {
+                      const targetRole = convexUser?.role === "instructor" ? "learner" : "instructor";
+                      handleSetRole(targetRole).then(() => setMobileMenuOpen(false));
+                    }}
+                    disabled={isSwitching}
+                    className="flex items-center gap-3 p-3 bg-slate-50 dark:bg-slate-900 rounded-xl disabled:opacity-50"
                   >
-                    <ArrowRightLeft className="w-5 h-5 text-blue-800" />
+                    <ArrowRightLeft className={cn("w-5 h-5 text-blue-800", isSwitching && "animate-spin")} />
                     <span className="text-sm font-medium">
-                      Switch to {convexUser?.role === "instructor" ? "Learner" : "Instructor"}
+                      {isSwitching ? "Switching..." : `Switch to ${convexUser?.role === "instructor" ? "Learner" : "Instructor"}`}
                     </span>
                   </button>
                 </div>
