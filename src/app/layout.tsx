@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ConvexClientProvider } from "@/components/providers/ConvexClientProvider";
 import { AuthProvider } from "@/components/providers/SessionProvider";
+import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { SyncUser } from "@/components/providers/SyncUser";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
@@ -33,14 +34,16 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col`}
       >
         <AuthProvider>
-          <ConvexClientProvider>
-            <SyncUser />
-            <Navbar />
-            <main className="flex-grow">
-              {children}
-            </main>
-            <Footer />
-          </ConvexClientProvider>
+          <ThemeProvider>
+            <ConvexClientProvider>
+              <SyncUser />
+              <Navbar />
+              <main className="flex-grow">
+                {children}
+              </main>
+              <Footer />
+            </ConvexClientProvider>
+          </ThemeProvider>
         </AuthProvider>
       </body>
     </html>

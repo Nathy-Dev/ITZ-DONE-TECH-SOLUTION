@@ -73,7 +73,7 @@ export const registerUser = mutation({
       email: args.email,
       password: args.password,
       name: args.name,
-      providerId: "credentials", // Fixed provider ID for credentials users
+      providerId: args.email, // Use email as providerId for uniqueness
     });
   },
 });

@@ -8,7 +8,9 @@ import { cn } from "@/lib/utils";
 import { signOut, useSession } from "next-auth/react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../../convex/_generated/api";
-import { GraduationCap, BookOpen, UserCircle } from "lucide-react";
+import { GraduationCap, BookOpen, UserCircle, Sun, Moon, LogOut, ArrowRightLeft, User } from "lucide-react";
+import { useTheme } from "@/components/providers/ThemeProvider";
+import { useRef } from "react";
 
 /**
  * Navbar component for ITZ-DONE TECH SOLUTION.
@@ -17,8 +19,28 @@ const Navbar = () => {
   const { data: session } = useSession();
   
   const isSignedIn = !!session;
+  const { theme, toggleTheme } = useTheme();
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+  const profileButtonRef = useRef<HTMLButtonElement>(null);
+
+  // Close menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        menuRef.current && 
+        !menuRef.current.contains(event.target as Node) &&
+        profileButtonRef.current &&
+        !profileButtonRef.current.contains(event.target as Node)
+      ) {
+        setUserMenuOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   // Handle scroll effect for glassmorphism
   useEffect(() => {
@@ -105,52 +127,110 @@ const Navbar = () => {
                 </Link>
               </>
             ) : (
-              <div className="flex items-center gap-4">
-                {session?.user?.image ? (
-                  <Image 
-                    src={session.user.image} 
-                    alt="User" 
-                    width={32} 
-                    height={32} 
-                    className="rounded-full ring-2 ring-blue-800/10" 
-                  />
-                ) : (
-                  <UserCircle className="w-8 h-8 text-slate-400" />
-                )}
-                
-                <div className="flex items-center gap-2 bg-slate-100 dark:bg-slate-800 p-1 rounded-xl">
-                  <button 
-                    onClick={toggleRole}
-                    className={cn(
-                      "flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold transition-all",
-                      convexUser?.role === "instructor" 
-                        ? "bg-blue-800 text-white shadow-sm" 
-                        : "text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700"
-                    )}
-                  >
-                    <GraduationCap className="w-3.5 h-3.5" />
-                    Instructor
-                  </button>
-                  <button 
-                    onClick={toggleRole}
-                    className={cn(
-                      "flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold transition-all",
-                      convexUser?.role !== "instructor" 
-                        ? "bg-blue-800 text-white shadow-sm" 
-                        : "text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700"
-                    )}
-                  >
-                    <BookOpen className="w-3.5 h-3.5" />
-                    Learner
-                  </button>
-                </div>
-
+              <div className="relative">
                 <button 
-                  onClick={() => signOut()}
-                  className="text-sm font-medium bg-slate-100 hover:bg-slate-200 px-4 py-2 rounded-xl transition-colors"
+                  ref={profileButtonRef}
+                  onClick={() => setUserMenuOpen(!userMenuOpen)}
+                  className="flex items-center gap-2 group transition-all"
                 >
-                  Sign Out
+                  {session?.user?.image ? (
+                    <Image 
+                      src={session.user.image} 
+                      alt="User" 
+                      width={40} 
+                      height={40} 
+                      className="rounded-full ring-2 ring-blue-800/10 group-hover:ring-blue-800/30 transition-all" 
+                    />
+                  ) : (
+                    <UserCircle className="w-10 h-10 text-slate-400 group-hover:text-blue-800 transition-colors" />
+                  )}
                 </button>
+
+                {/* User Dropdown Menu */}
+                {userMenuOpen && (
+                  <div 
+                    ref={menuRef}
+                    className="absolute right-0 mt-4 w-72 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border border-slate-200 dark:border-slate-800 rounded-[24px] shadow-2xl p-2 animate-in fade-in zoom-in-95 duration-200 origin-top-right z-[100]"
+                  >
+                    {/* User Header */}
+                    <div className="px-4 py-4 border-b border-slate-100 dark:border-slate-800 mb-2">
+                       <p className="font-bold text-sm truncate">{session?.user?.name}</p>
+                       <p className="text-xs text-muted-foreground truncate">{session?.user?.email}</p>
+                    </div>
+
+                    {/* Role Toggle */}
+                    <div className="p-1 mb-2">
+                       <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground px-3 mb-2">Switch Account</p>
+                       <div className="grid grid-cols-2 gap-1 bg-slate-100/50 dark:bg-slate-800/50 p-1 rounded-xl">
+                          <button 
+                            onClick={() => { toggleRole(); setUserMenuOpen(false); }}
+                            className={cn(
+                              "flex items-center justify-center gap-2 py-1.5 rounded-lg text-[11px] font-bold transition-all",
+                              convexUser?.role === "instructor" 
+                                ? "bg-white dark:bg-slate-900 text-blue-800 dark:text-cyan-400 shadow-sm" 
+                                : "text-slate-500 hover:text-slate-700 dark:text-slate-400"
+                            )}
+                          >
+                            <GraduationCap className="w-3 h-3" />
+                            Instructor
+                          </button>
+                          <button 
+                            onClick={() => { toggleRole(); setUserMenuOpen(false); }}
+                            className={cn(
+                              "flex items-center justify-center gap-2 py-1.5 rounded-lg text-[11px] font-bold transition-all",
+                              convexUser?.role !== "instructor" 
+                                ? "bg-white dark:bg-slate-900 text-blue-800 dark:text-cyan-400 shadow-sm" 
+                                : "text-slate-500 hover:text-slate-700 dark:text-slate-400"
+                            )}
+                          >
+                            <BookOpen className="w-3 h-3" />
+                            Learner
+                          </button>
+                       </div>
+                    </div>
+
+                    {/* Menu Items */}
+                    <div className="space-y-0.5">
+                      <Link 
+                        href="/profile" 
+                        className="flex items-center gap-3 px-4 py-2.5 text-sm font-medium rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                        onClick={() => setUserMenuOpen(false)}
+                      >
+                        <User className="w-4 h-4 text-slate-500" />
+                        Profile Settings
+                      </Link>
+                      
+                      <button 
+                        onClick={toggleTheme}
+                        className="w-full flex items-center justify-between px-4 py-2.5 text-sm font-medium rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                      >
+                        <div className="flex items-center gap-3">
+                          {theme === "light" ? <Moon className="w-4 h-4 text-slate-500" /> : <Sun className="w-4 h-4 text-slate-500" />}
+                          <span>{theme === "light" ? "Dark Mode" : "Light Mode"}</span>
+                        </div>
+                        <div className={cn(
+                          "w-8 h-4 rounded-full relative transition-colors duration-200",
+                          theme === "dark" ? "bg-blue-600" : "bg-slate-300"
+                        )}>
+                          <div className={cn(
+                            "absolute top-0.5 w-3 h-3 bg-white rounded-full transition-transform duration-200",
+                            theme === "dark" ? "translate-x-4.5" : "translate-x-0.5"
+                          )} />
+                        </div>
+                      </button>
+
+                      <div className="h-px bg-slate-100 dark:bg-slate-800 mx-2 my-1" />
+
+                      <button 
+                        onClick={() => { signOut(); setUserMenuOpen(false); }}
+                        className="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-red-600 rounded-xl hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                      >
+                        <LogOut className="w-4 h-4" />
+                        Sign Out
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </div>
@@ -191,28 +271,42 @@ const Navbar = () => {
               </>
             ) : (
               <>
-                <div className="flex items-center gap-3 py-2 border-b border-slate-100 dark:border-slate-800 mb-2">
-                  {session?.user?.image && (
-                    <Image 
-                      src={session.user.image} 
-                      alt="User" 
-                      width={40} 
-                      height={40} 
-                      className="rounded-full" 
-                    />
-                  )}
-                  <div className="flex flex-col">
-                    <span className="text-sm font-bold">{session?.user?.name}</span>
-                    <span className="text-xs text-muted-foreground">{session?.user?.email}</span>
-                  </div>
+                <div className="flex flex-col gap-2 mt-4">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground px-1">Theme</p>
+                  <button 
+                    onClick={toggleTheme}
+                    className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-900 rounded-xl"
+                  >
+                    <div className="flex items-center gap-3">
+                      {theme === "light" ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
+                      <span className="text-sm font-medium">{theme === "light" ? "Dark Mode" : "Light Mode"}</span>
+                    </div>
+                  </button>
                 </div>
+
+                <div className="flex flex-col gap-2 mt-4">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground px-1">Switch Role</p>
+                  <button 
+                    onClick={toggleRole}
+                    className="flex items-center gap-3 p-3 bg-slate-50 dark:bg-slate-900 rounded-xl"
+                  >
+                    <ArrowRightLeft className="w-5 h-5 text-blue-800" />
+                    <span className="text-sm font-medium">
+                      Switch to {convexUser?.role === "instructor" ? "Learner" : "Instructor"}
+                    </span>
+                  </button>
+                </div>
+
+                <div className="h-px bg-slate-100 dark:bg-slate-800 my-4" />
+                
                 <button 
                   onClick={() => {
                     signOut();
                     setMobileMenuOpen(false);
                   }}
-                  className="text-left text-red-600"
+                  className="flex items-center gap-3 p-3 text-red-600 font-bold"
                 >
+                  <LogOut className="w-5 h-5" />
                   Sign Out
                 </button>
               </>
