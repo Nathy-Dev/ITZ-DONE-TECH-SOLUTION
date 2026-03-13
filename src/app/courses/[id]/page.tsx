@@ -1,18 +1,21 @@
 "use client";
 
-import React, { use } from "react";
+import React, { use, useState } from "react";
 import { 
   Star, PlayCircle, Globe, Clock, 
   BarChart, Users, CheckCircle2, 
   ChevronDown, Share2, Heart,
   ShieldCheck,
-  Calendar
+  Calendar,
+  Loader2
 } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import { useQuery } from "convex/react";
+import { useQuery, useMutation } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
 import Image from "next/image";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -20,8 +23,25 @@ interface PageProps {
 
 export default function CourseDetailPage({ params }: PageProps) {
   const { id: courseId } = use(params) as { id: any };
+  const { data: session } = useSession();
+  const router = useRouter();
+  const [isEnrolling, setIsEnrolling] = useState(false);
+
   const course = useQuery(api.courses.getById, { id: courseId });
   const sections = useQuery(api.content.listSections, { courseId });
+  
+  const convexUser = useQuery(api.users.getUserByProviderId, 
+    session?.user?.id ? { 
+      providerId: session.user.id,
+      email: session.user.email ?? undefined 
+    } : "skip"
+  );
+
+  const enrollment = useQuery(api.enrollments.getEnrollment, 
+    convexUser?._id ? { courseId, userId: convexUser._id } : "skip"
+  );
+
+  const createEnrollment = useMutation(api.enrollments.createEnrollment);
 
   if (!course) {
     return (
@@ -31,13 +51,36 @@ export default function CourseDetailPage({ params }: PageProps) {
     );
   }
 
-  // Fallback for what you'll learn since it's not in schema yet
+  const handleEnroll = async () => {
+    if (!session) {
+      router.push("/login?callbackUrl=/courses/" + courseId);
+      return;
+    }
+
+    if (!convexUser) return;
+
+    setIsEnrolling(true);
+    try {
+      await createEnrollment({
+        courseId,
+        userId: convexUser._id,
+      });
+      // Refresh or redirect is handled by reactive useQuery 'enrollment'
+    } catch (error) {
+      console.error("Enrollment failed:", error);
+    } finally {
+      setIsEnrolling(false);
+    }
+  };
+
   const whatYouWillLearn = [
     "Comprehensive understanding of " + course.title,
     "Practical hands-on experience with real-world projects",
     "Master advanced concepts and industry best practices",
     "Gain skills that are highly in-demand in the current market",
   ];
+
+  const isEnrolled = !!enrollment;
 
   return (
     <div className="pt-24 pb-20 bg-white dark:bg-slate-950">
@@ -129,7 +172,11 @@ export default function CourseDetailPage({ params }: PageProps) {
             
             <div className="space-y-4">
                {sections?.map((section) => (
-                 <SectionAccordion key={section._id} section={section} />
+                 <SectionAccordion 
+                  key={section._id} 
+                  section={section} 
+                  isEnrolled={isEnrolled}
+                />
                ))}
                
                {sections?.length === 0 && (
@@ -200,12 +247,28 @@ export default function CourseDetailPage({ params }: PageProps) {
               </div>
 
               <div className="space-y-4">
-                <button className="w-full py-5 bg-blue-800 text-white font-black rounded-2xl hover:bg-blue-900 shadow-2xl shadow-blue-800/30 transition-all active:scale-[0.98] text-lg">
-                  Buy Now
-                </button>
-                <button className="w-full py-5 border-2 border-slate-100 dark:border-slate-800 font-black rounded-2xl hover:bg-slate-50 dark:hover:bg-slate-900 transition-all text-lg">
-                  Add to Cart
-                </button>
+                {isEnrolled ? (
+                  <Link 
+                    href={`/courses/${courseId}/lessons/start`} // We'll handle 'start' redirect in the viewer or helper
+                    className="w-full py-5 bg-emerald-600 text-white font-black rounded-2xl hover:bg-emerald-700 shadow-2xl shadow-emerald-800/30 transition-all active:scale-[0.98] text-lg flex items-center justify-center gap-2"
+                  >
+                    Go to Course
+                  </Link>
+                ) : (
+                  <button 
+                    onClick={handleEnroll}
+                    disabled={isEnrolling}
+                    className="w-full py-5 bg-blue-800 text-white font-black rounded-2xl hover:bg-blue-900 shadow-2xl shadow-blue-800/30 transition-all active:scale-[0.98] text-lg flex items-center justify-center gap-2 disabled:opacity-70"
+                  >
+                    {isEnrolling ? <Loader2 className="w-6 h-6 animate-spin" /> : "Enroll Now"}
+                  </button>
+                )}
+                
+                {!isEnrolled && (
+                  <button className="w-full py-5 border-2 border-slate-100 dark:border-slate-800 font-black rounded-2xl hover:bg-slate-50 dark:hover:bg-slate-900 transition-all text-lg">
+                    Add to Cart
+                  </button>
+                )}
               </div>
 
               <p className="text-[10px] text-center text-slate-400 font-black uppercase tracking-[0.1em]">30-Day Money-Back Guarantee</p>
@@ -252,8 +315,8 @@ export default function CourseDetailPage({ params }: PageProps) {
   );
 }
 
-function SectionAccordion({ section }: any) {
-  const [isOpen, setIsOpen] = React.useState(false);
+function SectionAccordion({ section, isEnrolled }: any) {
+  const [isOpen, setIsOpen] = useState(false);
   const lessons = useQuery(api.content.listLessons, { sectionId: section._id });
 
   return (
@@ -281,24 +344,43 @@ function SectionAccordion({ section }: any) {
       
       {isOpen && (
         <div className="p-2 space-y-1 animate-in slide-in-from-top-4 duration-300">
-          {lessons?.map((lesson: any) => (
-            <Link 
-              key={lesson._id} 
-              href={`/courses/${section.courseId}/lessons/${lesson._id}`}
-              className="flex items-center justify-between p-4 px-6 rounded-2xl hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors group/lesson"
-            >
-              <div className="flex items-center gap-4">
-                 <div className="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center text-blue-800 dark:text-cyan-400">
-                   <PlayCircle className="w-4 h-4" />
-                 </div>
-                 <span className="font-bold text-sm tracking-tight">{lesson.title}</span>
+          {lessons?.map((lesson: any) => {
+            const isLocked = !isEnrolled && !lesson.isFree;
+            
+            return (
+              <div 
+                key={lesson._id} 
+                className={cn(
+                  "flex items-center justify-between p-4 px-6 rounded-2xl transition-colors group/lesson",
+                  isLocked ? "bg-slate-50/50 dark:bg-slate-900/50 opacity-60 cursor-not-allowed" : "hover:bg-slate-50 dark:hover:bg-slate-800/50"
+                )}
+              >
+                <div className="flex items-center gap-4">
+                   <div className={cn(
+                     "w-8 h-8 rounded-lg flex items-center justify-center",
+                     isLocked ? "bg-slate-200 dark:bg-slate-800 text-slate-400" : "bg-blue-50 dark:bg-blue-900/20 text-blue-800 dark:text-cyan-400"
+                   )}>
+                     {isLocked ? <Clock className="w-4 h-4" /> : <PlayCircle className="w-4 h-4" />}
+                   </div>
+                   {isLocked ? (
+                     <span className="font-bold text-sm tracking-tight">{lesson.title}</span>
+                   ) : (
+                    <Link 
+                      href={`/courses/${section.courseId}/lessons/${lesson._id}`}
+                      className="font-bold text-sm tracking-tight hover:text-blue-800 dark:hover:text-cyan-400 transition-colors"
+                    >
+                      {lesson.title}
+                    </Link>
+                   )}
+                </div>
+                <div className="flex items-center gap-4 text-xs font-black text-slate-400">
+                  {lesson.isFree && <span className="text-emerald-500 uppercase tracking-widest text-[10px]">Preview</span>}
+                  {isLocked && <span className="uppercase tracking-widest text-[10px]">Locked</span>}
+                  <span>{lesson.duration || "5m"}</span>
+                </div>
               </div>
-              <div className="flex items-center gap-4 text-xs font-black text-slate-400">
-                {lesson.isFree && <span className="text-emerald-500 uppercase tracking-widest text-[10px]">Preview</span>}
-                <span>{lesson.duration || "5m"}</span>
-              </div>
-            </Link>
-          ))}
+            );
+          })}
           
           {lessons?.length === 0 && (
             <div className="p-8 text-center">

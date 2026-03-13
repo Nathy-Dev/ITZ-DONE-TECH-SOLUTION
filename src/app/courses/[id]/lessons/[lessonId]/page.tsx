@@ -1,7 +1,7 @@
 "use client";
 
-import React, { use, useState } from "react";
-import { useQuery } from "convex/react";
+import React, { use, useState, useEffect } from "react";
+import { useQuery, useMutation } from "convex/react";
 import { api } from "../../../../../../convex/_generated/api";
 import { 
   Play, 
@@ -13,11 +13,15 @@ import {
   Clock,
   ArrowLeft,
   Video,
-  FileText
+  FileText,
+  CheckCircle2,
+  Circle,
+  Lock
 } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-// import ReactMarkdown from 'react-markdown';
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 interface PageProps {
   params: Promise<{ id: string; lessonId: string }>;
@@ -25,19 +29,86 @@ interface PageProps {
 
 export default function LessonViewerPage({ params }: PageProps) {
   const { id: courseId, lessonId } = use(params) as { id: any; lessonId: any };
+  const { data: session } = useSession();
+  const router = useRouter();
+  
   const course = useQuery(api.courses.getById, { id: courseId });
-  const lesson = useQuery(api.content.getLessonById, { id: lessonId });
+  const lesson = useQuery(api.content.getLessonById, 
+    lessonId === "start" ? "skip" : { id: lessonId }
+  );
   const sections = useQuery(api.content.listSections, { courseId });
   
+  const convexUser = useQuery(api.users.getUserByProviderId, 
+    session?.user?.id ? { 
+      providerId: session.user.id,
+      email: session.user.email ?? undefined 
+    } : "skip"
+  );
+
+  const enrollment = useQuery(api.enrollments.getEnrollment, 
+    convexUser?._id ? { courseId, userId: convexUser._id } : "skip"
+  );
+
+  const progress = useQuery(api.progress.getCourseProgress, 
+    convexUser?._id ? { courseId, userId: convexUser._id } : "skip"
+  );
+
+  const completedLessonIds = useQuery(api.progress.getCompletedLessonIds, 
+    convexUser?._id ? { courseId, userId: convexUser._id } : "skip"
+  ) || [];
+
+  const toggleCompletion = useMutation(api.progress.toggleLessonCompletion);
+
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
-  if (!course || !lesson) {
+  const firstLesson = useQuery(api.content.getFirstLesson, { courseId });
+
+  // Handle "start" redirect
+  useEffect(() => {
+    if (lessonId === "start" && firstLesson) {
+      router.replace(`/courses/${courseId}/lessons/${firstLesson._id}`);
+    }
+  }, [lessonId, firstLesson, courseId, router]);
+
+  if (!course || (lessonId !== "start" && !lesson)) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white dark:bg-slate-950">
         <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-800 border-t-transparent"></div>
       </div>
     );
   }
+
+  const isEnrolled = !!enrollment;
+  const isLocked = !isEnrolled && lesson && !lesson.isFree;
+
+  if (isLocked) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-white dark:bg-slate-950 p-6 text-center space-y-6">
+        <div className="w-20 h-20 bg-slate-100 dark:bg-slate-800 rounded-3xl flex items-center justify-center text-slate-400">
+          <Lock className="w-10 h-10" />
+        </div>
+        <div className="space-y-2">
+          <h1 className="text-2xl font-black">This lesson is locked</h1>
+          <p className="text-slate-500 max-w-md">Please enroll in the course to access all lessons and resources.</p>
+        </div>
+        <Link 
+          href={`/courses/${courseId}`}
+          className="px-8 py-4 bg-blue-800 text-white font-black rounded-2xl hover:bg-blue-900 transition-all shadow-xl shadow-blue-800/20"
+        >
+          View Course Details
+        </Link>
+      </div>
+    );
+  }
+
+  const handleToggleComplete = async () => {
+    if (!convexUser || !lesson) return;
+    await toggleCompletion({
+      lessonId: lesson._id,
+      courseId,
+      userId: convexUser._id,
+    });
+  };
 
   return (
     <div className="flex flex-col h-screen bg-white dark:bg-slate-950 overflow-hidden">
@@ -49,7 +120,7 @@ export default function LessonViewerPage({ params }: PageProps) {
           </Link>
           <div className="hidden md:block">
             <h1 className="font-black text-sm tracking-tight truncate max-w-md">{course.title}</h1>
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{lesson.title}</p>
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{lesson?.title || "Starting Course..."}</p>
           </div>
         </div>
         
@@ -60,10 +131,20 @@ export default function LessonViewerPage({ params }: PageProps) {
           >
             <Menu className="w-5 h-5" />
           </button>
-          <div className="h-2 w-32 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden hidden sm:block">
-             <div className="h-full bg-blue-800 w-1/3" />
-          </div>
-          <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 hidden sm:block">35% Complete</span>
+          
+          {progress && (
+            <div className="flex items-center gap-4">
+              <div className="h-2 w-32 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden hidden sm:block">
+                 <div 
+                  className="h-full bg-blue-800 transition-all duration-1000" 
+                  style={{ width: `${progress.percentage}%` }} 
+                />
+              </div>
+              <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 hidden sm:block">
+                {progress.percentage}% Complete
+              </span>
+            </div>
+          )}
         </div>
       </header>
 
@@ -83,6 +164,8 @@ export default function LessonViewerPage({ params }: PageProps) {
                   section={section} 
                   activeLessonId={lessonId}
                   courseId={courseId}
+                  completedLessonIds={completedLessonIds}
+                  isEnrolled={isEnrolled}
                 />
              ))}
           </div>
@@ -90,75 +173,108 @@ export default function LessonViewerPage({ params }: PageProps) {
 
         {/* Main Lesson Content */}
         <main className="flex-grow overflow-y-auto bg-white dark:bg-slate-950">
-          {/* Video Player Section */}
-          <div className="aspect-video w-full bg-slate-950 flex items-center justify-center relative group">
-             {lesson.videoUrl ? (
-               <div className="w-full h-full">
-                  {/* Real video player would go here, using a placeholder for now */}
-                  <div className="w-full h-full flex flex-col items-center justify-center text-white/20 gap-4">
-                    <Video className="w-24 h-24" />
-                    <p className="font-black uppercase tracking-[0.3em] text-xs">Video Content Ready</p>
-                    <p className="text-[10px] opacity-50">{lesson.videoUrl}</p>
-                    <button className="mt-8 w-20 h-20 bg-blue-800 text-white rounded-full flex items-center justify-center hover:scale-110 shadow-2xl transition-all">
-                      <Play className="w-8 h-8 fill-current translate-x-1" />
+          {lessonId === "start" ? (
+            <div className="w-full h-full flex flex-col items-center justify-center space-y-6 p-12 text-center">
+              <div className="w-24 h-24 bg-blue-50 dark:bg-blue-900/20 rounded-[2rem] flex items-center justify-center text-blue-800 dark:text-cyan-400">
+                <Play className="w-12 h-12 fill-current translate-x-1" />
+              </div>
+              <div className="space-y-2">
+                <h2 className="text-3xl font-black">Ready to start?</h2>
+                <p className="text-slate-500 max-w-sm">Select a lesson from the sidebar to begin your learning journey.</p>
+              </div>
+            </div>
+          ) : (
+            <>
+              {/* Video Player Section */}
+              <div className="aspect-video w-full bg-slate-950 flex items-center justify-center relative group">
+                {lesson?.videoUrl ? (
+                  <div className="w-full h-full">
+                      <div className="w-full h-full flex flex-col items-center justify-center text-white/20 gap-4">
+                        <Video className="w-24 h-24" />
+                        <p className="font-black uppercase tracking-[0.3em] text-xs">Video Content Ready</p>
+                        <p className="text-[10px] opacity-50">{lesson.videoUrl}</p>
+                        <button className="mt-8 w-20 h-20 bg-blue-800 text-white rounded-full flex items-center justify-center hover:scale-110 shadow-2xl transition-all">
+                          <Play className="w-8 h-8 fill-current translate-x-1" />
+                        </button>
+                      </div>
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center text-slate-500 gap-4">
+                      <PlayCircle className="w-16 h-16 opacity-20" />
+                      <p className="font-black uppercase tracking-widest text-xs">No video for this lesson</p>
+                  </div>
+                )}
+              </div>
+
+              {/* Lesson Text Content */}
+              <div className="max-w-4xl mx-auto p-12 space-y-8">
+                <div className="flex justify-between items-start gap-8">
+                  <div className="space-y-4">
+                    <h2 className="text-4xl font-black tracking-tighter">{lesson?.title}</h2>
+                    <div className="flex items-center gap-6 text-xs font-black uppercase tracking-widest text-slate-400">
+                        <div className="flex items-center gap-2">
+                          <Clock className="w-4 h-4" />
+                          <span>{lesson?.duration || "10m"}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <FileText className="w-4 h-4" />
+                          <span>Lesson Documentation</span>
+                        </div>
+                    </div>
+                  </div>
+
+                  {isEnrolled && (
+                    <button 
+                      onClick={handleToggleComplete}
+                      className={cn(
+                        "flex items-center gap-2 px-6 py-3 rounded-2xl font-black text-xs uppercase tracking-widest transition-all shadow-lg",
+                        completedLessonIds.includes(lesson?._id)
+                          ? "bg-emerald-100 text-emerald-700 shadow-emerald-200"
+                          : "bg-slate-100 text-slate-600 hover:bg-emerald-50 hover:text-emerald-600"
+                      )}
+                    >
+                      {completedLessonIds.includes(lesson?._id) ? (
+                        <><CheckCircle2 className="w-4 h-4 transition-all" /> Completed</>
+                      ) : (
+                        <><Circle className="w-4 h-4" /> Mark as Done</>
+                      )}
                     </button>
-                  </div>
-               </div>
-             ) : (
-               <div className="flex flex-col items-center text-slate-500 gap-4">
-                  <PlayCircle className="w-16 h-16 opacity-20" />
-                  <p className="font-black uppercase tracking-widest text-xs">No video for this lesson</p>
-               </div>
-             )}
-          </div>
+                  )}
+                </div>
 
-          {/* Lesson Text Content */}
-          <div className="max-w-4xl mx-auto p-12 space-y-8">
-            <div className="space-y-4">
-               <h2 className="text-4xl font-black tracking-tighter">{lesson.title}</h2>
-               <div className="flex items-center gap-6 text-xs font-black uppercase tracking-widest text-slate-400">
-                  <div className="flex items-center gap-2">
-                    <Clock className="w-4 h-4" />
-                    <span>{lesson.duration || "10m"}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <FileText className="w-4 h-4" />
-                    <span>Lesson Documentation</span>
-                  </div>
-               </div>
-            </div>
+                <article className="prose prose-slate dark:prose-invert max-w-none">
+                  {lesson?.content ? (
+                    <div className="text-slate-600 dark:text-slate-300 leading-relaxed text-lg font-medium whitespace-pre-wrap">
+                        {lesson.content}
+                    </div>
+                  ) : (
+                    <div className="p-12 border-2 border-dashed border-slate-100 dark:border-slate-800 rounded-[32px] text-center">
+                        <p className="text-slate-400 font-bold">No additional resources for this lesson.</p>
+                    </div>
+                  )}
+                </article>
 
-            <article className="prose prose-slate dark:prose-invert max-w-none">
-               {lesson.content ? (
-                 <div className="text-slate-600 dark:text-slate-300 leading-relaxed text-lg font-medium whitespace-pre-wrap">
-                    {lesson.content}
-                 </div>
-               ) : (
-                 <div className="p-12 border-2 border-dashed border-slate-100 dark:border-slate-800 rounded-[32px] text-center">
-                    <p className="text-slate-400 font-bold">No additional resources for this lesson.</p>
-                 </div>
-               )}
-            </article>
-
-            {/* Navigation Buttons */}
-            <div className="pt-12 border-t border-slate-100 dark:border-slate-800 flex justify-between">
-               <button className="flex items-center gap-3 px-6 py-3 border border-slate-200 dark:border-slate-800 rounded-2xl font-bold hover:bg-slate-50 transition-all text-sm group">
-                  <ChevronLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
-                  Previous Lesson
-               </button>
-               <button className="flex items-center gap-3 px-8 py-3 bg-blue-800 text-white rounded-2xl font-bold hover:bg-blue-900 shadow-xl shadow-blue-800/20 transition-all text-sm group">
-                  Next Lesson
-                  <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-               </button>
-            </div>
-          </div>
+                {/* Navigation Buttons */}
+                <div className="pt-12 border-t border-slate-100 dark:border-slate-800 flex justify-between">
+                  <button className="flex items-center gap-3 px-6 py-3 border border-slate-200 dark:border-slate-800 rounded-2xl font-bold hover:bg-slate-50 transition-all text-sm group">
+                      <ChevronLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
+                      Previous Lesson
+                  </button>
+                  <button className="flex items-center gap-3 px-8 py-3 bg-blue-800 text-white rounded-2xl font-bold hover:bg-blue-900 shadow-xl shadow-blue-800/20 transition-all text-sm group">
+                      Next Lesson
+                      <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                  </button>
+                </div>
+              </div>
+            </>
+          )}
         </main>
       </div>
     </div>
   );
 }
 
-function SidebarSection({ section, activeLessonId, courseId }: any) {
+function SidebarSection({ section, activeLessonId, courseId, completedLessonIds, isEnrolled }: any) {
   const lessons = useQuery(api.content.listLessons, { sectionId: section._id });
   const [isOpen, setIsOpen] = useState(true);
 
@@ -182,34 +298,51 @@ function SidebarSection({ section, activeLessonId, courseId }: any) {
         <div className="pl-4 space-y-1 mt-1">
           {lessons?.map((l: any) => {
             const isActive = l._id === activeLessonId;
+            const isCompleted = completedLessonIds.includes(l._id);
+            const isLocked = !isEnrolled && !l.isFree;
+
             return (
-              <Link 
-                key={l._id} 
-                href={`/courses/${courseId}/lessons/${l._id}`}
-                className={cn(
-                  "flex items-center gap-3 p-3 rounded-[14px] transition-all group/item relative",
-                  isActive 
-                    ? "bg-blue-800 text-white shadow-lg shadow-blue-800/20" 
-                    : "hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400"
-                )}
-              >
-                <div className={cn(
-                  "w-6 h-6 rounded-lg flex items-center justify-center shrink-0",
-                  isActive ? "bg-white/20" : "bg-slate-100 dark:bg-slate-800"
-                )}>
-                  {isActive ? <PlayCircle className="w-4 h-4 fill-current" /> : <Play className="w-3 h-3 h-3" />}
-                </div>
-                <div className="flex flex-col">
-                  <span className="text-[11px] font-bold tracking-tight truncate w-44">{l.title}</span>
-                  <div className="flex items-center gap-2 mt-0.5">
-                    <span className="text-[9px] opacity-60 font-medium">{l.duration || "10m"}</span>
-                    {l.isFree && !isActive && <span className="text-[8px] bg-emerald-100 text-emerald-700 px-1 rounded font-black uppercase tracking-widest">Free</span>}
+              <div key={l._id} className="relative group/item">
+                <Link 
+                  href={isLocked ? "#" : `/courses/${courseId}/lessons/${l._id}`}
+                  className={cn(
+                    "flex items-center gap-3 p-3 rounded-[14px] transition-all relative",
+                    isActive 
+                      ? "bg-blue-800 text-white shadow-lg shadow-blue-800/20" 
+                      : isLocked 
+                        ? "opacity-50 cursor-not-allowed"
+                        : "hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400"
+                  )}
+                  onClick={(e) => isLocked && e.preventDefault()}
+                >
+                  <div className={cn(
+                    "w-6 h-6 rounded-lg flex items-center justify-center shrink-0",
+                    isActive ? "bg-white/20" : "bg-slate-100 dark:bg-slate-800"
+                  )}>
+                    {isCompleted ? (
+                      <CheckCircle2 className={cn("w-4 h-4", isActive ? "text-emerald-400" : "text-emerald-500")} />
+                    ) : isActive ? (
+                      <PlayCircle className="w-4 h-4 fill-current" />
+                    ) : isLocked ? (
+                      <Lock className="w-3 h-3" />
+                    ) : (
+                      <Play className="w-3 h-3" />
+                    )}
                   </div>
-                </div>
-                {isActive && (
-                  <div className="absolute right-3 w-1.5 h-1.5 bg-cyan-400 rounded-full animate-pulse" />
-                )}
-              </Link>
+                  <div className="flex flex-col">
+                    <span className={cn(
+                      "text-[11px] font-bold tracking-tight truncate w-40",
+                      isCompleted && !isActive && "text-slate-400 line-through decoration-emerald-500/30"
+                    )}>
+                      {l.title}
+                    </span>
+                    <div className="flex items-center gap-2 mt-0.5">
+                      <span className="text-[9px] opacity-60 font-medium">{l.duration || "10m"}</span>
+                      {l.isFree && !isActive && <span className="text-[8px] bg-emerald-100 text-emerald-700 px-1 rounded font-black uppercase tracking-widest">Free</span>}
+                    </div>
+                  </div>
+                </Link>
+              </div>
             );
           })}
         </div>

@@ -31,7 +31,19 @@ export default defineSchema({
     userId: v.id("users"),
     courseId: v.id("courses"),
     status: v.string(), // "active", "completed", "cancelled"
-  }),
+    enrolledAt: v.number(),
+  })
+    .index("by_user", ["userId"])
+    .index("by_course", ["courseId"])
+    .index("by_user_course", ["userId", "courseId"]),
+  progress: defineTable({
+    userId: v.id("users"),
+    courseId: v.id("courses"),
+    lessonId: v.id("lessons"),
+    completedAt: v.number(),
+  })
+    .index("by_user_lesson", ["userId", "lessonId"])
+    .index("by_user_course", ["userId", "courseId"]),
   sections: defineTable({
     courseId: v.id("courses"),
     title: v.string(),
