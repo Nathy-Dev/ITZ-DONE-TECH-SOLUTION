@@ -13,7 +13,6 @@ import {
   PlayCircle,
   Clock,
   ArrowLeft,
-  Video,
   FileText,
   CheckCircle2,
   Circle,
@@ -23,6 +22,17 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import dynamic from "next/dynamic";
+import MarkdownRenderer from "@/components/courses/MarkdownRenderer";
+
+const VideoPlayer = dynamic(() => import("@/components/courses/VideoPlayer"), { 
+  ssr: false,
+  loading: () => (
+    <div className="aspect-video w-full bg-slate-900 rounded-[2rem] flex items-center justify-center">
+      <div className="animate-spin rounded-full h-8 w-8 border-4 border-blue-800 border-t-transparent"></div>
+    </div>
+  )
+});
 
 interface PageProps {
   params: Promise<{ id: string; lessonId: string }>;
@@ -65,6 +75,7 @@ export default function LessonViewerPage({ params }: PageProps) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
   const firstLesson = useQuery(api.content.getFirstLesson, { courseId });
+  const allLessons = useQuery(api.content.listAllLessonsOrdered, { courseId });
 
   // Handle "start" redirect
   useEffect(() => {
@@ -111,6 +122,16 @@ export default function LessonViewerPage({ params }: PageProps) {
       courseId,
       userId: convexUser._id,
     });
+  };
+
+  // Find next and previous lessons for navigation
+  
+  const currentIndex = allLessons?.findIndex(l => l._id === lessonId) ?? -1;
+  const prevLesson = currentIndex > 0 ? allLessons?.[currentIndex - 1] : null;
+  const nextLesson = currentIndex < (allLessons?.length ?? 0) - 1 ? allLessons?.[currentIndex + 1] : null;
+
+  const navigateTo = (lId: string) => {
+    router.push(`/courses/${courseId}/lessons/${lId}`);
   };
 
   return (
@@ -191,16 +212,15 @@ export default function LessonViewerPage({ params }: PageProps) {
               {/* Video Player Section */}
               <div className="aspect-video w-full bg-slate-950 flex items-center justify-center relative group">
                 {lesson?.videoUrl ? (
-                  <div className="w-full h-full">
-                      <div className="w-full h-full flex flex-col items-center justify-center text-white/20 gap-4">
-                        <Video className="w-24 h-24" />
-                        <p className="font-black uppercase tracking-[0.3em] text-xs">Video Content Ready</p>
-                        <p className="text-[10px] opacity-50">{lesson.videoUrl}</p>
-                        <button className="mt-8 w-20 h-20 bg-blue-800 text-white rounded-full flex items-center justify-center hover:scale-110 shadow-2xl transition-all">
-                          <Play className="w-8 h-8 fill-current translate-x-1" />
-                        </button>
-                      </div>
-                  </div>
+                  <VideoPlayer 
+                    url={lesson.videoUrl} 
+                    title={lesson.title}
+                    onEnded={() => {
+                        if (!completedLessonIds.includes(lesson._id)) {
+                            handleToggleComplete();
+                        }
+                    }}
+                  />
                 ) : (
                   <div className="flex flex-col items-center text-slate-500 gap-4">
                       <PlayCircle className="w-16 h-16 opacity-20" />
@@ -247,9 +267,7 @@ export default function LessonViewerPage({ params }: PageProps) {
 
                 <article className="prose prose-slate dark:prose-invert max-w-none">
                   {lesson?.content ? (
-                    <div className="text-slate-600 dark:text-slate-300 leading-relaxed text-lg font-medium whitespace-pre-wrap">
-                        {lesson.content}
-                    </div>
+                    <MarkdownRenderer content={lesson.content} />
                   ) : (
                     <div className="p-12 border-2 border-dashed border-slate-100 dark:border-slate-800 rounded-[32px] text-center">
                         <p className="text-slate-400 font-bold">No additional resources for this lesson.</p>
@@ -259,12 +277,20 @@ export default function LessonViewerPage({ params }: PageProps) {
 
                 {/* Navigation Buttons */}
                 <div className="pt-12 border-t border-slate-100 dark:border-slate-800 flex justify-between">
-                  <button className="flex items-center gap-3 px-6 py-3 border border-slate-200 dark:border-slate-800 rounded-2xl font-bold hover:bg-slate-50 transition-all text-sm group">
+                  <button 
+                    onClick={() => prevLesson && navigateTo(prevLesson._id)}
+                    disabled={!prevLesson}
+                    className="flex items-center gap-3 px-6 py-3 border border-slate-200 dark:border-slate-800 rounded-2xl font-bold hover:bg-slate-50 transition-all text-sm group disabled:opacity-30 disabled:cursor-not-allowed"
+                  >
                       <ChevronLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
-                      Previous Lesson
+                      Previous
                   </button>
-                  <button className="flex items-center gap-3 px-8 py-3 bg-blue-800 text-white rounded-2xl font-bold hover:bg-blue-900 shadow-xl shadow-blue-800/20 transition-all text-sm group">
-                      Next Lesson
+                  <button 
+                    onClick={() => nextLesson && navigateTo(nextLesson._id)}
+                    disabled={!nextLesson}
+                    className="flex items-center gap-3 px-8 py-3 bg-blue-800 text-white rounded-2xl font-bold hover:bg-blue-900 shadow-xl shadow-blue-800/20 transition-all text-sm group disabled:opacity-30 disabled:cursor-not-allowed"
+                  >
+                      {nextLesson ? "Next Lesson" : "End of Course"}
                       <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                   </button>
                 </div>

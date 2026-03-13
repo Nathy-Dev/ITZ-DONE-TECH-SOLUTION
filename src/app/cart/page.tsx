@@ -1,3 +1,4 @@
+"use client";
 import Link from "next/link";
 import { ShoppingCart, Trash2, ArrowRight, ShieldCheck, Zap, CreditCard } from "lucide-react";
 import { useCart } from "@/components/providers/CartProvider";

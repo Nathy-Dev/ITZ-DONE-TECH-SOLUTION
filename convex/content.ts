@@ -138,3 +138,28 @@ export const getFirstLesson = query({
     return null;
   },
 });
+
+export const listAllLessonsOrdered = query({
+  args: { courseId: v.id("courses") },
+  handler: async (ctx, args) => {
+    const sections = await ctx.db
+      .query("sections")
+      .withIndex("by_course", (q) => q.eq("courseId", args.courseId))
+      .collect();
+
+    const sortedSections = sections.sort((a, b) => a.order - b.order);
+    const allLessons: any[] = [];
+
+    for (const section of sortedSections) {
+      const lessons = await ctx.db
+        .query("lessons")
+        .withIndex("by_section", (q) => q.eq("sectionId", section._id))
+        .collect();
+      
+      const sortedLessons = lessons.sort((a, b) => a.order - b.order);
+      allLessons.push(...sortedLessons);
+    }
+
+    return allLessons;
+  },
+});
