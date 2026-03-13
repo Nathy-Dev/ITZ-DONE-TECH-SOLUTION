@@ -109,3 +109,32 @@ export const deleteLesson = mutation({
     await ctx.db.delete(args.id);
   },
 });
+
+export const getFirstLesson = query({
+  args: { courseId: v.id("courses") },
+  handler: async (ctx, args) => {
+    const sections = await ctx.db
+      .query("sections")
+      .withIndex("by_course", (q) => q.eq("courseId", args.courseId))
+      .collect();
+
+    if (sections.length === 0) return null;
+
+    // Sort sections by order
+    const sortedSections = sections.sort((a, b) => a.order - b.order);
+
+    for (const section of sortedSections) {
+      const lessons = await ctx.db
+        .query("lessons")
+        .withIndex("by_section", (q) => q.eq("sectionId", section._id))
+        .collect();
+
+      if (lessons.length > 0) {
+        // Return the first lesson by order
+        return lessons.sort((a, b) => a.order - b.order)[0];
+      }
+    }
+
+    return null;
+  },
+});
