@@ -45,6 +45,14 @@ export default function CourseDetailPage({ params }: PageProps) {
 
   const createEnrollment = useMutation(api.enrollments.createEnrollment);
 
+  // Thumbnail resolution (Top level to avoid conditional hook violation)
+  const rawImage = course?.thumbnailUrl;
+  const isStorageId = !!(rawImage && !rawImage.startsWith("http") && !rawImage.startsWith("/"));
+  const resolvedUrl = useQuery(api.files.getImageUrl, 
+    (isStorageId && rawImage) ? { storageId: rawImage } : "skip"
+  );
+  const displayImage = isStorageId ? resolvedUrl : rawImage;
+
   if (!course) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950">
@@ -52,13 +60,6 @@ export default function CourseDetailPage({ params }: PageProps) {
       </div>
     );
   }
-
-  const rawImage = course.thumbnailUrl;
-  const isStorageId = rawImage && !rawImage.startsWith("http") && !rawImage.startsWith("/");
-  const resolvedUrl = useQuery(api.files.getImageUrl, 
-    isStorageId ? { storageId: rawImage } : "skip"
-  );
-  const displayImage = isStorageId ? resolvedUrl : rawImage;
 
   const handleEnroll = async () => {
     if (!session) {

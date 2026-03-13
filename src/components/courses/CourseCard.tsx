@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 import Link from "next/link";
 import { Star, Clock, User, BarChart } from "lucide-react";
@@ -31,7 +33,7 @@ interface CourseCardProps {
  * - Price formatting with discounts
  */
 const CourseCard = ({ 
-  id, _id, title, instructor, instructorId, rating, reviews = 0, price, 
+  id, _id, title, instructor, rating, reviews = 0, price, 
   originalPrice, level, duration, badge, image, thumbnailUrl 
 }: CourseCardProps) => {
   const courseId = _id || id;
