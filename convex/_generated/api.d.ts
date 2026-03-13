@@ -11,7 +11,8 @@
 import type * as content from "../content.js";
 import type * as courses from "../courses.js";
 import type * as debug from "../debug.js";
-import type * as migrations from "../migrations.js";
+import type * as enrollments from "../enrollments.js";
+import type * as progress from "../progress.js";
 import type * as seed from "../seed.js";
 import type * as users from "../users.js";
 
@@ -25,7 +26,8 @@ declare const fullApi: ApiFromModules<{
   content: typeof content;
   courses: typeof courses;
   debug: typeof debug;
-  migrations: typeof migrations;
+  enrollments: typeof enrollments;
+  progress: typeof progress;
   seed: typeof seed;
   users: typeof users;
 }>;

@@ -63,9 +63,38 @@ export const listMyEnrollments = query({
     for (const enrollment of enrollments) {
       const course = await ctx.db.get(enrollment.courseId);
       if (course) {
+        // Fetch progress
+        const completedLessons = await ctx.db
+          .query("progress")
+          .withIndex("by_user_course", (q) => 
+            q.eq("userId", args.userId).eq("courseId", enrollment.courseId)
+          )
+          .collect();
+
+        const sections = await ctx.db
+          .query("sections")
+          .withIndex("by_course", (q) => q.eq("courseId", enrollment.courseId))
+          .collect();
+        
+        let totalLessonsCount = 0;
+        for (const section of sections) {
+          const lessons = await ctx.db
+            .query("lessons")
+            .withIndex("by_section", (q) => q.eq("sectionId", section._id))
+            .collect();
+          totalLessonsCount += lessons.length;
+        }
+
         results.push({
           ...enrollment,
           course,
+          progress: {
+            completedCount: completedLessons.length,
+            totalCount: totalLessonsCount,
+            percentage: totalLessonsCount > 0 
+              ? Math.round((completedLessons.length / totalLessonsCount) * 100) 
+              : 0,
+          }
         });
       }
     }

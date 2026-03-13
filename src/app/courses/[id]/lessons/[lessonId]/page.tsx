@@ -3,6 +3,7 @@
 import React, { use, useState, useEffect } from "react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../../../../../convex/_generated/api";
+import { Id } from "../../../../../../convex/_generated/dataModel";
 import { 
   Play, 
   ChevronLeft, 
@@ -28,7 +29,9 @@ interface PageProps {
 }
 
 export default function LessonViewerPage({ params }: PageProps) {
-  const { id: courseId, lessonId } = use(params) as { id: any; lessonId: any };
+  const resolvedParams = use(params);
+  const courseId = resolvedParams.id as Id<"courses">;
+  const lessonId = resolvedParams.lessonId as Id<"lessons"> | "start";
   const { data: session } = useSession();
   const router = useRouter();
   
@@ -274,7 +277,13 @@ export default function LessonViewerPage({ params }: PageProps) {
   );
 }
 
-function SidebarSection({ section, activeLessonId, courseId, completedLessonIds, isEnrolled }: any) {
+function SidebarSection({ section, activeLessonId, courseId, completedLessonIds, isEnrolled }: {
+  section: any;
+  activeLessonId: string;
+  courseId: string;
+  completedLessonIds: string[];
+  isEnrolled: boolean;
+}) {
   const lessons = useQuery(api.content.listLessons, { sectionId: section._id });
   const [isOpen, setIsOpen] = useState(true);
 

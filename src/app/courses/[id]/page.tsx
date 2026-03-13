@@ -13,6 +13,7 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
+import { Id } from "../../../../convex/_generated/dataModel";
 import Image from "next/image";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
@@ -22,7 +23,8 @@ interface PageProps {
 }
 
 export default function CourseDetailPage({ params }: PageProps) {
-  const { id: courseId } = use(params) as { id: any };
+  const resolvedParams = use(params);
+  const courseId = resolvedParams.id as Id<"courses">;
   const { data: session } = useSession();
   const router = useRouter();
   const [isEnrolling, setIsEnrolling] = useState(false);
@@ -315,7 +317,7 @@ export default function CourseDetailPage({ params }: PageProps) {
   );
 }
 
-function SectionAccordion({ section, isEnrolled }: any) {
+function SectionAccordion({ section, isEnrolled }: { section: any; isEnrolled: boolean }) {
   const [isOpen, setIsOpen] = useState(false);
   const lessons = useQuery(api.content.listLessons, { sectionId: section._id });
 
