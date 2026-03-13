@@ -24,7 +24,7 @@ import CourseCard from "@/components/courses/CourseCard";
 import { cn } from "@/lib/utils";
 import { useQuery } from "convex/react";
 import { api } from "../../../convex/_generated/api";
-import { Doc } from "../../../convex/_generated/dataModel";
+import { Doc, Id } from "../../../convex/_generated/dataModel";
 
 export default function DashboardPage() {
   const { data: session, status } = useSession();
@@ -125,7 +125,7 @@ function LearnerDashboard({ enrolledCourses, allCourses }: {
   allCourses: Doc<"courses">[] | undefined 
 }) {
   // Find course with most progress or just the first one
-  const featuredEnrollment = enrolledCourses?.sort((a, b) => b.progress.percentage - a.progress.percentage)[0];
+  const featuredEnrollment = enrolledCourses?.sort((a: EnrollmentWithCourse, b: EnrollmentWithCourse) => b.progress.percentage - a.progress.percentage)[0];
 
   return (
     <div className="grid lg:grid-cols-3 gap-8">
@@ -258,7 +258,7 @@ function LearnerDashboard({ enrolledCourses, allCourses }: {
               <div className="p-4 bg-white/10 rounded-2xl border border-white/10">
                 <p className="text-[9px] text-blue-200 uppercase font-black tracking-widest mb-1">Completed</p>
                 <p className="text-2xl font-black">
-                  {enrolledCourses?.filter(e => e.progress.percentage === 100).length || 0}
+                  {enrolledCourses?.filter((e: EnrollmentWithCourse) => e.progress.percentage === 100).length || 0}
                 </p>
               </div>
             </div>
