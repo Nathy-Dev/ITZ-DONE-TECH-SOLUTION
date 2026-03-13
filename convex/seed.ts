@@ -15,6 +15,8 @@ export const seed = mutation({
         level: "Advanced",
         duration: "24h 45m",
         studentsEnrolled: 1250,
+        isPublished: true,
+        publishedAt: Date.now(),
       },
       {
         title: "AI Engineering with Python & OpenAI API",
@@ -27,6 +29,8 @@ export const seed = mutation({
         level: "Intermediate",
         duration: "18h 20m",
         studentsEnrolled: 840,
+        isPublished: true,
+        publishedAt: Date.now(),
       },
       {
         title: "Modern UI/UX Design with Figma & Framer",
@@ -39,6 +43,8 @@ export const seed = mutation({
         level: "Beginner",
         duration: "12h 15m",
         studentsEnrolled: 2100,
+        isPublished: true,
+        publishedAt: Date.now(),
       },
     ];
 
