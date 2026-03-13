@@ -1,6 +1,9 @@
 import React from "react";
 import Link from "next/link";
 import { Star, Clock, User, BarChart } from "lucide-react";
+import { useQuery } from "convex/react";
+import { api } from "../../../convex/_generated/api";
+import Image from "next/image";
 
 interface CourseCardProps {
   id?: string;
@@ -33,16 +36,27 @@ const CourseCard = ({
 }: CourseCardProps) => {
   const courseId = _id || id;
   const displayInstructor = instructor || "ITZ-DONE Instructor";
-  const displayImage = thumbnailUrl || image;
+  const rawImage = thumbnailUrl || image;
+  
+  // Check if rawImage is a external URL or a Convex storage ID
+  const isStorageId = rawImage && !rawImage.startsWith("http") && !rawImage.startsWith("/");
+  
+  const resolvedUrl = useQuery(api.files.getImageUrl, 
+    isStorageId ? { storageId: rawImage as string } : "skip"
+  );
+
+  const displayImage = isStorageId ? resolvedUrl : rawImage;
+
   return (
     <Link href={`/courses/${courseId}`} className="group block bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl overflow-hidden hover:shadow-xl transition-all h-full flex flex-col">
       {/* Course Image */}
       <div className="relative aspect-video overflow-hidden bg-slate-100 dark:bg-slate-800">
         {displayImage ? (
-           <img 
+           <Image 
              src={displayImage} 
              alt={title} 
-             className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" 
+             fill
+             className="object-cover group-hover:scale-110 transition-transform duration-500" 
            />
         ) : (
           <div className="absolute inset-0 bg-gradient-to-br from-blue-800/20 to-cyan-500/20 group-hover:scale-110 transition-transform duration-500 flex items-center justify-center">

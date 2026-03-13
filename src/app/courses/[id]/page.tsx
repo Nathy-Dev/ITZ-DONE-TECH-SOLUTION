@@ -53,6 +53,13 @@ export default function CourseDetailPage({ params }: PageProps) {
     );
   }
 
+  const rawImage = course.thumbnailUrl;
+  const isStorageId = rawImage && !rawImage.startsWith("http") && !rawImage.startsWith("/");
+  const resolvedUrl = useQuery(api.files.getImageUrl, 
+    isStorageId ? { storageId: rawImage } : "skip"
+  );
+  const displayImage = isStorageId ? resolvedUrl : rawImage;
+
   const handleEnroll = async () => {
     if (!session) {
       router.push("/login?callbackUrl=/courses/" + courseId);
@@ -224,9 +231,9 @@ export default function CourseDetailPage({ params }: PageProps) {
           <div className="sticky top-32 p-1 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-[3rem] shadow-2xl overflow-hidden">
             {/* Preview Section */}
             <div className="relative aspect-video bg-slate-900 rounded-[2.75rem] flex items-center justify-center group overflow-hidden m-2">
-              {course.thumbnailUrl ? (
+              {displayImage ? (
                 <Image 
-                  src={course.thumbnailUrl} 
+                  src={displayImage} 
                   alt={course.title} 
                   fill 
                   className="object-cover opacity-60 group-hover:scale-105 transition-transform duration-700"

@@ -120,6 +120,23 @@ interface EnrollmentWithCourse {
   };
 }
 
+function ThumbnailImage({ thumbnailUrl, title, className }: { thumbnailUrl: string | undefined; title: string; className?: string }) {
+  const isStorageId = thumbnailUrl && !thumbnailUrl.startsWith("http") && !thumbnailUrl.startsWith("/");
+  const resolvedUrl = useQuery(api.files.getImageUrl, isStorageId ? { storageId: thumbnailUrl } : "skip");
+  const displayImage = isStorageId ? resolvedUrl : thumbnailUrl;
+
+  if (!displayImage) return <div className="absolute inset-0 bg-gradient-to-br from-blue-800/40 to-cyan-500/40" />;
+
+  return (
+    <Image 
+      src={displayImage} 
+      alt={title} 
+      fill
+      className={cn("object-cover", className)} 
+    />
+  );
+}
+
 function LearnerDashboard({ enrolledCourses, allCourses }: { 
   enrolledCourses: EnrollmentWithCourse[] | undefined; 
   allCourses: Doc<"courses">[] | undefined 
@@ -146,16 +163,11 @@ function LearnerDashboard({ enrolledCourses, allCourses }: {
 
               <div className="flex flex-col md:flex-row gap-8 items-start">
                 <div className="w-full md:w-56 aspect-video bg-slate-900 rounded-2xl overflow-hidden relative shadow-2xl">
-                  {featuredEnrollment.course.thumbnailUrl ? (
-                    <Image 
-                      src={featuredEnrollment.course.thumbnailUrl} 
-                      alt={featuredEnrollment.course.title} 
-                      fill
-                      className="object-cover opacity-60" 
-                    />
-                  ) : (
-                    <div className="absolute inset-0 bg-gradient-to-br from-blue-800/40 to-cyan-500/40" />
-                  )}
+                  <ThumbnailImage 
+                    thumbnailUrl={featuredEnrollment.course.thumbnailUrl} 
+                    title={featuredEnrollment.course.title}
+                    className="opacity-60"
+                  />
                   <div className="absolute inset-0 flex items-center justify-center">
                      <PlayCircle className="w-12 h-12 text-white/80 group-hover:scale-110 transition-transform" />
                   </div>
@@ -338,16 +350,11 @@ function InstructorDashboard({ courses }: { courses: Doc<"courses">[] | undefine
             {courses?.map((course) => (
               <div key={course._id} className="flex flex-col md:flex-row items-center gap-6 p-5 border border-slate-50 dark:border-slate-800 rounded-3xl hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-all group">
                 <div className="w-full md:w-40 aspect-video bg-slate-900 rounded-2xl overflow-hidden relative shadow-lg">
-                   {course.thumbnailUrl ? (
-                     <Image 
-                        src={course.thumbnailUrl} 
-                        alt={course.title} 
-                        fill
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
-                      />
-                   ) : (
-                     <div className="absolute inset-0 bg-blue-800/30 flex items-center justify-center text-white/50"><Video /></div>
-                   )}
+                   <ThumbnailImage 
+                      thumbnailUrl={course.thumbnailUrl} 
+                      title={course.title}
+                      className="group-hover:scale-105 transition-transform duration-500"
+                   />
                 </div>
                 <div className="flex-grow">
                   <h4 className="font-black text-xl">{course.title}</h4>
