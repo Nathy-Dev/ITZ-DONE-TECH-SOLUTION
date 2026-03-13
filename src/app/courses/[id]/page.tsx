@@ -1,105 +1,97 @@
 "use client";
 
-import React from "react";
+import React, { use } from "react";
 import { 
   Star, PlayCircle, Globe, Clock, 
   BarChart, Users, CheckCircle2, 
-  ChevronDown, Share2, Heart, Flag 
+  ChevronDown, Share2, Heart,
+  ShieldCheck,
+  Calendar
 } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { useQuery } from "convex/react";
+import { api } from "../../../../convex/_generated/api";
+import Image from "next/image";
 
-/**
- * Course Detail Page.
- * Dynamic route for individual courses.
- * Shows detailed curriculum, instructor, and price/enrollment options.
- */
-export default function CourseDetailPage() {
-  // Static mockup data for a single course (since we're building the frontend)
-  const course = {
-    title: "Mastering Next.js 15: The Complete Full-Stack Guide",
-    description: "Learn Next.js 15 by building production-ready applications with React 19, Tailwind CSS, Prisma, and PostgreSql. This course covers everything from fundamentals to advanced patterns like Server Actions and AI Integration.",
-    rating: 4.9,
-    reviews: 1250,
-    students: 15420,
-    lastUpdated: "February 2025",
-    language: "English",
-    price: 49.99,
-    originalPrice: 129.99,
-    instructor: {
-      name: "Nathy Dev",
-      bio: "Senior Full-Stack Engineer with 10+ years of experience in building scalable web applications. Passionate about teaching modern tech stacks.",
-      role: "Lead Instructor & Software Architect",
-      coursesCount: 15,
-      studentsCount: "50,000+",
-    }
-  };
+interface PageProps {
+  params: Promise<{ id: string }>;
+}
 
+export default function CourseDetailPage({ params }: PageProps) {
+  const { id: courseId } = use(params) as { id: any };
+  const course = useQuery(api.courses.getById, { id: courseId });
+  const sections = useQuery(api.content.listSections, { courseId });
+
+  if (!course) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950">
+        <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-800 border-t-transparent"></div>
+      </div>
+    );
+  }
+
+  // Fallback for what you'll learn since it's not in schema yet
   const whatYouWillLearn = [
-    "Build performant full-stack applications with Next.js 15 and React 19",
-    "Master Server Components and Client Components architecture",
-    "Implement complex state management and Server Actions",
-    "Integrate AI models and LLMs into your web applications",
-    "Master advanced Tailwind CSS techniques and Shadcn UI",
-    "Deploy production-ready apps to Vercel and AWS"
-  ];
-
-  const curriculum = [
-    { title: "Introduction to Next.js 15", lessons: 5, duration: "45m" },
-    { title: "React 19 Core Concepts", lessons: 8, duration: "1h 20m" },
-    { title: "Data Fetching & Caching Strategies", lessons: 12, duration: "2h 15m" },
-    { title: "Building the Frontend with Tailwind & Radix", lessons: 15, duration: "3h 45m" },
-    { title: "Server Actions and Form Handling", lessons: 10, duration: "1h 50m" },
-    { title: "AI Integration with Vercel AI SDK", lessons: 7, duration: "2h 00m" },
+    "Comprehensive understanding of " + course.title,
+    "Practical hands-on experience with real-world projects",
+    "Master advanced concepts and industry best practices",
+    "Gain skills that are highly in-demand in the current market",
   ];
 
   return (
     <div className="pt-24 pb-20 bg-white dark:bg-slate-950">
       {/* Course Header Banner (Dark) */}
-      <section className="bg-slate-900 text-white py-16">
-        <div className="max-w-7xl mx-auto px-6 md:px-12 grid lg:grid-cols-3 gap-12">
+      <section className="bg-slate-900 text-white py-20 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-900/20 to-transparent" />
+        <div className="max-w-7xl mx-auto px-6 md:px-12 grid lg:grid-cols-3 gap-12 relative z-10">
           <div className="lg:col-span-2 space-y-6">
-            <nav className="text-xs font-medium text-slate-400 flex gap-2">
-              <Link href="/courses">Courses</Link>
+            <nav className="text-xs font-black uppercase tracking-widest text-slate-400 flex gap-2">
+              <Link href="/courses" className="hover:text-cyan-400 transition-colors">Courses</Link>
               <span>/</span>
-              <span className="text-cyan-400">Development</span>
+              <span className="text-cyan-400">{course.category}</span>
               <span>/</span>
-              <span>Next.js</span>
+              <span>{course.level}</span>
             </nav>
             
-            <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight leading-tight">
+            <h1 className="text-4xl md:text-5xl font-black tracking-tight leading-tight">
               {course.title}
             </h1>
             
-            <p className="text-xl text-slate-300 leading-relaxed">
+            <p className="text-xl text-slate-300 leading-relaxed max-w-3xl">
               {course.description}
             </p>
 
-            <div className="flex flex-wrap items-center gap-6 text-sm">
-              <div className="flex items-center gap-1.5 text-amber-400">
-                <span className="font-bold text-lg">{course.rating}</span>
+            <div className="flex flex-wrap items-center gap-8 text-sm">
+              <div className="flex items-center gap-2 text-amber-400">
+                <span className="font-black text-2xl">{course.rating.toFixed(1)}</span>
                 <div className="flex">
-                  {[1, 2, 3, 4, 5].map((i) => <Star key={i} className="w-4 h-4 fill-current" />)}
+                  {[1, 2, 3, 4, 5].map((i) => (
+                    <Star key={i} className={cn("w-4 h-4 fill-current", i > Math.floor(course.rating) && "opacity-30")} />
+                  ))}
                 </div>
-                <span className="text-cyan-400 underline ml-1">({course.reviews} reviews)</span>
+                <span className="text-slate-400 ml-1">(2.5k reviews)</span>
               </div>
-              <div className="flex items-center gap-1.5">
-                <Users className="w-4 h-4" />
-                <span>{course.students.toLocaleString()} students</span>
+              <div className="flex items-center gap-2 text-slate-300">
+                <Users className="w-5 h-5 text-cyan-400" />
+                <span className="font-bold">{course.studentsEnrolled.toLocaleString()} students</span>
               </div>
             </div>
 
-            <div className="flex flex-wrap items-center gap-6 text-sm text-slate-300">
-              <div className="flex items-center gap-1.5 font-medium">
-                Created by <span className="text-cyan-400 underline">{course.instructor.name}</span>
+            <div className="flex flex-wrap items-center gap-8 text-sm text-slate-300 pt-4">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-full bg-blue-800 flex items-center justify-center font-bold text-[10px]">
+                  {course.instructorId.substring(0, 2).toUpperCase()}
+                </div>
+                <span>Created by <span className="text-cyan-400 font-bold">Instructor</span></span>
               </div>
-              <div className="flex items-center gap-1.5">
-                <ShieldCheck className="w-4 h-4" />
-                <span>Last updated {course.lastUpdated}</span>
+              <div className="flex items-center gap-2">
+                <Calendar className="w-4 h-4 text-slate-400" />
+                <span>Last updated {course.publishedAt ? new Date(course.publishedAt).toLocaleDateString() : "Recently"}</span>
               </div>
-              <div className="flex items-center gap-1.5">
-                <Globe className="w-4 h-4" />
-                <span>{course.language}</span>
+              <div className="flex items-center gap-2">
+                <Globe className="w-4 h-4 text-slate-400" />
+                <span>English</span>
               </div>
             </div>
           </div>
@@ -110,13 +102,15 @@ export default function CourseDetailPage() {
         {/* Main Content (Left) */}
         <div className="lg:col-span-2 space-y-16">
           {/* What you'll learn */}
-          <section className="p-8 border border-slate-200 dark:border-slate-800 rounded-3xl">
-            <h2 className="text-2xl font-bold mb-8">What you'll learn</h2>
-            <div className="grid sm:grid-cols-2 gap-6">
+          <section className="p-10 bg-slate-50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-800 rounded-[32px]">
+            <h2 className="text-2xl font-black mb-8">What you&apos;ll learn</h2>
+            <div className="grid sm:grid-cols-2 gap-8">
               {whatYouWillLearn.map((item, idx) => (
                 <div key={idx} className="flex gap-4">
-                  <CheckCircle2 className="w-5 h-5 text-blue-800 shrink-0" />
-                  <p className="text-sm dark:text-slate-300 leading-relaxed">{item}</p>
+                  <div className="w-6 h-6 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center shrink-0">
+                    <CheckCircle2 className="w-4 h-4 text-blue-800 dark:text-cyan-400" />
+                  </div>
+                  <p className="text-sm dark:text-slate-300 leading-relaxed font-medium">{item}</p>
                 </div>
               ))}
             </div>
@@ -124,113 +118,131 @@ export default function CourseDetailPage() {
 
           {/* Curriculum */}
           <section>
-            <h2 className="text-2xl font-bold mb-8">Course content</h2>
-            <div className="flex justify-between items-center mb-6 text-sm">
-              <div className="flex gap-4">
-                <span>6 sections</span>
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+              <h2 className="text-2xl font-black">Course Curriculum</h2>
+              <div className="flex gap-4 text-sm font-bold text-slate-500">
+                <span>{sections?.length || 0} sections</span>
                 <span>•</span>
-                <span>57 lessons</span>
-                <span>•</span>
-                <span>24h 45m total length</span>
+                <span>{course.duration} total length</span>
               </div>
-              <button className="text-cyan-500 font-bold hover:underline">Expand all sections</button>
             </div>
             
-            <div className="border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden">
-              {curriculum.map((section, idx) => (
-                <div key={idx} className={cn(
-                  "border-b border-slate-100 dark:border-slate-900 p-6 flex justify-between items-center hover:bg-slate-50 dark:hover:bg-slate-900/50 cursor-pointer transition-all",
-                  idx === curriculum.length - 1 && "border-0"
-                )}>
-                  <div className="flex items-center gap-4">
-                    <ChevronDown className="w-5 h-5 text-muted-foreground" />
-                    <div>
-                      <h4 className="font-bold">{section.title}</h4>
-                      <p className="text-xs text-muted-foreground mt-1">{section.lessons} lessons</p>
-                    </div>
-                  </div>
-                  <span className="text-sm text-muted-foreground">{section.duration}</span>
-                </div>
-              ))}
+            <div className="space-y-4">
+               {sections?.map((section) => (
+                 <SectionAccordion key={section._id} section={section} />
+               ))}
+               
+               {sections?.length === 0 && (
+                 <div className="text-center py-12 border-2 border-dashed border-slate-100 dark:border-slate-800 rounded-[32px]">
+                   <p className="text-muted-foreground uppercase font-black text-xs tracking-widest">No content available yet</p>
+                 </div>
+               )}
             </div>
           </section>
 
-          {/* Instructor */}
-          <section>
-            <h2 className="text-2xl font-bold mb-8">Instructor</h2>
-            <div className="space-y-6">
-              <div className="flex items-center gap-6">
-                <div className="w-20 h-20 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center text-blue-800 font-bold text-2xl">
-                  ND
-                </div>
+          {/* Instructor Placeholder */}
+          <section className="p-10 border border-slate-100 dark:border-slate-800 rounded-[32px]">
+            <h2 className="text-2xl font-black mb-8 text-blue-800 dark:text-cyan-400">Your Instructor</h2>
+            <div className="flex flex-col md:flex-row gap-8 items-start">
+              <div className="w-24 h-24 bg-slate-900 rounded-3xl flex items-center justify-center text-white font-black text-3xl shadow-2xl">
+                {course.instructorId.substring(0, 2).toUpperCase()}
+              </div>
+              <div className="flex-grow space-y-4">
                 <div>
-                  <h3 className="text-xl font-bold text-blue-800">{course.instructor.name}</h3>
-                  <p className="text-sm text-muted-foreground">{course.instructor.role}</p>
+                  <h3 className="text-2xl font-black">Lead Instructor</h3>
+                  <p className="text-blue-800 dark:text-cyan-400 font-bold">Expert Educator</p>
                 </div>
+                <div className="flex gap-8 text-xs font-black uppercase tracking-widest text-slate-500">
+                  <div className="flex items-center gap-2">
+                    <Star className="w-4 h-4 text-amber-500 fill-current" />
+                    <span>4.9 Rating</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Users className="w-4 h-4 text-blue-500" />
+                    <span>1,000+ Students</span>
+                  </div>
+                </div>
+                <p className="text-slate-600 dark:text-slate-400 leading-relaxed font-medium">
+                  Leading expert in the field with years of practical experience and a passion for teaching modern technologies.
+                </p>
               </div>
-              <div className="flex gap-12 text-sm font-medium">
-                <div className="flex items-center gap-2">
-                  <Star className="w-4 h-4 text-amber-500 fill-current" />
-                  <span>4.9 Instructor Rating</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Users className="w-4 h-4 text-blue-500" />
-                  <span>{course.instructor.studentsCount} Students</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <PlayCircle className="w-4 h-4 text-blue-800" />
-                  <span>{course.instructor.coursesCount} Courses</span>
-                </div>
-              </div>
-              <p className="text-slate-600 dark:text-slate-400 leading-relaxed">
-                {course.instructor.bio}
-              </p>
             </div>
           </section>
         </div>
 
         {/* Sidebar (Right) */}
         <div className="relative">
-          <div className="sticky top-32 p-1 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-[2.5rem] shadow-2xl overflow-hidden">
-            {/* Preview Placeholder */}
-            <div className="relative aspect-video bg-slate-900 rounded-[2.25rem] flex items-center justify-center group overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-br from-blue-800/20 to-cyan-500/20" />
-              <PlayCircle className="w-20 h-20 text-white fill-white/10 opacity-80 group-hover:scale-110 transition-transform cursor-pointer" />
-              <p className="absolute bottom-6 text-white text-sm font-medium uppercase tracking-widest">Preview this course</p>
+          <div className="sticky top-32 p-1 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-[3rem] shadow-2xl overflow-hidden">
+            {/* Preview Section */}
+            <div className="relative aspect-video bg-slate-900 rounded-[2.75rem] flex items-center justify-center group overflow-hidden m-2">
+              {course.thumbnailUrl ? (
+                <Image 
+                  src={course.thumbnailUrl} 
+                  alt={course.title} 
+                  fill 
+                  className="object-cover opacity-60 group-hover:scale-105 transition-transform duration-700"
+                />
+              ) : (
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-800/40 to-cyan-500/40" />
+              )}
+              <div className="absolute inset-0 bg-slate-950/20 group-hover:bg-slate-950/40 transition-colors" />
+              <PlayCircle className="w-20 h-20 text-white fill-white/10 relative z-10 group-hover:scale-110 transition-transform cursor-pointer drop-shadow-2xl" />
+              <p className="absolute bottom-6 text-white text-[10px] font-black uppercase tracking-[0.2em] z-10 opacity-80">Preview Course</p>
             </div>
 
             <div className="p-10 space-y-8">
               <div className="flex items-center gap-4">
-                <span className="text-4xl font-extrabold">${course.price}</span>
-                <span className="text-xl text-muted-foreground line-through">${course.originalPrice}</span>
-                <span className="text-blue-800 font-bold px-2 py-1 bg-blue-50 dark:bg-blue-950 rounded-lg text-sm">62% OFF</span>
+                <span className="text-5xl font-black tracking-tighter">${course.price}</span>
+                <div className="flex flex-col">
+                  <span className="text-lg text-slate-400 line-through font-bold">${(course.price * 2.5).toFixed(2)}</span>
+                  <span className="text-blue-800 dark:text-cyan-400 font-black text-xs uppercase tracking-widest">60% OFF</span>
+                </div>
               </div>
 
               <div className="space-y-4">
-                <button className="w-full py-5 bg-blue-800 text-white font-extrabold rounded-2xl hover:bg-blue-900 shadow-xl shadow-blue-800/20 transition-all active:scale-[0.98]">
+                <button className="w-full py-5 bg-blue-800 text-white font-black rounded-2xl hover:bg-blue-900 shadow-2xl shadow-blue-800/30 transition-all active:scale-[0.98] text-lg">
                   Buy Now
                 </button>
-                <button className="w-full py-4 border-2 border-slate-200 dark:border-slate-800 font-bold rounded-2xl hover:bg-slate-50 dark:hover:bg-slate-900 transition-all">
+                <button className="w-full py-5 border-2 border-slate-100 dark:border-slate-800 font-black rounded-2xl hover:bg-slate-50 dark:hover:bg-slate-900 transition-all text-lg">
                   Add to Cart
                 </button>
               </div>
 
-              <p className="text-xs text-center text-muted-foreground">30-Day Money-Back Guarantee</p>
+              <p className="text-[10px] text-center text-slate-400 font-black uppercase tracking-[0.1em]">30-Day Money-Back Guarantee</p>
 
-              <div className="space-y-4 pt-4 border-t border-slate-100 dark:border-slate-900">
-                <h5 className="font-bold text-sm">This course includes:</h5>
-                <ul className="space-y-3 text-sm text-slate-600 dark:text-slate-400">
-                  <li className="flex items-center gap-3"><PlayCircle className="w-4 h-4" /> 24 hours on-demand video</li>
-                  <li className="flex items-center gap-3"><Clock className="w-4 h-4" /> Lifetime access</li>
-                  <li className="flex items-center gap-3"><BarChart className="w-4 h-4" /> Assignments and projects</li>
-                  <li className="flex items-center gap-3"><CheckCircle2 className="w-4 h-4" /> Certificate of completion</li>
+              <div className="space-y-5 pt-8 border-t border-slate-100 dark:border-slate-900">
+                <h5 className="font-black text-xs uppercase tracking-widest text-slate-900 dark:text-white">This course includes:</h5>
+                <ul className="space-y-4 text-sm text-slate-600 dark:text-slate-400 font-medium">
+                  <li className="flex items-center gap-4">
+                    <div className="w-6 h-6 rounded-lg bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center">
+                      <PlayCircle className="w-4 h-4 text-blue-800 dark:text-cyan-400" />
+                    </div>
+                    <span>{course.duration} on-demand video</span>
+                  </li>
+                  <li className="flex items-center gap-4">
+                    <div className="w-6 h-6 rounded-lg bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center">
+                      <Clock className="w-4 h-4 text-blue-800 dark:text-cyan-400" />
+                    </div>
+                    <span>Full lifetime access</span>
+                  </li>
+                  <li className="flex items-center gap-4">
+                    <div className="w-6 h-6 rounded-lg bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center">
+                      <BarChart className="w-4 h-4 text-blue-800 dark:text-cyan-400" />
+                    </div>
+                    <span>Assignments & Projects</span>
+                  </li>
+                  <li className="flex items-center gap-4">
+                    <div className="w-6 h-6 rounded-lg bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center">
+                      <ShieldCheck className="w-4 h-4 text-blue-800 dark:text-cyan-400" />
+                    </div>
+                    <span>Certificate of completion</span>
+                  </li>
                 </ul>
               </div>
 
-              <div className="flex justify-between items-center pt-4">
-                <button className="flex items-center gap-2 text-sm font-bold hover:text-cyan-500 transition-all"><Share2 className="w-4 h-4" /> Share</button>
-                <button className="flex items-center gap-2 text-sm font-bold hover:text-cyan-500 transition-all"><Heart className="w-4 h-4" /> Favorite</button>
-                <button className="flex items-center gap-2 text-sm font-bold hover:text-red-500 transition-all"><Flag className="w-4 h-4" /> Report</button>
+              <div className="flex justify-between items-center pt-6">
+                <button className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-slate-400 hover:text-blue-800 transition-all"><Share2 className="w-4 h-4" /> Share</button>
+                <button className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-slate-400 hover:text-red-500 transition-all"><Heart className="w-4 h-4" /> Save</button>
               </div>
             </div>
           </div>
@@ -240,23 +252,61 @@ export default function CourseDetailPage() {
   );
 }
 
-// Missing component from standard library used in code
-function ShieldCheck({ className }: { className?: string }) {
+function SectionAccordion({ section }: any) {
+  const [isOpen, setIsOpen] = React.useState(false);
+  const lessons = useQuery(api.content.listLessons, { sectionId: section._id });
+
   return (
-    <svg 
-      xmlns="http://www.w3.org/2000/svg" 
-      width="24" 
-      height="24" 
-      viewBox="0 0 24 24" 
-      fill="none" 
-      stroke="currentColor" 
-      strokeWidth="2" 
-      strokeLinecap="round" 
-      strokeLinejoin="round" 
-      className={className}
-    >
-      <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.5 3.8 17 5 19 5a1 1 0 0 1 1 1z" />
-      <path d="m9 12 2 2 4-4" />
-    </svg>
+    <div className="border border-slate-100 dark:border-slate-800 rounded-3xl overflow-hidden bg-white dark:bg-slate-900 group transition-all">
+      <button 
+        onClick={() => setIsOpen(!isOpen)}
+        className={cn(
+          "w-full p-6 flex justify-between items-center transition-all",
+          isOpen ? "bg-slate-50 dark:bg-slate-800/50" : "hover:bg-slate-50/50 dark:hover:bg-slate-800/30"
+        )}
+      >
+        <div className="flex items-center gap-5">
+          <div className={cn(
+            "w-10 h-10 rounded-2xl flex items-center justify-center transition-all",
+            isOpen ? "bg-blue-800 text-white rotate-180" : "bg-slate-100 dark:bg-slate-800 text-slate-500"
+          )}>
+            <ChevronDown className="w-5 h-5" />
+          </div>
+          <div className="text-left">
+            <h4 className="font-black text-lg">{section.title}</h4>
+            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">{lessons?.length || 0} lessons</p>
+          </div>
+        </div>
+      </button>
+      
+      {isOpen && (
+        <div className="p-2 space-y-1 animate-in slide-in-from-top-4 duration-300">
+          {lessons?.map((lesson: any) => (
+            <Link 
+              key={lesson._id} 
+              href={`/courses/${section.courseId}/lessons/${lesson._id}`}
+              className="flex items-center justify-between p-4 px-6 rounded-2xl hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors group/lesson"
+            >
+              <div className="flex items-center gap-4">
+                 <div className="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center text-blue-800 dark:text-cyan-400">
+                   <PlayCircle className="w-4 h-4" />
+                 </div>
+                 <span className="font-bold text-sm tracking-tight">{lesson.title}</span>
+              </div>
+              <div className="flex items-center gap-4 text-xs font-black text-slate-400">
+                {lesson.isFree && <span className="text-emerald-500 uppercase tracking-widest text-[10px]">Preview</span>}
+                <span>{lesson.duration || "5m"}</span>
+              </div>
+            </Link>
+          ))}
+          
+          {lessons?.length === 0 && (
+            <div className="p-8 text-center">
+              <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">No lessons in this section</p>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
   );
 }

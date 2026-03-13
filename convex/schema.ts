@@ -13,6 +13,8 @@ export default defineSchema({
     level: v.string(),
     studentsEnrolled: v.number(),
     rating: v.number(),
+    isPublished: v.boolean(),
+    publishedAt: v.optional(v.number()),
   }).index("by_title", ["title"]),
   users: defineTable({
     name: v.string(),

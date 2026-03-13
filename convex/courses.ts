@@ -41,7 +41,23 @@ export const create = mutation({
       ...args,
       studentsEnrolled: 0,
       rating: 0,
+      isPublished: false,
     });
     return courseId;
+  },
+});
+
+export const togglePublish = mutation({
+  args: { id: v.id("courses") },
+  handler: async (ctx, args) => {
+    const course = await ctx.db.get(args.id);
+    if (!course) throw new Error("Course not found");
+
+    const newStatus = !course.isPublished;
+    await ctx.db.patch(args.id, {
+      isPublished: newStatus,
+      publishedAt: newStatus ? Date.now() : undefined,
+    });
+    return newStatus;
   },
 });

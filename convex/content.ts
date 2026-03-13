@@ -65,6 +65,13 @@ export const listLessons = query({
   },
 });
 
+export const getLessonById = query({
+  args: { id: v.id("lessons") },
+  handler: async (ctx, args) => {
+    return await ctx.db.get(args.id);
+  },
+});
+
 export const createLesson = mutation({
   args: {
     sectionId: v.id("sections"),

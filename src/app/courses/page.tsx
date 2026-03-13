@@ -7,84 +7,7 @@ import { cn } from "@/lib/utils";
 import { useQuery } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 
-// Mock data for courses
-const MOCK_COURSES = [
-  {
-    id: "nextjs-fullstack",
-    title: "Mastering Next.js 15: The Complete Full-Stack Guide",
-    instructor: "Nathy Dev",
-    rating: 4.9,
-    reviews: 1250,
-    price: 49.99,
-    originalPrice: 129.99,
-    image: "",
-    level: "Advanced",
-    duration: "24h 45m",
-    badge: "Best Seller"
-  },
-  {
-    id: "ai-engineering",
-    title: "AI Engineering with Python & OpenAI API",
-    instructor: "Sarah Johnson",
-    rating: 4.8,
-    reviews: 840,
-    price: 89.99,
-    originalPrice: 199.99,
-    image: "",
-    level: "Intermediate",
-    duration: "18h 20m",
-    badge: "New"
-  },
-  {
-    id: "ui-ux-modern",
-    title: "Modern UI/UX Design with Figma & Framer",
-    instructor: "Alex Rivera",
-    rating: 4.7,
-    reviews: 2100,
-    price: 39.99,
-    originalPrice: 89.99,
-    image: "",
-    level: "Beginner",
-    duration: "12h 15m"
-  },
-  {
-    id: "cloud-architect",
-    title: "AWS Solutions Architect Associate Certification",
-    instructor: "David Miller",
-    rating: 4.9,
-    reviews: 3200,
-    price: 99.99,
-    originalPrice: 249.99,
-    image: "",
-    level: "Intermediate",
-    duration: "35h 00m",
-    badge: "Top Rated"
-  },
-  {
-    id: "cybersecurity-zero",
-    title: "Cybersecurity from Zero to Hero (2025)",
-    instructor: "Emma Wilson",
-    rating: 4.6,
-    reviews: 1500,
-    price: 59.99,
-    originalPrice: 149.99,
-    image: "",
-    level: "All Levels",
-    duration: "20h 30m"
-  },
-  {
-    id: "react-native-mastery",
-    title: "React Native Mastery: Build Cross-Platform Apps",
-    instructor: "Nathy Dev",
-    rating: 4.9,
-    reviews: 600,
-    price: 45.99,
-    originalPrice: 119.99,
-    image: "",
-    level: "Intermediate",
-    duration: "15h 45m"
-  },
-];
+// Mock data removed
 
 const categories = ["Web Development", "AI & ML", "Data Science", "Mobile Dev", "Cloud", "Design", "DevOps"];
 
@@ -96,7 +19,8 @@ export default function CoursesPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
   
-  const courses = useQuery(api.courses.list) || [];
+  const allCourses = (useQuery(api.courses.list) || []) as any[];
+  const courses = allCourses.filter((c: any) => c.isPublished);
 
   return (
     <div className="pt-28 pb-20">
@@ -212,7 +136,7 @@ export default function CoursesPage() {
                   image={course.thumbnailUrl}
                   level={course.level}
                   duration={course.duration}
-                  reviews={Math.floor(Math.random() * 2000)} // Keeping mock for reviews for now
+                  reviews={120} // Fixed value instead of Math.random
                 />
               ))}
             </div>

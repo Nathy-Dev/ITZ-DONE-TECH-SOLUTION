@@ -12,15 +12,15 @@ import {
   Pencil, 
   Trash2, 
   Video, 
-  FileText,
-  ChevronDown,
-  ChevronUp,
-  Save,
+  Clock,
   X,
   PlusCircle,
-  PlayCircle
+  PlayCircle,
+  Save,
+  Rocket
 } from "lucide-react";
 import Link from "next/link";
+import { cn } from "@/lib/utils";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -37,12 +37,16 @@ export default function ManageCoursePage({ params }: PageProps) {
   const createSection = useMutation(api.content.createSection);
   const deleteSection = useMutation(api.content.deleteSection);
   const createLesson = useMutation(api.content.createLesson);
+  const updateLesson = useMutation(api.content.updateLesson);
   const deleteLesson = useMutation(api.content.deleteLesson);
+  const togglePublish = useMutation(api.courses.togglePublish);
 
   const [isAddingSection, setIsAddingSection] = useState(false);
   const [newSectionTitle, setNewSectionTitle] = useState("");
   const [addingLessonToSection, setAddingLessonToSection] = useState<string | null>(null);
   const [newLessonTitle, setNewLessonTitle] = useState("");
+  const [editingLessonId, setEditingLessonId] = useState<string | null>(null);
+  const [isPublishing, setIsPublishing] = useState(false);
 
   if (status === "unauthenticated") {
     router.push("/login");
@@ -73,11 +77,22 @@ export default function ManageCoursePage({ params }: PageProps) {
     await createLesson({
       sectionId,
       title: newLessonTitle,
-      order: 1, // Simplified for now
+      order: 1,
       isFree: false,
     });
     setNewLessonTitle("");
     setAddingLessonToSection(null);
+  };
+
+  const handleTogglePublish = async () => {
+    setIsPublishing(true);
+    try {
+      await togglePublish({ id: courseId });
+    } catch (error) {
+       console.error(error);
+    } finally {
+      setIsPublishing(false);
+    }
   };
 
   return (
@@ -92,21 +107,42 @@ export default function ManageCoursePage({ params }: PageProps) {
               <ArrowLeft className="w-4 h-4" />
               Back to Dashboard
             </Link>
-            <h1 className="text-3xl font-bold tracking-tight">{course.title}</h1>
+            <div className="flex items-center gap-3">
+              <h1 className="text-3xl font-bold tracking-tight">{course.title}</h1>
+              <span className={cn(
+                "px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest",
+                course.isPublished ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700"
+              )}>
+                {course.isPublished ? "Published" : "Draft"}
+              </span>
+            </div>
             <p className="text-muted-foreground mt-1">Curriculum Builder & Course Management</p>
           </div>
           <div className="flex items-center gap-3">
-             <button className="px-6 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl font-bold hover:bg-slate-50 transition-all">
+             <button className="px-6 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl font-bold hover:bg-slate-50 transition-all text-sm">
                Settings
              </button>
-             <button className="px-6 py-3 bg-blue-800 text-white rounded-2xl font-bold shadow-lg shadow-blue-800/20 hover:bg-blue-900 transition-all">
-               Publish Course
+             <button 
+               disabled={isPublishing}
+               onClick={handleTogglePublish}
+               className={cn(
+                 "flex items-center gap-2 px-6 py-3 rounded-2xl font-bold transition-all text-sm",
+                 course.isPublished 
+                  ? "bg-slate-200 text-slate-800 dark:bg-slate-800 dark:text-slate-200 hover:bg-slate-300" 
+                  : "bg-blue-800 text-white hover:bg-blue-900 shadow-lg shadow-blue-800/20"
+               )}
+             >
+               {isPublishing ? "Processing..." : (
+                 <>
+                   <Rocket className="w-4 h-4" />
+                   {course.isPublished ? "Unpublish Course" : "Publish Course"}
+                 </>
+               )}
              </button>
           </div>
         </div>
 
         <div className="grid lg:grid-cols-3 gap-8">
-          {/* Main Content: Curriculum Builder */}
           <div className="lg:col-span-2 space-y-6">
             <div className="bg-white dark:bg-slate-900 rounded-[32px] p-8 border border-slate-100 dark:border-slate-800 shadow-xl shadow-blue-800/5">
               <div className="flex items-center justify-between mb-8">
@@ -133,6 +169,7 @@ export default function ManageCoursePage({ params }: PageProps) {
                     onChangeNewLessonTitle={setNewLessonTitle}
                     onSubmitLesson={() => handleCreateLesson(section._id)}
                     deleteLesson={(lessonId: any) => deleteLesson({ id: lessonId })}
+                    onEditLesson={(lessonId: string) => setEditingLessonId(lessonId)}
                   />
                 ))}
 
@@ -173,7 +210,6 @@ export default function ManageCoursePage({ params }: PageProps) {
             </div>
           </div>
 
-          {/* Sidebar: Quick Stats & Tips */}
           <div className="space-y-6">
             <div className="bg-slate-900 text-white rounded-[32px] p-8">
               <h3 className="font-bold text-lg mb-4">Course Progress</h3>
@@ -185,10 +221,6 @@ export default function ManageCoursePage({ params }: PageProps) {
                 <div className="flex justify-between text-sm">
                   <span className="text-slate-400">Total Lessons</span>
                   <span className="font-bold">0</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-slate-400">Total Duration</span>
-                  <span className="font-bold">0m</span>
                 </div>
               </div>
             </div>
@@ -202,6 +234,14 @@ export default function ManageCoursePage({ params }: PageProps) {
           </div>
         </div>
       </div>
+      
+      {editingLessonId && (
+        <LessonEditor 
+          lessonId={editingLessonId} 
+          onClose={() => setEditingLessonId(null)}
+          updateLesson={updateLesson}
+        />
+      )}
     </div>
   );
 }
@@ -215,7 +255,8 @@ function SectionItem({
   newLessonTitle, 
   onChangeNewLessonTitle, 
   onSubmitLesson,
-  deleteLesson
+  deleteLesson,
+  onEditLesson
 }: any) {
   const lessons = useQuery(api.content.listLessons, { sectionId: section._id });
 
@@ -229,9 +270,6 @@ function SectionItem({
         <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
           <button onClick={onAddLesson} className="p-2 hover:bg-white dark:hover:bg-slate-700 rounded-lg text-blue-800 dark:text-cyan-400 transition-colors">
             <Plus className="w-5 h-5" />
-          </button>
-          <button className="p-2 hover:bg-white dark:hover:bg-slate-700 rounded-lg text-slate-600 transition-colors">
-            <Pencil className="w-4 h-4" />
           </button>
           <button onClick={onDelete} className="p-2 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg text-red-500 transition-colors">
             <Trash2 className="w-4 h-4" />
@@ -249,10 +287,13 @@ function SectionItem({
                <span className="text-sm font-medium">{lesson.title}</span>
             </div>
             <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-               <button className="p-1.5 hover:bg-white dark:hover:bg-slate-700 rounded-lg text-slate-500">
+               <button 
+                onClick={() => onEditLesson(lesson._id)}
+                className="p-1.5 hover:bg-white dark:hover:bg-slate-700 rounded-lg text-slate-500 transition-colors"
+               >
                   <Pencil className="w-3.5 h-3.5" />
                </button>
-               <button onClick={() => deleteLesson(lesson._id)} className="p-1.5 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg text-red-500">
+               <button onClick={() => deleteLesson(lesson._id)} className="p-1.5 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg text-red-500 transition-colors">
                   <Trash2 className="w-3.5 h-3.5" />
                </button>
             </div>
@@ -272,21 +313,154 @@ function SectionItem({
             />
             <div className="flex justify-end gap-2">
               <button onClick={onCancelLesson} className="text-xs font-bold text-slate-500 hover:text-slate-700">Cancel</button>
-              <button 
-                onClick={onSubmitLesson}
-                className="bg-blue-800 text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-blue-900"
-              >
+              <button onClick={onSubmitLesson} className="bg-blue-800 text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-blue-900 transition-all">
                 Add Lesson
               </button>
             </div>
           </div>
         )}
+      </div>
+    </div>
+  );
+}
 
-        {lessons?.length === 0 && !isAddingLesson && (
-          <div className="text-center py-6">
-            <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-widest">Empty Section</p>
+function LessonEditor({ lessonId, onClose, updateLesson }: any) {
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/40 backdrop-blur-sm p-6">
+      <div className="bg-white dark:bg-slate-900 w-full max-w-2xl rounded-[32px] shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+        <LessonEditorForm lessonId={lessonId} onClose={onClose} updateLesson={updateLesson} />
+      </div>
+    </div>
+  );
+}
+
+function LessonEditorForm({ lessonId, onClose, updateLesson }: any) {
+  const lesson = useQuery(api.content.getLessonById, { id: lessonId });
+  const [formData, setFormData] = useState<any>(null);
+  const [isSaving, setIsSaving] = useState(false);
+
+  React.useEffect(() => {
+    if (lesson && !formData) {
+      setFormData({
+        title: lesson.title,
+        content: lesson.content || "",
+        videoUrl: lesson.videoUrl || "",
+        duration: lesson.duration || "",
+        isFree: lesson.isFree || false,
+      });
+    }
+  }, [lesson, formData]);
+
+  if (!lesson || !formData) return (
+    <div className="p-12 flex items-center justify-center">
+      <div className="animate-spin rounded-full h-8 w-8 border-4 border-blue-800 border-t-transparent"></div>
+    </div>
+  );
+
+  const handleSave = async () => {
+    setIsSaving(true);
+    try {
+      await updateLesson({
+        id: lessonId,
+        ...formData
+      });
+      onClose();
+    } catch (error) {
+       console.error(error);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  return (
+    <div className="flex flex-col h-full max-h-[90vh]">
+      <div className="p-8 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50/50 dark:bg-slate-800/50">
+        <div>
+          <h2 className="text-2xl font-bold">Edit Lesson</h2>
+          <p className="text-sm text-muted-foreground">{formData.title}</p>
+        </div>
+        <button onClick={onClose} className="p-2 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-full transition-colors">
+          <X className="w-6 h-6" />
+        </button>
+      </div>
+
+      <div className="p-8 space-y-6 overflow-y-auto">
+        <div className="space-y-2">
+          <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Lesson Title</label>
+          <input 
+            type="text" 
+            className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-800/20"
+            value={formData.title}
+            onChange={(e) => setFormData({...formData, title: e.target.value})}
+          />
+        </div>
+
+        <div className="grid md:grid-cols-2 gap-6">
+          <div className="space-y-2">
+            <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Video URL</label>
+            <div className="relative">
+              <Video className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+              <input 
+                type="text" 
+                placeholder="YouTube or Vimeo link"
+                className="w-full pl-10 pr-4 py-3 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-800/20"
+                value={formData.videoUrl}
+                onChange={(e) => setFormData({...formData, videoUrl: e.target.value})}
+              />
+            </div>
           </div>
-        )}
+          <div className="space-y-2">
+            <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Duration</label>
+            <div className="relative">
+              <Clock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+              <input 
+                type="text" 
+                placeholder="e.g. 10m 30s"
+                className="w-full pl-10 pr-4 py-3 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-800/20"
+                value={formData.duration}
+                onChange={(e) => setFormData({...formData, duration: e.target.value})}
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Lesson Content (Markdown)</label>
+          <textarea 
+            rows={8}
+            placeholder="Add structured text content, links, or code blocks..."
+            className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-800/20 resize-none font-mono text-sm"
+            value={formData.content}
+            onChange={(e) => setFormData({...formData, content: e.target.value})}
+          />
+        </div>
+
+        <div className="flex items-center gap-3 p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl">
+           <input 
+             type="checkbox" 
+             id="isFree"
+             className="w-5 h-5 rounded-lg accent-blue-800"
+             checked={formData.isFree}
+             onChange={(e) => setFormData({...formData, isFree: e.target.checked})}
+           />
+           <label htmlFor="isFree" className="text-sm font-bold cursor-pointer">Preview Lesson (Free for all students)</label>
+        </div>
+      </div>
+
+      <div className="p-8 border-t border-slate-100 dark:border-slate-800 flex justify-end gap-3 bg-slate-50/50 dark:bg-slate-800/50">
+        <button 
+          onClick={onClose}
+          className="px-6 py-3 font-bold text-slate-500 hover:text-slate-700 transition-colors"
+        >
+          Cancel
+        </button>
+        <button 
+          disabled={isSaving}
+          onClick={handleSave}
+          className="px-8 py-3 bg-blue-800 text-white rounded-2xl font-bold shadow-lg shadow-blue-800/20 hover:bg-blue-900 transition-all flex items-center gap-2"
+        >
+          {isSaving ? "Saving..." : <><Save className="w-4 h-4" /> Save Changes</>}
+        </button>
       </div>
     </div>
   );
