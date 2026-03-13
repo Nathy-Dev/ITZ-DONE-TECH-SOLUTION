@@ -13,7 +13,7 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
-import { Id } from "../../../../convex/_generated/dataModel";
+import { Id, Doc } from "../../../../convex/_generated/dataModel";
 import Image from "next/image";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
@@ -317,7 +317,7 @@ export default function CourseDetailPage({ params }: PageProps) {
   );
 }
 
-function SectionAccordion({ section, isEnrolled }: { section: any; isEnrolled: boolean }) {
+function SectionAccordion({ section, isEnrolled }: { section: Doc<"sections">; isEnrolled: boolean }) {
   const [isOpen, setIsOpen] = useState(false);
   const lessons = useQuery(api.content.listLessons, { sectionId: section._id });
 
@@ -346,7 +346,7 @@ function SectionAccordion({ section, isEnrolled }: { section: any; isEnrolled: b
       
       {isOpen && (
         <div className="p-2 space-y-1 animate-in slide-in-from-top-4 duration-300">
-          {lessons?.map((lesson: any) => {
+          {lessons?.map((lesson) => {
             const isLocked = !isEnrolled && !lesson.isFree;
             
             return (

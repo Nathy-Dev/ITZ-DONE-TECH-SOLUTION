@@ -19,9 +19,12 @@ import {
   PlayCircle
 } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 import CourseCard from "@/components/courses/CourseCard";
+import { cn } from "@/lib/utils";
 import { useQuery } from "convex/react";
 import { api } from "../../../convex/_generated/api";
+import { Doc } from "../../../convex/_generated/dataModel";
 
 export default function DashboardPage() {
   const { data: session, status } = useSession();
@@ -104,7 +107,23 @@ export default function DashboardPage() {
   );
 }
 
-function LearnerDashboard({ enrolledCourses, allCourses }: { enrolledCourses: any[] | undefined, allCourses: any[] | undefined }) {
+interface EnrollmentWithCourse {
+  _id: Id<"enrollments">;
+  courseId: Id<"courses">;
+  status: string;
+  enrolledAt: number;
+  course: Doc<"courses">;
+  progress: {
+    completedCount: number;
+    totalCount: number;
+    percentage: number;
+  };
+}
+
+function LearnerDashboard({ enrolledCourses, allCourses }: { 
+  enrolledCourses: EnrollmentWithCourse[] | undefined; 
+  allCourses: Doc<"courses">[] | undefined 
+}) {
   // Find course with most progress or just the first one
   const featuredEnrollment = enrolledCourses?.sort((a, b) => b.progress.percentage - a.progress.percentage)[0];
 
@@ -128,7 +147,12 @@ function LearnerDashboard({ enrolledCourses, allCourses }: { enrolledCourses: an
               <div className="flex flex-col md:flex-row gap-8 items-start">
                 <div className="w-full md:w-56 aspect-video bg-slate-900 rounded-2xl overflow-hidden relative shadow-2xl">
                   {featuredEnrollment.course.thumbnailUrl ? (
-                    <img src={featuredEnrollment.course.thumbnailUrl} alt={featuredEnrollment.course.title} className="w-full h-full object-cover opacity-60" />
+                    <Image 
+                      src={featuredEnrollment.course.thumbnailUrl} 
+                      alt={featuredEnrollment.course.title} 
+                      fill
+                      className="object-cover opacity-60" 
+                    />
                   ) : (
                     <div className="absolute inset-0 bg-gradient-to-br from-blue-800/40 to-cyan-500/40" />
                   )}
@@ -273,7 +297,7 @@ function LearnerDashboard({ enrolledCourses, allCourses }: { enrolledCourses: an
   );
 }
 
-function InstructorDashboard({ courses }: { courses: any[] | undefined }) {
+function InstructorDashboard({ courses }: { courses: Doc<"courses">[] | undefined }) {
   return (
     <div className="grid lg:grid-cols-4 gap-6">
       {/* Stats Overview */}
@@ -315,7 +339,12 @@ function InstructorDashboard({ courses }: { courses: any[] | undefined }) {
               <div key={course._id} className="flex flex-col md:flex-row items-center gap-6 p-5 border border-slate-50 dark:border-slate-800 rounded-3xl hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-all group">
                 <div className="w-full md:w-40 aspect-video bg-slate-900 rounded-2xl overflow-hidden relative shadow-lg">
                    {course.thumbnailUrl ? (
-                     <img src={course.thumbnailUrl} alt={course.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                     <Image 
+                        src={course.thumbnailUrl} 
+                        alt={course.title} 
+                        fill
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+                      />
                    ) : (
                      <div className="absolute inset-0 bg-blue-800/30 flex items-center justify-center text-white/50"><Video /></div>
                    )}

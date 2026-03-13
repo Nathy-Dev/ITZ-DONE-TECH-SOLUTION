@@ -3,7 +3,7 @@
 import React, { use, useState, useEffect } from "react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../../../../../convex/_generated/api";
-import { Id } from "../../../../../../convex/_generated/dataModel";
+import { Id, Doc } from "../../../../../../convex/_generated/dataModel";
 import { 
   Play, 
   ChevronLeft, 
@@ -226,17 +226,17 @@ export default function LessonViewerPage({ params }: PageProps) {
                     </div>
                   </div>
 
-                  {isEnrolled && (
+                  {isEnrolled && lesson && (
                     <button 
                       onClick={handleToggleComplete}
                       className={cn(
                         "flex items-center gap-2 px-6 py-3 rounded-2xl font-black text-xs uppercase tracking-widest transition-all shadow-lg",
-                        completedLessonIds.includes(lesson?._id)
+                        completedLessonIds.includes(lesson._id)
                           ? "bg-emerald-100 text-emerald-700 shadow-emerald-200"
                           : "bg-slate-100 text-slate-600 hover:bg-emerald-50 hover:text-emerald-600"
                       )}
                     >
-                      {completedLessonIds.includes(lesson?._id) ? (
+                      {completedLessonIds.includes(lesson._id) ? (
                         <><CheckCircle2 className="w-4 h-4 transition-all" /> Completed</>
                       ) : (
                         <><Circle className="w-4 h-4" /> Mark as Done</>
@@ -278,10 +278,10 @@ export default function LessonViewerPage({ params }: PageProps) {
 }
 
 function SidebarSection({ section, activeLessonId, courseId, completedLessonIds, isEnrolled }: {
-  section: any;
+  section: Doc<"sections">;
   activeLessonId: string;
-  courseId: string;
-  completedLessonIds: string[];
+  courseId: Id<"courses">;
+  completedLessonIds: Id<"lessons">[];
   isEnrolled: boolean;
 }) {
   const lessons = useQuery(api.content.listLessons, { sectionId: section._id });
@@ -305,7 +305,7 @@ function SidebarSection({ section, activeLessonId, courseId, completedLessonIds,
 
       {isOpen && (
         <div className="pl-4 space-y-1 mt-1">
-          {lessons?.map((l: any) => {
+          {lessons?.map((l) => {
             const isActive = l._id === activeLessonId;
             const isCompleted = completedLessonIds.includes(l._id);
             const isLocked = !isEnrolled && !l.isFree;
