@@ -5,6 +5,7 @@ import { ConvexClientProvider } from "@/components/providers/ConvexClientProvide
 import { AuthProvider } from "@/components/providers/SessionProvider";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { SyncUser } from "@/components/providers/SyncUser";
+import { CartProvider } from "@/components/providers/CartProvider";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 
@@ -36,12 +37,14 @@ export default function RootLayout({
         <AuthProvider>
           <ThemeProvider>
             <ConvexClientProvider>
-              <SyncUser />
-              <Navbar />
-              <main className="flex-grow">
-                {children}
-              </main>
-              <Footer />
+              <CartProvider>
+                <SyncUser />
+                <Navbar />
+                <main className="flex-grow">
+                  {children}
+                </main>
+                <Footer />
+              </CartProvider>
             </ConvexClientProvider>
           </ThemeProvider>
         </AuthProvider>

@@ -3,14 +3,15 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Search, ShoppingCart, Menu, X } from "lucide-react";
+import { Search, ShoppingCart, Menu, X, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { signOut, useSession } from "next-auth/react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import { GraduationCap, BookOpen, UserCircle, Sun, Moon, LogOut, ArrowRightLeft, User } from "lucide-react";
-import { useTheme } from "@/components/providers/ThemeProvider";
 import { useRef } from "react";
+import { useCart } from "@/components/providers/CartProvider";
+import { useTheme } from "@/components/providers/ThemeProvider";
 
 /**
  * Navbar component for ITZ-DONE TECH SOLUTION.
@@ -80,6 +81,9 @@ const Navbar = () => {
     }
   };
 
+const { itemCount, items, removeItem, totalPrice } = useCart();
+  const [cartPreviewOpen, setCartPreviewOpen] = useState(false);
+
   return (
     <header
       className={cn(
@@ -119,10 +123,63 @@ const Navbar = () => {
             />
           </div>
 
-          <Link href="/cart" className="p-2 relative hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors">
-            <ShoppingCart className="w-5 h-5" />
-            <span className="absolute top-0 right-0 w-4 h-4 bg-blue-800 text-[10px] text-white rounded-full flex items-center justify-center">0</span>
-          </Link>
+          <div 
+            className="relative"
+            onMouseEnter={() => setCartPreviewOpen(true)}
+            onMouseLeave={() => setCartPreviewOpen(false)}
+          >
+            <Link href="/cart" className="p-2 relative block hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors">
+              <ShoppingCart className="w-5 h-5" />
+              {itemCount > 0 && (
+                <span className="absolute top-0 right-0 w-4 h-4 bg-blue-800 text-[10px] text-white rounded-full flex items-center justify-center animate-in zoom-in duration-300">
+                  {itemCount}
+                </span>
+              )}
+            </Link>
+
+            {/* Floating Cart Preview */}
+            {cartPreviewOpen && itemCount > 0 && (
+              <div className="absolute right-0 mt-2 w-80 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border border-slate-200 dark:border-slate-800 rounded-[24px] shadow-2xl p-4 animate-in fade-in zoom-in-95 duration-200 origin-top-right z-[110]">
+                <div className="flex items-center justify-between mb-4 px-2">
+                   <h3 className="font-black text-sm uppercase tracking-widest">Cart Preview</h3>
+                   <span className="text-[10px] font-bold text-muted-foreground">{itemCount} Items</span>
+                </div>
+                
+                <div className="space-y-4 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar mb-4">
+                   {items.map((item) => (
+                     <div key={item.id} className="flex gap-3 group/item">
+                        <div className="w-16 aspect-video bg-slate-100 rounded-lg overflow-hidden shrink-0 relative">
+                           {item.image && <Image src={item.image} alt={item.title} fill className="object-cover" />}
+                        </div>
+                        <div className="flex-grow min-w-0">
+                           <p className="font-bold text-[11px] leading-tight truncate">{item.title}</p>
+                           <p className="text-[10px] text-muted-foreground mt-1">${item.price}</p>
+                        </div>
+                        <button 
+                          onClick={() => removeItem(item.id)}
+                          className="opacity-0 group-hover/item:opacity-100 transition-opacity p-1 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                     </div>
+                   ))}
+                </div>
+
+                <div className="pt-4 border-t border-slate-100 dark:border-slate-800 space-y-3">
+                   <div className="flex justify-between items-center px-1">
+                      <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Subtotal</span>
+                      <span className="font-black">${totalPrice}</span>
+                   </div>
+                   <Link 
+                     href="/cart"
+                     className="w-full py-3 bg-blue-800 text-white rounded-xl text-xs font-black uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-blue-900 shadow-lg shadow-blue-800/10 transition-all active:scale-95"
+                   >
+                     View Cart & Checkout
+                   </Link>
+                </div>
+              </div>
+            )}
+          </div>
 
           <div className="hidden sm:flex items-center gap-3">
             {!isSignedIn ? (

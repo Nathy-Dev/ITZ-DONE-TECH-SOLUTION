@@ -17,6 +17,8 @@ import { Id, Doc } from "../../../../convex/_generated/dataModel";
 import Image from "next/image";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { useCart } from "@/components/providers/CartProvider";
+import { ShoppingCart, CheckCircle } from "lucide-react";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -32,6 +34,8 @@ export default function CourseDetailPage({ params }: PageProps) {
   const course = useQuery(api.courses.getById, { id: courseId });
   const sections = useQuery(api.content.listSections, { courseId });
   
+  const { addItem, isInCart } = useCart();
+  const inCart = isInCart(courseId);
   const convexUser = useQuery(api.users.getUserByProviderId, 
     session?.user?.id ? { 
       providerId: session.user.id,
@@ -275,8 +279,37 @@ export default function CourseDetailPage({ params }: PageProps) {
                 )}
                 
                 {!isEnrolled && (
-                  <button className="w-full py-5 border-2 border-slate-100 dark:border-slate-800 font-black rounded-2xl hover:bg-slate-50 dark:hover:bg-slate-900 transition-all text-lg">
-                    Add to Cart
+                  <button 
+                    onClick={() => {
+                      if (course) {
+                        addItem({
+                          id: course._id,
+                          title: course.title,
+                          price: course.price,
+                          image: displayImage || undefined,
+                          instructor: "Instructor"
+                        });
+                      }
+                    }}
+                    disabled={inCart}
+                    className={cn(
+                      "w-full py-5 border-2 border-slate-100 dark:border-slate-800 font-black rounded-2xl transition-all text-lg flex items-center justify-center gap-2",
+                      inCart 
+                        ? "bg-emerald-50 text-emerald-600 border-emerald-100 dark:bg-emerald-900/10 dark:text-emerald-400 dark:border-emerald-800" 
+                        : "hover:bg-slate-50 dark:hover:bg-slate-900"
+                    )}
+                  >
+                    {inCart ? (
+                      <>
+                        <CheckCircle className="w-5 h-5" />
+                        In Cart
+                      </>
+                    ) : (
+                      <>
+                        <ShoppingCart className="w-5 h-5" />
+                        Add to Cart
+                      </>
+                    )}
                   </button>
                 )}
               </div>
