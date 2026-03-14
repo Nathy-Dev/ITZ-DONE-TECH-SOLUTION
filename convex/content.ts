@@ -163,3 +163,27 @@ export const listAllLessonsOrdered = query({
     return allLessons;
   },
 });
+
+export const reorderSections = mutation({
+  args: {
+    updates: v.array(v.object({ id: v.id("sections"), order: v.number() }))
+  },
+  handler: async (ctx, args) => {
+    for (const update of args.updates) {
+      await ctx.db.patch(update.id, { order: update.order });
+    }
+    return true;
+  }
+});
+
+export const reorderLessons = mutation({
+  args: {
+    updates: v.array(v.object({ id: v.id("lessons"), order: v.number() }))
+  },
+  handler: async (ctx, args) => {
+    for (const update of args.updates) {
+      await ctx.db.patch(update.id, { order: update.order });
+    }
+    return true;
+  }
+});

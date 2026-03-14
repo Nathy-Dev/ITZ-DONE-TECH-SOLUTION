@@ -135,3 +135,30 @@ export const updateUserRole = mutation({
     return args.role;
   },
 });
+
+export const updateProfile = mutation({
+  args: {
+    providerId: v.string(),
+    name: v.optional(v.string()),
+    bio: v.optional(v.string()),
+    profileImage: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_provider_id", (q) => q.eq("providerId", args.providerId))
+      .unique();
+
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    const updates: Partial<typeof user> = {};
+    if (args.name !== undefined) updates.name = args.name;
+    if (args.bio !== undefined) updates.bio = args.bio;
+    if (args.profileImage !== undefined) updates.profileImage = args.profileImage;
+
+    await ctx.db.patch(user._id, updates);
+    return true;
+  },
+});

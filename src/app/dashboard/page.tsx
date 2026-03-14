@@ -21,6 +21,7 @@ import {
 import Link from "next/link";
 import Image from "next/image";
 import CourseCard from "@/components/courses/CourseCard";
+import EarningsAnalytics from "@/components/dashboard/EarningsAnalytics";
 import { cn } from "@/lib/utils";
 import { useQuery } from "convex/react";
 import { api } from "../../../convex/_generated/api";
@@ -334,6 +335,7 @@ function InstructorDashboard({ courses }: { courses: Doc<"courses">[] | undefine
 
       {/* Main Instructor Area */}
       <div className="lg:col-span-3 space-y-8 mt-4">
+        <EarningsAnalytics />
         <div className="bg-white dark:bg-slate-900 rounded-[32px] p-8 border border-slate-100 dark:border-slate-800 shadow-xl shadow-blue-800/5">
           <div className="flex items-center justify-between mb-8">
             <h2 className="text-2xl font-black">Your Courses</h2>

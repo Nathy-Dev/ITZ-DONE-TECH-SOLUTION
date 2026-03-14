@@ -20,6 +20,7 @@ export default defineSchema({
     name: v.string(),
     email: v.string(),
     profileImage: v.optional(v.string()),
+    bio: v.optional(v.string()),
     password: v.optional(v.string()),
     emailVerified: v.optional(v.string()),
     providerId: v.string(),
@@ -58,4 +59,12 @@ export default defineSchema({
     order: v.number(),
     isFree: v.boolean(),
   }).index("by_section", ["sectionId"]),
+  courseMedia: defineTable({
+    courseId: v.id("courses"),
+    storageId: v.id("_storage"),
+    name: v.string(),
+    type: v.string(), 
+    size: v.number(),
+    url: v.string(),
+  }).index("by_course", ["courseId"]),
 });
