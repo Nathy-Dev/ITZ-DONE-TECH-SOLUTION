@@ -279,7 +279,7 @@ export default function LessonViewerPage({ params }: PageProps) {
 
                 {lesson && isEnrolled && (
                   <div className="pt-12 border-t border-slate-100 dark:border-slate-800">
-                    <LessonDiscussion lessonId={lesson._id} />
+                    <LessonDiscussion lessonId={lesson._id} userId={convexUser?._id || null} />
                   </div>
                 )}
 
@@ -288,6 +288,7 @@ export default function LessonViewerPage({ params }: PageProps) {
                   <div className="pt-8">
                     <CertificateButton 
                       courseId={courseId} 
+                      userId={convexUser?._id || null}
                       studentName={session?.user?.name || "Student"} 
                       courseTitle={course.title} 
                       progress={progress.percentage}

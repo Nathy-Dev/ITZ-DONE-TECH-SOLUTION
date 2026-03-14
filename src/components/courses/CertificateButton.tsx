@@ -9,6 +9,7 @@ import { jsPDF } from "jspdf";
 
 interface CertificateButtonProps {
   courseId: Id<"courses">;
+  userId: Id<"users"> | null;
   studentName: string;
   courseTitle: string;
   progress: number;
@@ -16,12 +17,15 @@ interface CertificateButtonProps {
 
 export default function CertificateButton({ 
   courseId, 
+  userId,
   studentName, 
   courseTitle, 
   progress 
 }: CertificateButtonProps) {
   const [isGenerating, setIsGenerating] = useState(false);
-  const existingCertificate = useQuery(api.certificates.getCertificateByCourse, { courseId });
+  const existingCertificate = useQuery(api.certificates.getCertificateByCourse, 
+    userId ? { courseId, userId } : "skip"
+  );
   const issueCertificate = useMutation(api.certificates.issueCertificate);
 
   const generatePDF = async () => {
@@ -30,7 +34,7 @@ export default function CertificateButton({
       // 1. Logic to issue certificate in backend if it doesn't exist
       if (!existingCertificate) {
         const certId = `CERT-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
-        await issueCertificate({ courseId, certificateId: certId });
+        await issueCertificate({ courseId, userId: userId!, certificateId: certId });
       }
 
       // 2. Generate PDF

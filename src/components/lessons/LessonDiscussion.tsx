@@ -10,9 +10,10 @@ import { formatDistanceToNow } from "date-fns";
 
 interface LessonDiscussionProps {
   lessonId: Id<"lessons">;
+  userId: Id<"users"> | null;
 }
 
-export default function LessonDiscussion({ lessonId }: LessonDiscussionProps) {
+export default function LessonDiscussion({ lessonId, userId }: LessonDiscussionProps) {
   const messages = useQuery(api.discussions.getMessagesByLesson, { lessonId });
   const postMessage = useMutation(api.discussions.postMessage);
   const deleteMessage = useMutation(api.discussions.deleteMessage);
@@ -29,6 +30,7 @@ export default function LessonDiscussion({ lessonId }: LessonDiscussionProps) {
     try {
       await postMessage({
         lessonId,
+        userId: userId!,
         content,
         parentMessageId: replyTo || undefined,
       });
@@ -102,7 +104,7 @@ export default function LessonDiscussion({ lessonId }: LessonDiscussionProps) {
               message={msg} 
               replies={getReplies(msg._id)}
               onReply={() => setReplyTo(msg._id)}
-              onDelete={() => deleteMessage({ id: msg._id })}
+              onDelete={(id: Id<"discussions">) => deleteMessage({ id, userId: userId! })}
             />
           ))
         )}

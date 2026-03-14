@@ -4,18 +4,12 @@ import { mutation, query } from "./_generated/server";
 export const addReview = mutation({
   args: {
     courseId: v.id("courses"),
+    userId: v.id("users"),
     rating: v.number(),
     comment: v.string(),
   },
   handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) throw new Error("Unauthorized");
-
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_provider_id", (q) => q.eq("providerId", identity.subject))
-      .unique();
-
+    const user = await ctx.db.get(args.userId);
     if (!user) throw new Error("User not found");
 
     // Check if user is enrolled

@@ -10,10 +10,11 @@ import { formatDistanceToNow } from "date-fns";
 
 interface CourseReviewsProps {
   courseId: Id<"courses">;
+  userId: Id<"users"> | null;
   isEnrolled: boolean;
 }
 
-export default function CourseReviews({ courseId, isEnrolled }: CourseReviewsProps) {
+export default function CourseReviews({ courseId, userId, isEnrolled }: CourseReviewsProps) {
   const reviews = useQuery(api.reviews.getReviewsByCourse, { courseId });
   const addReview = useMutation(api.reviews.addReview);
   
@@ -30,6 +31,7 @@ export default function CourseReviews({ courseId, isEnrolled }: CourseReviewsPro
     try {
       await addReview({
         courseId,
+        userId: userId!,
         rating,
         comment,
       });

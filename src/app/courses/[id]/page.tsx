@@ -204,7 +204,7 @@ export default function CourseDetailPage({ params }: PageProps) {
 
           {/* Reviews Section */}
           <section id="reviews">
-            <CourseReviews courseId={courseId} isEnrolled={isEnrolled} />
+            <CourseReviews courseId={courseId} userId={convexUser?._id || null} isEnrolled={isEnrolled} />
           </section>
 
           {/* Instructor Placeholder */}

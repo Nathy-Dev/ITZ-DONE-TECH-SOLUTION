@@ -4,18 +4,12 @@ import { mutation, query } from "./_generated/server";
 export const postMessage = mutation({
   args: {
     lessonId: v.id("lessons"),
+    userId: v.id("users"),
     content: v.string(),
     parentMessageId: v.optional(v.id("discussions")),
   },
   handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) throw new Error("Unauthorized");
-
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_provider_id", (q) => q.eq("providerId", identity.subject))
-      .unique();
-
+    const user = await ctx.db.get(args.userId);
     if (!user) throw new Error("User not found");
 
     // Check if user is enrolled (optional, but recommended for quality)
@@ -67,19 +61,12 @@ export const getMessagesByLesson = query({
 });
 
 export const deleteMessage = mutation({
-  args: { id: v.id("discussions") },
+  args: { id: v.id("discussions"), userId: v.id("users") },
   handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) throw new Error("Unauthorized");
-
     const message = await ctx.db.get(args.id);
     if (!message) throw new Error("Message not found");
 
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_provider_id", (q) => q.eq("providerId", identity.subject))
-      .unique();
-
+    const user = await ctx.db.get(args.userId);
     if (!user || (user._id !== message.userId && user.role !== "instructor")) {
       throw new Error("Permission denied");
     }

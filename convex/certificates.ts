@@ -4,17 +4,11 @@ import { mutation, query } from "./_generated/server";
 export const issueCertificate = mutation({
   args: {
     courseId: v.id("courses"),
+    userId: v.id("users"),
     certificateId: v.string(), // Randomly generated on client or server
   },
   handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) throw new Error("Unauthorized");
-
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_provider_id", (q) => q.eq("providerId", identity.subject))
-      .unique();
-
+    const user = await ctx.db.get(args.userId);
     if (!user) throw new Error("User not found");
 
     // Check if user is enrolled
@@ -43,21 +37,11 @@ export const issueCertificate = mutation({
 });
 
 export const getCertificateByCourse = query({
-  args: { courseId: v.id("courses") },
+  args: { courseId: v.id("courses"), userId: v.id("users") },
   handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) return null;
-
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_provider_id", (q) => q.eq("providerId", identity.subject))
-      .unique();
-
-    if (!user) return null;
-
     return await ctx.db
       .query("certificates")
-      .withIndex("by_user_course", (q) => q.eq("userId", user._id).eq("courseId", args.courseId))
+      .withIndex("by_user_course", (q) => q.eq("userId", args.userId).eq("courseId", args.courseId))
       .unique();
   },
 });
