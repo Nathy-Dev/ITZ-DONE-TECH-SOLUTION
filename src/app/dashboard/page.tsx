@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { useSession } from "next-auth/react";
 import { redirect } from "next/navigation";
 import { 
@@ -14,18 +14,37 @@ import {
   Plus,
   Users,
   DollarSign,
-  BarChart3,
   Video,
-  PlayCircle
+  PlayCircle,
+  PlusIcon,
+  Edit2
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import CourseCard from "@/components/courses/CourseCard";
 import EarningsAnalytics from "@/components/dashboard/EarningsAnalytics";
+import MentorRegister from "@/components/mentorship/MentorRegister";
 import { cn } from "@/lib/utils";
 import { useQuery } from "convex/react";
 import { api } from "../../../convex/_generated/api";
-import { Doc, Id } from "../../../convex/_generated/dataModel";
+import { Doc } from "../../../convex/_generated/dataModel";
+
+interface EnrollmentWithCourse extends Doc<"enrollments"> {
+  course: Doc<"courses">;
+  progress: {
+    completedCount: number;
+    totalCount: number;
+    percentage: number;
+  };
+}
+
+interface InstructorStats {
+  totalStudents: number;
+  totalRevenue: number;
+  averageRating: number;
+  totalCourses: number;
+  recentEarnings: any[]; // Keeping any for complex chart data for now but could refine later
+}
 
 export default function DashboardPage() {
   const { data: session, status } = useSession();
@@ -46,6 +65,9 @@ export default function DashboardPage() {
   );
 
   const allCourses = useQuery(api.courses.list);
+  const instructorStats = useQuery(api.analytics.getInstructorStats, 
+    session?.user?.id ? { instructorId: session.user.id } : "skip"
+  );
 
   if (status === "unauthenticated") {
     redirect("/login");
@@ -99,26 +121,13 @@ export default function DashboardPage() {
         </div>
 
         {isInstructor ? (
-          <InstructorDashboard courses={instructorCourses} />
+          <InstructorDashboard courses={instructorCourses} stats={instructorStats} />
         ) : (
-          <LearnerDashboard enrolledCourses={enrolledCourses} allCourses={allCourses} />
+          <LearnerDashboard enrolledCourses={enrolledCourses as any} allCourses={allCourses} />
         )}
       </div>
     </div>
   );
-}
-
-interface EnrollmentWithCourse {
-  _id: Id<"enrollments">;
-  courseId: Id<"courses">;
-  status: string;
-  enrolledAt: number;
-  course: Doc<"courses">;
-  progress: {
-    completedCount: number;
-    totalCount: number;
-    percentage: number;
-  };
 }
 
 function ThumbnailImage({ thumbnailUrl, title, className }: { thumbnailUrl: string | undefined; title: string; className?: string }) {
@@ -142,8 +151,7 @@ function LearnerDashboard({ enrolledCourses, allCourses }: {
   enrolledCourses: EnrollmentWithCourse[] | undefined; 
   allCourses: Doc<"courses">[] | undefined 
 }) {
-  // Find course with most progress or just the first one
-  const featuredEnrollment = enrolledCourses?.sort((a: EnrollmentWithCourse, b: EnrollmentWithCourse) => b.progress.percentage - a.progress.percentage)[0];
+  const featuredEnrollment = enrolledCourses?.sort((a, b) => (b.progress?.percentage || 0) - (a.progress?.percentage || 0))[0];
 
   return (
     <div className="grid lg:grid-cols-3 gap-8">
@@ -175,7 +183,7 @@ function LearnerDashboard({ enrolledCourses, allCourses }: {
                   <div className="absolute bottom-0 left-0 right-0 h-1.5 bg-white/10 text-xs">
                     <div 
                       className="h-full bg-cyan-400 transition-all duration-1000" 
-                      style={{ width: `${featuredEnrollment.progress.percentage}%` }} 
+                      style={{ width: `${featuredEnrollment.progress?.percentage || 0}%` }} 
                     />
                   </div>
                 </div>
@@ -186,16 +194,16 @@ function LearnerDashboard({ enrolledCourses, allCourses }: {
                     <div className="flex items-center gap-4 text-sm text-muted-foreground font-bold">
                       <div className="flex items-center gap-1.5">
                         <Clock className="w-4 h-4 text-blue-800 dark:text-cyan-400" />
-                        <span>{featuredEnrollment.progress.completedCount} of {featuredEnrollment.progress.totalCount} lessons</span>
+                        <span>{featuredEnrollment.progress?.completedCount || 0} of {featuredEnrollment.progress?.totalCount || 0} lessons</span>
                       </div>
                       <div className="flex items-center gap-1.5 text-emerald-500">
                         <CheckCircle2 className="w-4 h-4" />
-                        <span>{featuredEnrollment.progress.percentage}% Complete</span>
+                        <span>{featuredEnrollment.progress?.percentage || 0}% Complete</span>
                       </div>
                     </div>
                   </div>
                   <Link 
-                    href={`/courses/${featuredEnrollment.courseId}/lessons/start`}
+                    href={`/courses/${featuredEnrollment.courseId}/lessons/${featuredEnrollment.lastLessonId || "start"}`}
                     className="px-8 py-4 bg-blue-800 text-white font-black rounded-2xl hover:bg-blue-900 transition-all flex items-center gap-2 w-fit shadow-xl shadow-blue-800/20 active:scale-95"
                   >
                       Continue Lesson
@@ -271,7 +279,7 @@ function LearnerDashboard({ enrolledCourses, allCourses }: {
               <div className="p-4 bg-white/10 rounded-2xl border border-white/10">
                 <p className="text-[9px] text-blue-200 uppercase font-black tracking-widest mb-1">Completed</p>
                 <p className="text-2xl font-black">
-                  {enrolledCourses?.filter((e: EnrollmentWithCourse) => e.progress.percentage === 100).length || 0}
+                  {enrolledCourses?.filter((e: any) => e.progress?.percentage === 100).length || 0}
                 </p>
               </div>
             </div>
@@ -310,15 +318,24 @@ function LearnerDashboard({ enrolledCourses, allCourses }: {
   );
 }
 
-function InstructorDashboard({ courses }: { courses: Doc<"courses">[] | undefined }) {
+function InstructorDashboard({ courses, stats }: { 
+  courses: Doc<"courses">[] | undefined;
+  stats: InstructorStats | undefined;
+}) {
+  const [activeInstructorTab, setActiveInstructorTab] = useState<"courses" | "mentorship">("courses");
+  const { data: session } = useSession();
+  const convexUser = useQuery(api.users.getUserByProviderId, 
+    session?.user?.id ? { providerId: session.user.id } : "skip"
+  );
+
   return (
     <div className="grid lg:grid-cols-4 gap-6">
       {/* Stats Overview */}
       {[
-        { label: "Total Students", value: courses?.reduce((acc, curr) => acc + (curr.studentsEnrolled || 0), 0) || 0, icon: Users, color: "text-blue-600", bg: "bg-blue-100 dark:bg-blue-900/30" },
-        { label: "Course Revenue", value: "$0", icon: DollarSign, color: "text-emerald-600", bg: "bg-emerald-100 dark:bg-emerald-900/30" },
-        { label: "Course Rating", value: "0.0", icon: Trophy, color: "text-amber-600", bg: "bg-amber-100 dark:bg-amber-900/30" },
-        { label: "My Courses", value: courses?.length || 0, icon: Video, color: "text-purple-600", bg: "bg-purple-100 dark:bg-purple-900/30" },
+        { label: "Total Students", value: stats?.totalStudents || 0, icon: Users, color: "text-blue-600", bg: "bg-blue-100 dark:bg-blue-900/30" },
+        { label: "Course Revenue", value: `$${stats?.totalRevenue || 0}`, icon: DollarSign, color: "text-emerald-600", bg: "bg-emerald-100 dark:bg-emerald-900/30" },
+        { label: "Course Rating", value: stats?.averageRating?.toFixed(1) || "0.0", icon: Trophy, color: "text-amber-600", bg: "bg-amber-100 dark:bg-amber-900/30" },
+        { label: "My Courses", value: stats?.totalCourses || 0, icon: Video, color: "text-purple-600", bg: "bg-purple-100 dark:bg-purple-900/30" },
       ].map((stat, i) => (
         <div key={i} className="bg-white dark:bg-slate-900 p-6 rounded-[24px] border border-slate-100 dark:border-slate-800 shadow-sm">
           <div className="flex items-center gap-4">
@@ -335,61 +352,87 @@ function InstructorDashboard({ courses }: { courses: Doc<"courses">[] | undefine
 
       {/* Main Instructor Area */}
       <div className="lg:col-span-3 space-y-8 mt-4">
-        <EarningsAnalytics />
-        <div className="bg-white dark:bg-slate-900 rounded-[32px] p-8 border border-slate-100 dark:border-slate-800 shadow-xl shadow-blue-800/5">
-          <div className="flex items-center justify-between mb-8">
-            <h2 className="text-2xl font-black">Your Courses</h2>
-            <Link href="/courses" className="text-blue-800 dark:text-cyan-400 font-bold hover:underline text-sm uppercase tracking-widest">View Public Catalog</Link>
-          </div>
-          
-          <div className="space-y-4">
-            {courses?.length === 0 && (
-              <div className="text-center py-12 border-2 border-dashed border-slate-100 dark:border-slate-800 rounded-[32px]">
-                <p className="text-muted-foreground font-bold italic">You haven&apos;t created any courses yet.</p>
-                <Link href="/courses/create" className="text-blue-800 dark:text-cyan-400 font-black hover:underline mt-4 inline-block text-xs uppercase tracking-widest">Create your first course</Link>
-              </div>
+        <div className="flex bg-slate-100 dark:bg-slate-800 p-1.5 rounded-2xl w-fit">
+          <button 
+            onClick={() => setActiveInstructorTab("courses")}
+            className={cn(
+              "px-6 py-2 rounded-xl text-sm font-bold transition-all",
+              activeInstructorTab === "courses" ? "bg-white dark:bg-slate-900 shadow-sm text-blue-800 dark:text-cyan-400" : "text-slate-500 hover:text-slate-700"
             )}
-            {courses?.map((course) => (
-              <div key={course._id} className="flex flex-col md:flex-row items-center gap-6 p-5 border border-slate-50 dark:border-slate-800 rounded-3xl hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-all group">
-                <div className="w-full md:w-40 aspect-video bg-slate-900 rounded-2xl overflow-hidden relative shadow-lg">
-                   <ThumbnailImage 
-                      thumbnailUrl={course.thumbnailUrl} 
-                      title={course.title}
-                      className="group-hover:scale-105 transition-transform duration-500"
-                   />
-                </div>
-                <div className="flex-grow">
-                  <h4 className="font-black text-xl">{course.title}</h4>
-                  <div className="flex items-center gap-4 mt-2">
-                    <span className={cn(
-                      "text-[10px] font-black underline decoration-2 uppercase tracking-widest",
-                      course.isPublished ? "text-emerald-500 decoration-emerald-200" : "text-amber-500 decoration-amber-200"
-                    )}>
-                      {course.isPublished ? "Published" : "Draft"}
-                    </span>
-                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{course.category}</span>
-                  </div>
-                </div>
-                <div className="flex items-center gap-8 px-4">
-                   <div className="text-center">
-                     <p className="text-[9px] text-muted-foreground uppercase font-black tracking-widest mb-1">Students</p>
-                     <p className="font-black text-lg">{course.studentsEnrolled || 0}</p>
-                   </div>
-                   <div className="text-center">
-                     <p className="text-[9px] text-muted-foreground uppercase font-black tracking-widest mb-1">Earnings</p>
-                     <p className="font-black text-lg text-emerald-600">$0</p>
-                   </div>
-                   <Link 
-                    href={`/courses/manage/${course._id}`} 
-                    className="p-3 bg-slate-100 dark:bg-slate-800 rounded-2xl hover:bg-blue-800 hover:text-white transition-all shadow-sm"
-                   >
-                      <BarChart3 className="w-5 h-5" />
-                   </Link>
-                </div>
-              </div>
-            ))}
-          </div>
+          >
+            My Courses
+          </button>
+          <button 
+            onClick={() => setActiveInstructorTab("mentorship")}
+            className={cn(
+              "px-6 py-2 rounded-xl text-sm font-bold transition-all",
+              activeInstructorTab === "mentorship" ? "bg-white dark:bg-slate-900 shadow-sm text-blue-800 dark:text-cyan-400" : "text-slate-500 hover:text-slate-700"
+            )}
+          >
+            Mentorship
+          </button>
         </div>
+
+        {activeInstructorTab === "courses" ? (
+          <>
+            <EarningsAnalytics chartData={stats?.recentEarnings} />
+            <div className="bg-white dark:bg-slate-900 rounded-[32px] p-8 border border-slate-100 dark:border-slate-800 shadow-xl shadow-blue-800/5">
+              <div className="flex items-center justify-between mb-8">
+                <h2 className="text-2xl font-black">Your Courses</h2>
+                <Link href="/courses/create">
+                  <button className="bg-blue-800 hover:bg-black text-white px-6 py-3 rounded-2xl font-black text-sm transition-all shadow-lg flex items-center gap-2">
+                    <PlusIcon className="w-4 h-4" /> Create Course
+                  </button>
+                </Link>
+              </div>
+
+              <div className="space-y-4">
+                {courses?.length === 0 && (
+                  <div className="text-center py-12 border-2 border-dashed border-slate-100 dark:border-slate-800 rounded-[32px]">
+                    <p className="text-muted-foreground font-bold italic">You haven&apos;t created any courses yet.</p>
+                  </div>
+                )}
+                {courses?.map((course) => (
+                  <div key={course._id} className="flex flex-col md:flex-row items-center gap-6 p-5 border border-slate-50 dark:border-slate-800 rounded-3xl hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-all group">
+                    <div className="w-full md:w-40 aspect-video bg-slate-900 rounded-2xl overflow-hidden relative shadow-lg">
+                       <ThumbnailImage 
+                          thumbnailUrl={course.thumbnailUrl} 
+                          title={course.title}
+                          className="group-hover:scale-105 transition-transform duration-500"
+                       />
+                    </div>
+                    <div className="flex-grow">
+                      <h4 className="font-black text-xl">{course.title}</h4>
+                      <div className="flex items-center gap-4 mt-2">
+                        <span className={cn(
+                          "text-[10px] font-black underline decoration-2 uppercase tracking-widest",
+                          course.isPublished ? "text-emerald-500 decoration-emerald-200" : "text-amber-500 decoration-amber-200"
+                        )}>
+                          {course.isPublished ? "Published" : "Draft"}
+                        </span>
+                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{course.category}</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-8 px-4">
+                       <div className="text-center">
+                         <p className="text-[9px] text-muted-foreground uppercase font-black tracking-widest mb-1">Students</p>
+                         <p className="font-black text-lg">{course.studentsEnrolled || 0}</p>
+                       </div>
+                       <Link 
+                        href={`/courses/manage/${course._id}`} 
+                        className="p-3 bg-slate-100 dark:bg-slate-800 rounded-2xl hover:bg-blue-800 hover:text-white transition-all shadow-sm"
+                       >
+                          <Edit2 className="w-5 h-5" />
+                       </Link>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </>
+        ) : (
+          <MentorRegister userId={convexUser?._id as any} />
+        )}
       </div>
 
       {/* Instructor Sidebar */}
@@ -400,21 +443,6 @@ function InstructorDashboard({ courses }: { courses: Doc<"courses">[] | undefine
           <p className="text-slate-400 text-sm leading-relaxed font-medium relative z-10">
             Keep your lesson titles clear and descriptive. Courses with structured curriculum have 40% higher completion rates.
           </p>
-        </div>
-
-        <div className="bg-white dark:bg-slate-900 rounded-[32px] p-8 border border-slate-100 dark:border-slate-800 shadow-sm">
-          <h3 className="font-black text-xl mb-6">Recent Activity</h3>
-          <div className="space-y-6">
-             {[
-               "No student activity to show yet.",
-               "Complete your course structure to get started."
-             ].map((activity, i) => (
-                <div key={i} className="flex gap-4">
-                   <div className="w-1.5 h-1.5 bg-blue-800 rounded-full mt-2 shrink-0" />
-                   <p className="text-xs text-muted-foreground font-bold italic">{activity}</p>
-                </div>
-             ))}
-          </div>
         </div>
       </div>
     </div>

@@ -16,6 +16,7 @@ export default defineSchema({
     isPublished: v.boolean(),
     publishedAt: v.optional(v.number()),
   }).index("by_title", ["title"])
+    .index("by_published_category", ["isPublished", "category"])
     .searchIndex("search_courses", {
       searchField: "title",
       filterFields: ["category", "isPublished"],
@@ -37,6 +38,8 @@ export default defineSchema({
     courseId: v.id("courses"),
     status: v.string(), // "active", "completed", "cancelled"
     enrolledAt: v.number(),
+    lastLessonId: v.optional(v.id("lessons")),
+    lastViewedAt: v.optional(v.number()),
   })
     .index("by_user", ["userId"])
     .index("by_course", ["courseId"])
@@ -102,4 +105,16 @@ export default defineSchema({
     .index("by_user", ["userId"])
     .index("by_course", ["courseId"])
     .index("by_user_course", ["userId", "courseId"]),
+
+  mentorProfiles: defineTable({
+    userId: v.id("users"),
+    bio: v.string(),
+    expertise: v.array(v.string()),
+    hourlyRate: v.number(),
+    isAvailable: v.boolean(),
+    rating: v.optional(v.number()),
+    totalSessions: v.optional(v.number()),
+    createdAt: v.number(),
+  }).index("by_user", ["userId"])
+    .index("by_availability", ["isAvailable"]),
 });

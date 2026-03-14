@@ -78,6 +78,18 @@ export default function LessonViewerPage({ params }: PageProps) {
 
   const firstLesson = useQuery(api.content.getFirstLesson, { courseId });
   const allLessons = useQuery(api.content.listAllLessonsOrdered, { courseId });
+  const updateLastViewed = useMutation(api.enrollments.markLessonAsViewed);
+
+  // Track last viewed lesson
+  useEffect(() => {
+    if (convexUser?._id && lessonId !== "start") {
+      updateLastViewed({
+        courseId,
+        userId: convexUser._id,
+        lessonId: lessonId as Id<"lessons">,
+      }).catch(console.error);
+    }
+  }, [lessonId, convexUser?._id, courseId, updateLastViewed]);
 
   // Handle "start" redirect
   useEffect(() => {

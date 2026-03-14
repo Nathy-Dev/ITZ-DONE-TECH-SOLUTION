@@ -8,6 +8,7 @@ import { SyncUser } from "@/components/providers/SyncUser";
 import { CartProvider } from "@/components/providers/CartProvider";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
+import { Toaster } from "sonner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -69,6 +70,7 @@ export default function RootLayout({
                   {children}
                 </main>
                 <Footer />
+                <Toaster richColors position="top-right" />
               </CartProvider>
             </ConvexClientProvider>
           </ThemeProvider>

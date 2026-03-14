@@ -66,18 +66,58 @@ export const search = query({
   args: {
     searchQuery: v.string(),
     category: v.optional(v.string()),
+    level: v.optional(v.string()),
+    isFree: v.optional(v.boolean()),
   },
   handler: async (ctx, args) => {
-    const q = (ctx.db.query("courses") as any).withSearchIndex("search_courses", (q: any) => {
-      let searchQ = q.search("title", args.searchQuery);
-      if (args.category) {
-        searchQ = searchQ.eq("category", args.category);
-      }
-      return searchQ;
-    });
+    const q = ctx.db.query("courses")
+      .withSearchIndex("search_courses", (q) => {
+        let searchQ = q.search("title", args.searchQuery).eq("isPublished", true);
+        if (args.category) {
+          searchQ = searchQ.eq("category", args.category);
+        }
+        return searchQ;
+      });
 
-    // Only return published courses in public search
     const results = await q.collect();
-    return results.filter((course: any) => course.isPublished);
+
+    // Secondary filtering for fields not in search index or complex logic
+    return results.filter((course) => {
+      const matchesLevel = args.level ? course.level === args.level : true;
+      const matchesPrice = args.isFree !== undefined 
+        ? (args.isFree ? course.price === 0 : course.price > 0) 
+        : true;
+      
+      return matchesLevel && matchesPrice;
+    });
+  },
+});
+
+export const listFiltered = query({
+  args: {
+    category: v.optional(v.string()),
+    level: v.optional(v.string()),
+    isFree: v.optional(v.boolean()),
+  },
+  handler: async (ctx, args) => {
+    let q = ctx.db.query("courses")
+      .withIndex("by_published_category", (q) => q.eq("isPublished", true));
+    
+    if (args.category) {
+      q = ctx.db.query("courses")
+        .withIndex("by_published_category", (q) => 
+          q.eq("isPublished", true).eq("category", args.category as string)
+        );
+    }
+
+    const results = await q.collect();
+
+    return results.filter((course) => {
+      const matchesLevel = args.level ? course.level === args.level : true;
+      const matchesPrice = args.isFree !== undefined 
+        ? (args.isFree ? course.price === 0 : course.price > 0) 
+        : true;
+      return matchesLevel && matchesPrice;
+    });
   },
 });

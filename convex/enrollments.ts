@@ -101,3 +101,26 @@ export const listMyEnrollments = query({
     return results;
   },
 });
+
+export const markLessonAsViewed = mutation({
+  args: {
+    courseId: v.id("courses"),
+    userId: v.id("users"),
+    lessonId: v.id("lessons"),
+  },
+  handler: async (ctx, args) => {
+    const enrollment = await ctx.db
+      .query("enrollments")
+      .withIndex("by_user_course", (q) => 
+        q.eq("userId", args.userId).eq("courseId", args.courseId)
+      )
+      .unique();
+
+    if (enrollment) {
+      await ctx.db.patch(enrollment._id, {
+        lastLessonId: args.lessonId,
+        lastViewedAt: Date.now(),
+      });
+    }
+  },
+});

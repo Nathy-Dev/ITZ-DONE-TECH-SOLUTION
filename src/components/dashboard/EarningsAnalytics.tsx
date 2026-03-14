@@ -36,8 +36,19 @@ const completionData = [
   { name: 'Week 4', rate: 85 },
 ];
 
-export default function EarningsAnalytics() {
+interface EarningsAnalyticsProps {
+  chartData?: { name: string; amount: number }[];
+}
+
+export default function EarningsAnalytics({ chartData }: EarningsAnalyticsProps) {
   const [activeTab, setActiveTab] = useState<"revenue" | "enrollment" | "completion">("revenue");
+
+  // Format data for chart
+  const revenueChartData = chartData ? chartData.map(d => ({
+    name: d.name,
+    current: d.amount,
+    previous: Math.round(d.amount * 0.8) // Mocking previous for visual depth
+  })) : revenueData;
 
   return (
     <div className="bg-white dark:bg-slate-900 rounded-[32px] p-8 border border-slate-100 dark:border-slate-800 shadow-xl shadow-blue-800/5 mt-8 mb-8">
@@ -81,7 +92,7 @@ export default function EarningsAnalytics() {
       <div className="h-[300px] w-full mt-4">
         {activeTab === "revenue" && (
           <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={revenueData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+            <AreaChart data={revenueChartData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
               <defs>
                 <linearGradient id="colorCurrent" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor="#2563eb" stopOpacity={0.3}/>

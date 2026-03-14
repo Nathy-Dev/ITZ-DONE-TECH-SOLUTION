@@ -2,8 +2,9 @@
 
 import React, { useState } from "react";
 import { Users, CheckCircle2, ArrowRight, Target, Flame, Compass, Loader2 } from "lucide-react";
-import { useMutation } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 import { api } from "../../../convex/_generated/api";
+import MentorCard from "@/components/mentorship/MentorCard";
 
 export default function MentorshipPage() {
   const [email, setEmail] = useState("");
@@ -11,6 +12,7 @@ export default function MentorshipPage() {
   const [isSuccess, setIsSuccess] = useState(false);
   const [error, setError] = useState("");
 
+  const mentors = useQuery(api.mentors.listMentors);
   const joinWaitlist = useMutation(api.waitlist.joinWaitlist);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -46,51 +48,80 @@ export default function MentorshipPage() {
             Connect directly with senior engineers and industry leaders to guide your technical journey and career growth.
           </p>
 
-          {/* Waitlist Form */}
-          <div className="max-w-md mx-auto bg-white dark:bg-slate-900 rounded-[2rem] p-2 border border-slate-100 dark:border-slate-800 shadow-2xl relative">
-            {isSuccess ? (
-              <div className="p-8 text-center animate-in fade-in zoom-in duration-500">
-                <div className="w-16 h-16 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <CheckCircle2 className="w-8 h-8" />
+          {/* Mentors or Waitlist */}
+          {mentors && mentors.length > 0 ? (
+            <div className="mt-16 text-left">
+              <div className="flex items-center justify-between mb-12">
+                <div>
+                   <h2 className="text-3xl font-black mb-2">Available Mentors</h2>
+                   <p className="text-muted-foreground font-medium">Book a session with one of our top industry experts.</p>
                 </div>
-                <h3 className="text-xl font-black mb-2">You&apos;re on the list!</h3>
-                <p className="text-sm font-medium text-slate-500">We&apos;ll be in touch soon when spots open up.</p>
+                <div className="flex items-center gap-2 px-6 py-2 bg-emerald-500/10 text-emerald-600 rounded-full text-xs font-black uppercase tracking-widest">
+                   <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
+                   {mentors.length} Mentors Online
+                </div>
               </div>
-            ) : (
-              <form onSubmit={handleSubmit} className="flex flex-col gap-4 p-4">
-                <div className="text-left mb-2">
-                  <h3 className="font-black">Join the Mentorship Waitlist</h3>
-                  <p className="text-xs font-bold text-slate-500 mt-1 uppercase tracking-widest">Spots are extremely limited</p>
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {mentors.map((mentor) => (
+                  <MentorCard 
+                    key={mentor._id}
+                    name={mentor.user.name || "Anonymous"}
+                    image={mentor.user.profileImage}
+                    bio={mentor.bio}
+                    expertise={mentor.expertise}
+                    hourlyRate={mentor.hourlyRate}
+                    rating={mentor.rating}
+                  />
+                ))}
+              </div>
+            </div>
+          ) : (
+            /* Waitlist Form */
+            <div className="max-w-md mx-auto bg-white dark:bg-slate-900 rounded-[2rem] p-2 border border-slate-100 dark:border-slate-800 shadow-2xl relative">
+              {isSuccess ? (
+                <div className="p-8 text-center animate-in fade-in zoom-in duration-500">
+                  <div className="w-16 h-16 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <CheckCircle2 className="w-8 h-8" />
+                  </div>
+                  <h3 className="text-xl font-black mb-2">You&apos;re on the list!</h3>
+                  <p className="text-sm font-medium text-slate-500">We&apos;ll be in touch soon when spots open up.</p>
                 </div>
-                
-                <input
-                  type="email"
-                  placeholder="name@example.com"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-6 py-4 bg-slate-50 dark:bg-slate-950 border-2 border-slate-100 dark:border-slate-800 rounded-2xl font-bold focus:border-cyan-500 dark:focus:border-cyan-400 focus:outline-none transition-colors"
-                />
-                
-                {error && <p className="text-xs font-bold text-red-500 px-2 text-left">{error}</p>}
-                
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="w-full py-4 bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-black rounded-2xl hover:bg-slate-800 dark:hover:bg-slate-100 shadow-xl shadow-slate-900/10 transition-all flex items-center justify-center gap-2 disabled:opacity-70 group"
-                >
-                  {isSubmitting ? (
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                  ) : (
-                    <>
-                      Reserve My Spot
-                      <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                    </>
-                  )}
-                </button>
-              </form>
-            )}
-          </div>
+              ) : (
+                <form onSubmit={handleSubmit} className="flex flex-col gap-4 p-4">
+                  <div className="text-left mb-2">
+                    <h3 className="font-black">Join the Mentorship Waitlist</h3>
+                    <p className="text-xs font-bold text-slate-500 mt-1 uppercase tracking-widest">Spots are extremely limited</p>
+                  </div>
+                  
+                  <input
+                    type="email"
+                    placeholder="name@example.com"
+                    required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="w-full px-6 py-4 bg-slate-50 dark:bg-slate-950 border-2 border-slate-100 dark:border-slate-800 rounded-2xl font-bold focus:border-cyan-500 dark:focus:border-cyan-400 focus:outline-none transition-colors"
+                  />
+                  
+                  {error && <p className="text-xs font-bold text-red-500 px-2 text-left">{error}</p>}
+                  
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="w-full py-4 bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-black rounded-2xl hover:bg-slate-800 dark:hover:bg-slate-100 shadow-xl shadow-slate-900/10 transition-all flex items-center justify-center gap-2 disabled:opacity-70 group"
+                  >
+                    {isSubmitting ? (
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                    ) : (
+                      <>
+                        Reserve My Spot
+                        <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                      </>
+                    )}
+                  </button>
+                </form>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Features Grid */}

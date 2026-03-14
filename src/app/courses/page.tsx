@@ -22,19 +22,39 @@ export default function CoursesPage() {
   const [debouncedSearchQuery] = useDebounce(searchQuery, 500);
   const [selectedCategory, setSelectedCategory] = useState("All");
   
-  // Use search if either query exists or category is selected, otherwise get all published
-  const isSearching = debouncedSearchQuery.length > 0 || selectedCategory !== "All";
+  // Filters
+  const [selectedLevels, setSelectedLevels] = useState<string[]>([]);
+  const [selectedPrice, setSelectedPrice] = useState<string[]>([]);
+
+  // Use search if search query exists, otherwise use listFiltered
+  const isSearching = debouncedSearchQuery.length > 0;
   
   const searchResults = useQuery(api.courses.search, isSearching ? {
     searchQuery: debouncedSearchQuery,
-    category: selectedCategory === "All" ? undefined : selectedCategory
+    category: selectedCategory === "All" ? undefined : selectedCategory,
+    level: selectedLevels.length === 1 ? selectedLevels[0] : undefined,
+    isFree: selectedPrice.length === 1 ? selectedPrice[0] === "Free" : undefined,
   } : "skip");
 
-  const allCourses = useQuery(api.courses.list);
-  
-  const courses = isSearching 
-    ? (searchResults || []) 
-    : (allCourses?.filter(c => c.isPublished) || []);
+  const filteredCourses = useQuery(api.courses.listFiltered, !isSearching ? {
+    category: selectedCategory === "All" ? undefined : selectedCategory,
+    level: selectedLevels.length === 1 ? selectedLevels[0] : undefined,
+    isFree: selectedPrice.length === 1 ? selectedPrice[0] === "Free" : undefined,
+  } : "skip");
+
+  const courses = isSearching ? (searchResults || []) : (filteredCourses || []);
+
+  const toggleLevel = (level: string) => {
+    setSelectedLevels(prev => 
+      prev.includes(level) ? prev.filter(l => l !== level) : [...prev, level]
+    );
+  };
+
+  const togglePrice = (price: string) => {
+    setSelectedPrice(prev => 
+      prev.includes(price) ? prev.filter(p => p !== price) : [...prev, price]
+    );
+  };
 
   return (
     <div className="pt-28 pb-20">
@@ -98,7 +118,12 @@ export default function CoursesPage() {
               <div className="space-y-3">
                 {["Free", "Paid"].map((price) => (
                   <label key={price} className="flex items-center gap-3 cursor-pointer group">
-                    <input type="checkbox" className="w-4 h-4 rounded border-slate-300 text-blue-800 focus:ring-blue-800" />
+                    <input 
+                      type="checkbox" 
+                      className="w-4 h-4 rounded border-slate-300 text-blue-800 focus:ring-blue-800"
+                      checked={selectedPrice.includes(price)}
+                      onChange={() => togglePrice(price)}
+                    />
                     <span className="text-sm group-hover:text-cyan-500 transition-colors">{price}</span>
                   </label>
                 ))}
@@ -110,7 +135,12 @@ export default function CoursesPage() {
               <div className="space-y-3">
                 {["Beginner", "Intermediate", "Advanced"].map((level) => (
                   <label key={level} className="flex items-center gap-3 cursor-pointer group">
-                    <input type="checkbox" className="w-4 h-4 rounded border-slate-300 text-blue-800 focus:ring-blue-800" />
+                    <input 
+                      type="checkbox" 
+                      className="w-4 h-4 rounded border-slate-300 text-blue-800 focus:ring-blue-800"
+                      checked={selectedLevels.includes(level)}
+                      onChange={() => toggleLevel(level)}
+                    />
                     <span className="text-sm group-hover:text-cyan-500 transition-colors">{level}</span>
                   </label>
                 ))}
@@ -121,7 +151,7 @@ export default function CoursesPage() {
           {/* Main Content */}
           <div className="flex-grow">
             <div className="flex items-center justify-between mb-8 pb-4 border-b border-slate-100 dark:border-slate-900">
-              <p className="text-sm font-medium">Showing <span className="font-bold text-blue-800">6</span> results</p>
+              <p className="text-sm font-medium">Showing <span className="font-bold text-blue-800">{courses.length}</span> results</p>
               
               <div className="flex items-center gap-6">
                 <div className="flex items-center gap-2 group cursor-pointer text-sm font-medium">
