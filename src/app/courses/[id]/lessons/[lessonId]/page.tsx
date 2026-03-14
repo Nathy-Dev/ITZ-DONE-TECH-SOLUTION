@@ -24,6 +24,8 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import MarkdownRenderer from "@/components/courses/MarkdownRenderer";
+import LessonDiscussion from "@/components/lessons/LessonDiscussion";
+import CertificateButton from "@/components/courses/CertificateButton";
 
 const VideoPlayer = dynamic(() => import("@/components/courses/VideoPlayer"), { 
   ssr: false,
@@ -275,7 +277,23 @@ export default function LessonViewerPage({ params }: PageProps) {
                   )}
                 </article>
 
+                {lesson && isEnrolled && (
+                  <div className="pt-12 border-t border-slate-100 dark:border-slate-800">
+                    <LessonDiscussion lessonId={lesson._id} />
+                  </div>
+                )}
+
                 {/* Navigation Buttons */}
+                {progress?.percentage === 100 && (
+                  <div className="pt-8">
+                    <CertificateButton 
+                      courseId={courseId} 
+                      studentName={session?.user?.name || "Student"} 
+                      courseTitle={course.title} 
+                      progress={progress.percentage}
+                    />
+                  </div>
+                )}
                 <div className="pt-12 border-t border-slate-100 dark:border-slate-800 flex justify-between">
                   <button 
                     onClick={() => prevLesson && navigateTo(prevLesson._id)}

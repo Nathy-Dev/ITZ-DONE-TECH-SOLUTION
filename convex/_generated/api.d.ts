@@ -8,12 +8,15 @@
  * @module
  */
 
+import type * as certificates from "../certificates.js";
 import type * as content from "../content.js";
 import type * as courses from "../courses.js";
 import type * as debug from "../debug.js";
+import type * as discussions from "../discussions.js";
 import type * as enrollments from "../enrollments.js";
 import type * as files from "../files.js";
 import type * as progress from "../progress.js";
+import type * as reviews from "../reviews.js";
 import type * as seed from "../seed.js";
 import type * as users from "../users.js";
 import type * as waitlist from "../waitlist.js";
@@ -25,12 +28,15 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  certificates: typeof certificates;
   content: typeof content;
   courses: typeof courses;
   debug: typeof debug;
+  discussions: typeof discussions;
   enrollments: typeof enrollments;
   files: typeof files;
   progress: typeof progress;
+  reviews: typeof reviews;
   seed: typeof seed;
   users: typeof users;
   waitlist: typeof waitlist;

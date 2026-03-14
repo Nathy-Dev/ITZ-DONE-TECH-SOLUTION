@@ -19,6 +19,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/components/providers/CartProvider";
 import { ShoppingCart, CheckCircle } from "lucide-react";
+import CourseReviews from "@/components/courses/CourseReviews";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -199,6 +200,11 @@ export default function CourseDetailPage({ params }: PageProps) {
                  </div>
                )}
             </div>
+          </section>
+
+          {/* Reviews Section */}
+          <section id="reviews">
+            <CourseReviews courseId={courseId} isEnrolled={isEnrolled} />
           </section>
 
           {/* Instructor Placeholder */}

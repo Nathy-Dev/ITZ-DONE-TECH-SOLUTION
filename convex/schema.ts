@@ -75,4 +75,31 @@ export default defineSchema({
     email: v.string(),
     type: v.string(), // "business" or "mentorship"
   }).index("by_email_type", ["email", "type"]),
+  reviews: defineTable({
+    userId: v.id("users"),
+    courseId: v.id("courses"),
+    rating: v.number(),
+    comment: v.string(),
+    createdAt: v.number(),
+  })
+    .index("by_course", ["courseId"])
+    .index("by_user_course", ["userId", "courseId"]),
+  discussions: defineTable({
+    userId: v.id("users"),
+    lessonId: v.id("lessons"),
+    content: v.string(),
+    parentMessageId: v.optional(v.id("discussions")),
+    createdAt: v.number(),
+  })
+    .index("by_lesson", ["lessonId"])
+    .index("by_parent", ["parentMessageId"]),
+  certificates: defineTable({
+    userId: v.id("users"),
+    courseId: v.id("courses"),
+    certificateId: v.string(),
+    issuedAt: v.number(),
+  })
+    .index("by_user", ["userId"])
+    .index("by_course", ["courseId"])
+    .index("by_user_course", ["userId", "courseId"]),
 });
