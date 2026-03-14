@@ -33,7 +33,7 @@ export default function CourseDetailPage({ params }: PageProps) {
   const router = useRouter();
   const [isEnrolling, setIsEnrolling] = useState(false);
 
-  const course = useQuery(api.courses.getById, { id: courseId });
+  const course = useQuery(api.courses.getByIdDetailed, { id: courseId });
   const sections = useQuery(api.content.listSections, { courseId });
   
   const { addItem, isInCart } = useCart();
@@ -129,7 +129,7 @@ export default function CourseDetailPage({ params }: PageProps) {
                     <Star key={i} className={cn("w-4 h-4 fill-current", i > Math.floor(course.rating) && "opacity-30")} />
                   ))}
                 </div>
-                <span className="text-slate-400 ml-1">(2.5k reviews)</span>
+                <span className="text-slate-400 ml-1">({course.totalReviews} reviews)</span>
               </div>
               <div className="flex items-center gap-2 text-slate-300">
                 <Users className="w-5 h-5 text-cyan-400" />
@@ -139,10 +139,14 @@ export default function CourseDetailPage({ params }: PageProps) {
 
             <div className="flex flex-wrap items-center gap-8 text-sm text-slate-300 pt-4">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-full bg-blue-800 flex items-center justify-center font-bold text-[10px]">
-                  {course.instructorId.substring(0, 2).toUpperCase()}
+                <div className="w-8 h-8 rounded-full bg-blue-800 flex items-center justify-center font-bold text-[10px] overflow-hidden">
+                  {course.instructor?.profileImage ? (
+                    <Image src={course.instructor.profileImage} alt={course.instructor.name} width={32} height={32} className="object-cover" />
+                  ) : (
+                    course.instructor?.name.substring(0, 2).toUpperCase() || "IN"
+                  )}
                 </div>
-                <span>Created by <span className="text-cyan-400 font-bold">Instructor</span></span>
+                <span>Created by <span className="text-cyan-400 font-bold">{course.instructor?.name || "Instructor"}</span></span>
               </div>
               <div className="flex items-center gap-2">
                 <Calendar className="w-4 h-4 text-slate-400" />
@@ -212,12 +216,16 @@ export default function CourseDetailPage({ params }: PageProps) {
           <section className="p-10 border border-slate-100 dark:border-slate-800 rounded-[32px]">
             <h2 className="text-2xl font-black mb-8 text-blue-800 dark:text-cyan-400">Your Instructor</h2>
             <div className="flex flex-col md:flex-row gap-8 items-start">
-              <div className="w-24 h-24 bg-slate-900 rounded-3xl flex items-center justify-center text-white font-black text-3xl shadow-2xl">
-                {course.instructorId.substring(0, 2).toUpperCase()}
+              <div className="w-24 h-24 bg-slate-900 rounded-3xl flex items-center justify-center text-white font-black text-3xl shadow-2xl overflow-hidden">
+                {course.instructor?.profileImage ? (
+                  <Image src={course.instructor.profileImage} alt={course.instructor.name} width={96} height={96} className="object-cover" />
+                ) : (
+                  course.instructor?.name.substring(0, 2).toUpperCase() || "IN"
+                )}
               </div>
               <div className="flex-grow space-y-4">
                 <div>
-                  <h3 className="text-2xl font-black">Lead Instructor</h3>
+                  <h3 className="text-2xl font-black">{course.instructor?.name || "Lead Instructor"}</h3>
                   <p className="text-blue-800 dark:text-cyan-400 font-bold">Expert Educator</p>
                 </div>
                 <div className="flex gap-8 text-xs font-black uppercase tracking-widest text-slate-500">
@@ -227,11 +235,11 @@ export default function CourseDetailPage({ params }: PageProps) {
                   </div>
                   <div className="flex items-center gap-2">
                     <Users className="w-4 h-4 text-blue-500" />
-                    <span>1,000+ Students</span>
+                    <span>{course.studentsEnrolled.toLocaleString()} Students</span>
                   </div>
                 </div>
                 <p className="text-slate-600 dark:text-slate-400 leading-relaxed font-medium">
-                  Leading expert in the field with years of practical experience and a passion for teaching modern technologies.
+                  {course.instructor?.bio || "Leading expert in the field with years of practical experience and a passion for teaching modern technologies."}
                 </p>
               </div>
             </div>
@@ -296,7 +304,7 @@ export default function CourseDetailPage({ params }: PageProps) {
                           title: course.title,
                           price: course.price,
                           image: displayImage || undefined,
-                          instructor: "Instructor"
+                          instructor: course.instructor?.name || "Instructor"
                         });
                       }
                     }}

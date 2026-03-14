@@ -15,6 +15,34 @@ export const getById = query({
   },
 });
 
+export const getByIdDetailed = query({
+  args: { id: v.id("courses") },
+  handler: async (ctx, args) => {
+    const course = await ctx.db.get(args.id);
+    if (!course) return null;
+
+    const instructor = await ctx.db
+      .query("users")
+      .withIndex("by_provider_id", (q) => q.eq("providerId", course.instructorId))
+      .unique();
+
+    const reviews = await ctx.db
+      .query("reviews")
+      .withIndex("by_course", (q) => q.eq("courseId", args.id))
+      .collect();
+
+    return {
+      ...course,
+      instructor: instructor ? {
+        name: instructor.name,
+        profileImage: instructor.profileImage,
+        bio: instructor.bio,
+      } : null,
+      totalReviews: reviews.length,
+    };
+  },
+});
+
 export const listByInstructor = query({
   args: { instructorId: v.string() },
   handler: async (ctx, args) => {
