@@ -76,6 +76,14 @@ export default function ProfilePage() {
     );
   }
 
+  if (convexUser === null) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950 font-bold text-slate-500">
+        User profile not found.
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pt-32 pb-20">
       <div className="max-w-4xl mx-auto px-6 md:px-12">
