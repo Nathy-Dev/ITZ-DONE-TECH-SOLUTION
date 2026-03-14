@@ -22,21 +22,21 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    template: "%s | ITZ-DONE TECH SOLUTION",
-    default: "ITZ-DONE TECH SOLUTION | Master Modern Tech Skills",
+    template: "%s | ITS-DONE TECH SOLUTION",
+    default: "ITS-DONE TECH SOLUTION | Master Modern Tech Skills",
   },
   description: "A premium platform for hosting and purchasing high-quality tech courses and mentorship.",
   openGraph: {
-    title: "ITZ-DONE TECH SOLUTION",
+    title: "ITS-DONE TECH SOLUTION",
     description: "Master Modern Tech Skills with our premium courses.",
-    url: "https://itz-done-tech-solution.vercel.app/",
-    siteName: "ITZ-DONE TECH SOLUTION",
+    url: "https://its-done-tech.vercel.app/",
+    siteName: "ITS-DONE TECH SOLUTION",
     images: [
       {
         url: "/og-image.jpg", // Placeholder for actual OG image
         width: 1200,
         height: 630,
-        alt: "ITZ-DONE TECH SOLUTION Preview",
+        alt: "ITS-DONE TECH SOLUTION Preview",
       },
     ],
     locale: "en_US",
@@ -44,7 +44,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "ITZ-DONE TECH SOLUTION",
+    title: "ITS-DONE TECH SOLUTION",
     description: "Master Modern Tech Skills with our premium courses.",
     images: ["/og-image.jpg"],
   },

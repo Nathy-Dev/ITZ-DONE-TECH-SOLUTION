@@ -8,7 +8,7 @@ import { MoveRight, PlayCircle, Users, CheckCircle2 } from "lucide-react";
 import Link from "next/link";
 
 /**
- * Main ITZ-DONE TECH SOLUTION Landing Page.
+ * Main ITS-DONE TECH SOLUTION Landing Page.
  * Assembles various sections to create a high-converting experience.
  */
 export default function Home() {
@@ -70,7 +70,7 @@ export default function Home() {
             
             <div className="space-y-8">
               <h2 className="text-4xl md:text-5xl font-bold leading-tight">
-                Why thousands of students choose <span className="text-cyan-500">ITZ-DONE</span> every day.
+                Why thousands of students choose <span className="text-cyan-500">ITS-DONE</span> every day.
               </h2>
               <p className="text-lg text-muted-foreground leading-relaxed">
                 We don&apos;t just provide content; we provide a career-focused learning ecosystem. Our platform is built by engineers, for engineers, with a focus on simplicity, quality, and results.

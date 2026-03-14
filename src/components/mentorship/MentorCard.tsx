@@ -3,6 +3,7 @@
 import React from "react";
 import Image from "next/image";
 import { Star, MessageSquare } from "lucide-react";
+import { formatPrice } from "@/lib/format";
 
 interface MentorCardProps {
   name: string;
@@ -34,7 +35,7 @@ export default function MentorCard({ name, image, bio, expertise, hourlyRate, ra
             </div>
         </div>
         <div className="text-right">
-            <p className="text-2xl font-black text-blue-800 dark:text-cyan-400">${hourlyRate}</p>
+            <p className="text-2xl font-black text-blue-800 dark:text-cyan-400">{formatPrice(hourlyRate)}</p>
             <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mt-1">/ hour</p>
         </div>
       </div>

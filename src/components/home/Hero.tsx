@@ -28,7 +28,7 @@ const Hero = () => {
           </div>
 
           <p className="text-2xl md:text-3xl font-extrabold tracking-wider uppercase text-blue-800 dark:text-blue-300">
-            ITZ-DONE TECH SOLUTIONS
+            ITS-DONE TECH SOLUTIONS
           </p>
           
           <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight leading-[1.1]">

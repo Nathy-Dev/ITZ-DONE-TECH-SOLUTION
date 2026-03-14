@@ -3,7 +3,7 @@ import Link from "next/link";
 import { ShoppingCart, Trash2, ArrowRight, ShieldCheck, Zap, CreditCard } from "lucide-react";
 import { useCart } from "@/components/providers/CartProvider";
 import Image from "next/image";
-import { cn } from "@/lib/utils";
+import { formatPrice } from "@/lib/format";
 
 export default function CartPage() {
   const { items, removeItem, totalPrice, itemCount } = useCart();
@@ -52,7 +52,7 @@ export default function CartPage() {
                     {item.image ? (
                       <Image src={item.image} alt={item.title} fill className="object-cover group-hover:scale-105 transition-transform duration-500" />
                     ) : (
-                      <div className="absolute inset-0 bg-blue-800/10 flex items-center justify-center font-black text-blue-800/20 text-xl">ITZ-DONE</div>
+                      <div className="absolute inset-0 bg-blue-800/10 flex items-center justify-center font-black text-blue-800/20 text-xl">ITS-DONE</div>
                     )}
                   </div>
 
@@ -75,7 +75,7 @@ export default function CartPage() {
                   </div>
 
                   <div className="flex flex-row md:flex-col items-center md:items-end justify-between md:justify-center gap-4">
-                    <div className="text-2xl font-black">${item.price}</div>
+                    <div className="text-2xl font-black">{formatPrice(item.price)}</div>
                     <button 
                       onClick={() => removeItem(item.id)}
                       className="p-3 text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-2xl transition-all group/btn"
@@ -101,15 +101,15 @@ export default function CartPage() {
                 <div className="space-y-4 mb-8 relative z-10">
                   <div className="flex justify-between text-slate-400 font-medium">
                     <span>Original Price</span>
-                    <span>${totalPrice}</span>
+                    <span>{formatPrice(totalPrice)}</span>
                   </div>
                   <div className="flex justify-between text-slate-400 font-medium pb-4 border-b border-white/10">
                     <span>Discounts</span>
-                    <span className="text-emerald-400">-$0</span>
+                    <span className="text-emerald-400">-{formatPrice(0)}</span>
                   </div>
                   <div className="flex justify-between items-end pt-2">
                     <span className="text-slate-300 font-black uppercase tracking-widest text-xs">Total Amount</span>
-                    <span className="text-3xl font-black text-cyan-400">${totalPrice}</span>
+                    <span className="text-3xl font-black text-cyan-400">{formatPrice(totalPrice)}</span>
                   </div>
                 </div>
 

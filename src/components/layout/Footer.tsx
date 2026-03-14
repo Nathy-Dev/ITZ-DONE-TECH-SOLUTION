@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Youtube, Twitter, Linkedin, Github, Mail } from "lucide-react";
 
 /**
- * Footer component for ITZ-DONE TECH SOLUTION.
+ * Footer component for ITS-DONE TECH SOLUTION.
  * Organized into logical sections with a modern tech-focused aesthetic.
  */
 const Footer = () => {
@@ -18,7 +18,7 @@ const Footer = () => {
                 ITZ
               </div>
               <span className="font-bold text-xl tracking-tight">
-                ITZ-DONE <span className="text-blue-800">TECH</span>
+                ITS-DONE <span className="text-blue-800">TECH</span>
               </span>
             </Link>
             <p className="text-muted-foreground text-sm leading-relaxed">
@@ -91,7 +91,7 @@ const Footer = () => {
         </div>
 
         <div className="pt-8 border-t border-slate-200 dark:border-slate-900 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-muted-foreground">
-          <p>© {new Date().getFullYear()} ITZ-DONE TECH SOLUTIONS. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} ITS-DONE TECH SOLUTIONS. All rights reserved.</p>
           <div className="flex gap-8">
             <Link href="#" className="hover:text-cyan-500">Privacy Policy</Link>
             <Link href="#" className="hover:text-cyan-500">Terms of Service</Link>

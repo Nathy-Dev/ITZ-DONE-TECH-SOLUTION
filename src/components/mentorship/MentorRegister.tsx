@@ -99,7 +99,7 @@ export default function MentorRegister({ userId }: MentorRegisterProps) {
           </div>
 
           <div className="space-y-2">
-            <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mx-4">Hourly Rate ($)</label>
+            <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mx-4">Hourly Rate (₦)</label>
             <input
               type="number"
               required

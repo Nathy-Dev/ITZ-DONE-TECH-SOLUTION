@@ -7,6 +7,7 @@ import {
 } from "recharts";
 import { TrendingUp, Users, Video } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { formatPrice } from "@/lib/format";
 
 // Mock Data
 const revenueData = [
@@ -105,7 +106,7 @@ export default function EarningsAnalytics({ chartData }: EarningsAnalyticsProps)
               </defs>
               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
               <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748b', fontWeight: 600 }} dy={10} />
-              <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748b', fontWeight: 600 }} tickFormatter={(value) => `$${value}`} />
+              <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748b', fontWeight: 600 }} tickFormatter={(value) => formatPrice(value)} />
               <Tooltip 
                 contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)' }}
                 labelStyle={{ fontWeight: 800, color: '#0f172a', marginBottom: '4px' }}

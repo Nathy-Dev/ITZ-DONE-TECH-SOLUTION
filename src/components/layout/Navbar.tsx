@@ -14,7 +14,7 @@ import { useCart } from "@/components/providers/CartProvider";
 import { useTheme } from "@/components/providers/ThemeProvider";
 
 /**
- * Navbar component for ITZ-DONE TECH SOLUTION.
+ * Navbar component for ITS-DONE TECH SOLUTION.
  */
 const Navbar = () => {
   const { data: session } = useSession();
@@ -100,7 +100,7 @@ const { itemCount, items, removeItem, totalPrice } = useCart();
             ITZ
           </div>
           <span className="font-bold text-xl tracking-tight hidden sm:block">
-            ITZ-DONE <span className="text-blue-800">TECH</span>
+            ITS-DONE <span className="text-blue-800">TECH</span>
           </span>
         </Link>
 

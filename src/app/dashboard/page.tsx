@@ -28,6 +28,7 @@ import { cn } from "@/lib/utils";
 import { useQuery } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import { Doc } from "../../../convex/_generated/dataModel";
+import { formatPrice } from "@/lib/format";
 
 interface EnrollmentWithCourse extends Doc<"enrollments"> {
   course: Doc<"courses">;
@@ -333,7 +334,7 @@ function InstructorDashboard({ courses, stats }: {
       {/* Stats Overview */}
       {[
         { label: "Total Students", value: stats?.totalStudents || 0, icon: Users, color: "text-blue-600", bg: "bg-blue-100 dark:bg-blue-900/30" },
-        { label: "Course Revenue", value: `$${stats?.totalRevenue || 0}`, icon: DollarSign, color: "text-emerald-600", bg: "bg-emerald-100 dark:bg-emerald-900/30" },
+        { label: "Course Revenue", value: formatPrice(stats?.totalRevenue || 0), icon: DollarSign, color: "text-emerald-600", bg: "bg-emerald-100 dark:bg-emerald-900/30" },
         { label: "Course Rating", value: stats?.averageRating?.toFixed(1) || "0.0", icon: Trophy, color: "text-amber-600", bg: "bg-amber-100 dark:bg-amber-900/30" },
         { label: "My Courses", value: stats?.totalCourses || 0, icon: Video, color: "text-purple-600", bg: "bg-purple-100 dark:bg-purple-900/30" },
       ].map((stat, i) => (

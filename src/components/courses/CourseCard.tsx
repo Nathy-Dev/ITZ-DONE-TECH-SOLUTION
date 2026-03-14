@@ -3,6 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { Star, Clock, User, BarChart, ShoppingCart, CheckCircle2 } from "lucide-react";
+import { formatPrice } from "@/lib/format";
 import { useQuery } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import Image from "next/image";
@@ -34,7 +35,7 @@ const CourseCard = ({
   originalPrice, level, duration, badge, image, thumbnailUrl 
 }: CourseCardProps) => {
   const courseId = (_id || id) as string;
-  const displayInstructor = instructor || "ITZ-DONE Instructor";
+  const displayInstructor = instructor || "ITS-DONE Instructor";
   const rawImage = thumbnailUrl || image;
   
   const { addItem, isInCart } = useCart();
@@ -77,7 +78,7 @@ const CourseCard = ({
              />
           ) : (
             <div className="absolute inset-0 bg-gradient-to-br from-blue-800/20 to-cyan-500/20 group-hover:scale-110 transition-transform duration-500 flex items-center justify-center">
-              <span className="text-4xl font-bold text-blue-800/10 dark:text-blue-400/5 select-none">ITZ-DONE</span>
+              <span className="text-4xl font-bold text-blue-800/10 dark:text-blue-400/5 select-none">ITS-DONE</span>
             </div>
           )}
           
@@ -120,9 +121,9 @@ const CourseCard = ({
 
           <div className="pt-3 mt-auto flex items-center justify-between gap-2">
             <div className="flex items-center gap-2">
-              <span className="text-xl font-extrabold">${price}</span>
+              <span className="text-xl font-extrabold">{formatPrice(price)}</span>
               {originalPrice && (
-                <span className="text-sm text-muted-foreground line-through">${originalPrice}</span>
+                <span className="text-sm text-muted-foreground line-through">{formatPrice(originalPrice)}</span>
               )}
             </div>
             

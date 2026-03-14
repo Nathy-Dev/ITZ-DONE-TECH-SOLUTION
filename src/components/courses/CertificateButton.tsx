@@ -89,7 +89,7 @@ export default function CertificateButton({
       doc.setTextColor(100, 116, 139);
       doc.setFontSize(14);
       doc.text(`DATE: ${new Date().toLocaleDateString()}`, 60, 170, { align: "center" });
-      doc.text("INSTRUCTOR: ITZ-DONE TECH SOLUTIONS", 237, 170, { align: "center" });
+      doc.text("INSTRUCTOR: ITS-DONE TECH SOLUTIONS", 237, 170, { align: "center" });
 
       // Seal/Icon placeholder effect
       doc.setDrawColor(251, 191, 36); // amber-400

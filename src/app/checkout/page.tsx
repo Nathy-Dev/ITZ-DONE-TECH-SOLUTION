@@ -6,6 +6,7 @@ import { redirect, useRouter } from "next/navigation";
 import { useCart } from "@/components/providers/CartProvider";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../../convex/_generated/api";
+import { Id } from "../../../convex/_generated/dataModel";
 import { 
   ShieldCheck, 
   CreditCard, 
@@ -19,6 +20,7 @@ import {
 import Link from "next/link";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
+import { formatPrice } from "@/lib/format";
 
 export default function CheckoutPage() {
   const { data: session, status } = useSession();
@@ -66,7 +68,7 @@ export default function CheckoutPage() {
       for (const item of items) {
         await createEnrollment({
           userId: convexUser._id,
-          courseId: item.id as any // Type cast for simplicity
+          courseId: item.id as Id<"courses">
         });
       }
 
@@ -93,7 +95,7 @@ export default function CheckoutPage() {
         </div>
         <h1 className="text-4xl font-black mb-4 animate-in fade-in slide-in-from-bottom-2 duration-700">Payment Successful!</h1>
         <p className="text-muted-foreground text-center max-w-md mb-10 font-medium animate-in fade-in duration-1000">
-          Welcome to the ITZ-DONE community. Your courses have been added to your dashboard. Preparing your learning environment...
+          Welcome to the ITS-DONE community. Your courses have been added to your dashboard. Preparing your learning environment...
         </p>
         <div className="flex items-center gap-3 text-blue-800 dark:text-cyan-400 font-bold animate-pulse">
            <Loader2 className="w-5 h-5 animate-spin" />
@@ -173,7 +175,7 @@ export default function CheckoutPage() {
                 <div className="flex items-center gap-3 p-4 bg-amber-500/10 border border-amber-500/20 rounded-2xl text-amber-700 dark:text-amber-400">
                     <AlertCircle className="w-5 h-5 shrink-0" />
                     <p className="text-xs font-bold leading-relaxed">
-                        By clicking &quot;Complete Enrollment&quot;, you agree to ITZ-DONE TECH SOLUTION&apos;s Terms of Service and Privacy Policy.
+                        By clicking &quot;Complete Enrollment&quot;, you agree to ITS-DONE TECH SOLUTION&apos;s Terms of Service and Privacy Policy.
                     </p>
                 </div>
             </div>
@@ -191,7 +193,7 @@ export default function CheckoutPage() {
                                 </div>
                                 <div className="flex-grow min-w-0">
                                    <p className="font-bold text-sm truncate group-hover:text-blue-800 transition-colors">{item.title}</p>
-                                   <p className="text-xs text-muted-foreground font-medium">${item.price}</p>
+                                   <p className="text-xs text-muted-foreground font-medium">{formatPrice(item.price)}</p>
                                 </div>
                              </div>
                            ))}
@@ -204,15 +206,15 @@ export default function CheckoutPage() {
                         <div className="space-y-4 font-bold text-sm">
                            <div className="flex justify-between text-muted-foreground">
                               <span>Subtotal</span>
-                              <span>${totalPrice}</span>
+                              <span>{formatPrice(totalPrice)}</span>
                            </div>
                            <div className="flex justify-between text-muted-foreground">
                               <span>Taxes</span>
-                              <span>$0.00</span>
+                              <span>{formatPrice(0)}</span>
                            </div>
                            <div className="flex justify-between text-xl font-black pt-4 border-t border-slate-100 dark:border-slate-800">
                               <span>Total</span>
-                              <span className="text-blue-800 dark:text-cyan-400">${totalPrice}</span>
+                              <span className="text-blue-800 dark:text-cyan-400">{formatPrice(totalPrice)}</span>
                            </div>
                         </div>
 

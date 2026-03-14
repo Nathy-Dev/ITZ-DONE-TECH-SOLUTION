@@ -71,11 +71,11 @@ export default function RegisterPage() {
           {/* Header */}
           <div className="text-center mb-10">
             <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-800 rounded-2xl text-white font-bold text-2xl mb-6 shadow-lg shadow-blue-800/20">
-              ITZ
+              ITS
             </div>
             <h1 className="text-3xl font-bold tracking-tight mb-2">Create Account</h1>
             <p className="text-slate-500 dark:text-slate-400">
-              Join ITZ-DONE TECH SOLUTION today
+              Join ITS-DONE TECH SOLUTION today
             </p>
           </div>
 
