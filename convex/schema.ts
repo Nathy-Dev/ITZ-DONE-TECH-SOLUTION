@@ -15,7 +15,11 @@ export default defineSchema({
     rating: v.number(),
     isPublished: v.boolean(),
     publishedAt: v.optional(v.number()),
-  }).index("by_title", ["title"]),
+  }).index("by_title", ["title"])
+    .searchIndex("search_courses", {
+      searchField: "title",
+      filterFields: ["category", "isPublished"],
+    }),
   users: defineTable({
     name: v.string(),
     email: v.string(),
@@ -63,8 +67,12 @@ export default defineSchema({
     courseId: v.id("courses"),
     storageId: v.id("_storage"),
     name: v.string(),
-    type: v.string(), 
+    type: v.string(),
     size: v.number(),
-    url: v.string(),
+    url: v.optional(v.string())
   }).index("by_course", ["courseId"]),
+  waitlist: defineTable({
+    email: v.string(),
+    type: v.string(), // "business" or "mentorship"
+  }).index("by_email_type", ["email", "type"]),
 });

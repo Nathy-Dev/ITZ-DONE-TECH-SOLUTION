@@ -7,6 +7,8 @@ import { cn } from "@/lib/utils";
 import { useQuery } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 
+import { useDebounce } from "use-debounce";
+
 // Mock data removed
 
 const categories = ["Web Development", "AI & ML", "Data Science", "Mobile Dev", "Cloud", "Design", "DevOps"];
@@ -17,10 +19,22 @@ const categories = ["Web Development", "AI & ML", "Data Science", "Mobile Dev", 
  */
 export default function CoursesPage() {
   const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedSearchQuery] = useDebounce(searchQuery, 500);
   const [selectedCategory, setSelectedCategory] = useState("All");
   
-  const allCourses = (useQuery(api.courses.list) || []) as any[];
-  const courses = allCourses.filter((c: any) => c.isPublished);
+  // Use search if either query exists or category is selected, otherwise get all published
+  const isSearching = debouncedSearchQuery.length > 0 || selectedCategory !== "All";
+  
+  const searchResults = useQuery(api.courses.search, isSearching ? {
+    searchQuery: debouncedSearchQuery,
+    category: selectedCategory === "All" ? undefined : selectedCategory
+  } : "skip");
+
+  const allCourses = useQuery(api.courses.list);
+  
+  const courses = isSearching 
+    ? (searchResults || []) 
+    : (allCourses?.filter(c => c.isPublished) || []);
 
   return (
     <div className="pt-28 pb-20">
@@ -125,7 +139,7 @@ export default function CoursesPage() {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-              {courses.map((course) => (
+              {courses.map((course: any) => (
                 <CourseCard 
                   key={course._id} 
                   id={course._id}

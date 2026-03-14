@@ -123,7 +123,7 @@ export default function CourseDetailPage({ params }: PageProps) {
               <div className="flex items-center gap-2 text-amber-400">
                 <span className="font-black text-2xl">{course.rating.toFixed(1)}</span>
                 <div className="flex">
-                  {[1, 2, 3, 4, 5].map((i) => (
+                  {[1, 2, 3, 4, 5].map((i: number) => (
                     <Star key={i} className={cn("w-4 h-4 fill-current", i > Math.floor(course.rating) && "opacity-30")} />
                   ))}
                 </div>
@@ -162,7 +162,7 @@ export default function CourseDetailPage({ params }: PageProps) {
           <section className="p-10 bg-slate-50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-800 rounded-[32px]">
             <h2 className="text-2xl font-black mb-8">What you&apos;ll learn</h2>
             <div className="grid sm:grid-cols-2 gap-8">
-              {whatYouWillLearn.map((item, idx) => (
+              {whatYouWillLearn.map((item: string, idx: number) => (
                 <div key={idx} className="flex gap-4">
                   <div className="w-6 h-6 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center shrink-0">
                     <CheckCircle2 className="w-4 h-4 text-blue-800 dark:text-cyan-400" />
@@ -185,7 +185,7 @@ export default function CourseDetailPage({ params }: PageProps) {
             </div>
             
             <div className="space-y-4">
-               {sections?.map((section) => (
+               {sections?.map((section: any) => (
                  <SectionAccordion 
                   key={section._id} 
                   section={section} 
@@ -387,7 +387,7 @@ function SectionAccordion({ section, isEnrolled }: { section: Doc<"sections">; i
       
       {isOpen && (
         <div className="p-2 space-y-1 animate-in slide-in-from-top-4 duration-300">
-          {lessons?.map((lesson) => {
+          {lessons?.map((lesson: any) => {
             const isLocked = !isEnrolled && !lesson.isFree;
             
             return (

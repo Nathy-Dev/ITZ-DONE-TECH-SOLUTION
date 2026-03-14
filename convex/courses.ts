@@ -61,3 +61,23 @@ export const togglePublish = mutation({
     return newStatus;
   },
 });
+
+export const search = query({
+  args: {
+    searchQuery: v.string(),
+    category: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const q = (ctx.db.query("courses") as any).withSearchIndex("search_courses", (q: any) => {
+      let searchQ = q.search("title", args.searchQuery);
+      if (args.category) {
+        searchQ = searchQ.eq("category", args.category);
+      }
+      return searchQ;
+    });
+
+    // Only return published courses in public search
+    const results = await q.collect();
+    return results.filter((course: any) => course.isPublished);
+  },
+});

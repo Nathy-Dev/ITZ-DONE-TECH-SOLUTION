@@ -200,7 +200,7 @@ export default function ManageCoursePage({ params }: PageProps) {
                   <Droppable droppableId="sections" type="section">
                     {(provided) => (
                       <div {...provided.droppableProps} ref={provided.innerRef} className="space-y-4">
-                        {sections.map((section, index) => (
+                        {sections.map((section: any, index: number) => (
                           <Draggable key={section._id} draggableId={section._id} index={index}>
                             {(provided) => (
                               <div
