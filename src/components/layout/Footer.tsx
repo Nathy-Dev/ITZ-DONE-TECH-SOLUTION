@@ -1,12 +1,18 @@
 import React from "react";
 import Link from "next/link";
 import { Youtube, Twitter, Linkedin, Github, Mail } from "lucide-react";
+import { usePathname } from "next/navigation";
 
 /**
  * Footer component for ITS-DONE TECH SOLUTION.
  * Organized into logical sections with a modern tech-focused aesthetic.
  */
 const Footer = () => {
+  const pathname = usePathname();
+  
+  // Hide Footer on lesson player routes
+  if (pathname?.includes("/lessons/")) return null;
+
   return (
     <footer className="bg-slate-50 dark:bg-slate-950 border-t border-slate-200 dark:border-slate-900 pt-16 pb-8">
       <div className="max-w-7xl mx-auto px-6 md:px-12">

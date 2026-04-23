@@ -12,12 +12,17 @@ import { GraduationCap, BookOpen, UserCircle, Sun, Moon, LogOut, ArrowRightLeft,
 import { useRef } from "react";
 import { useCart } from "@/components/providers/CartProvider";
 import { useTheme } from "@/components/providers/ThemeProvider";
+import { usePathname } from "next/navigation";
 
 /**
  * Navbar component for ITS-DONE TECH SOLUTION.
  */
 const Navbar = () => {
   const { data: session } = useSession();
+  const pathname = usePathname();
+  
+  // Hide Navbar on lesson player routes
+  if (pathname?.includes("/lessons/")) return null;
   
   const isSignedIn = !!session;
   const { theme, toggleTheme } = useTheme();
