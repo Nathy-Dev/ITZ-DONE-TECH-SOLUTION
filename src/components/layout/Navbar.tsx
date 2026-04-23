@@ -302,7 +302,7 @@ const Navbar = () => {
                       <div className="h-px bg-slate-100 dark:bg-slate-800 mx-2 my-1" />
 
                       <button 
-                        onClick={() => { signOut(); setUserMenuOpen(false); }}
+                        onClick={() => { signOut({ callbackUrl: "/login" }); setUserMenuOpen(false); }}
                         className="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-red-600 rounded-xl hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
                       >
                         <LogOut className="w-4 h-4" />
@@ -385,7 +385,7 @@ const Navbar = () => {
                 
                 <button 
                   onClick={() => {
-                    signOut();
+                    signOut({ callbackUrl: "/login" });
                     setMobileMenuOpen(false);
                   }}
                   className="flex items-center gap-3 p-3 text-red-600 font-bold"

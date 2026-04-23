@@ -158,7 +158,7 @@ export default function RegisterPage() {
           {/* OAuth Buttons */}
           <div className="grid grid-cols-2 gap-4">
             <button 
-              onClick={() => signIn("google", { callbackUrl: "/" })}
+              onClick={() => signIn("google", { callbackUrl: "/dashboard" })}
               className="flex items-center justify-center gap-2 py-3 border border-slate-100 dark:border-slate-800 rounded-2xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors font-medium text-sm"
             >
               <svg viewBox="0 0 24 24" className="w-5 h-5">
@@ -182,7 +182,7 @@ export default function RegisterPage() {
               Google
             </button>
             <button 
-              onClick={() => signIn("github", { callbackUrl: "/" })}
+              onClick={() => signIn("github", { callbackUrl: "/dashboard" })}
               className="flex items-center justify-center gap-2 py-3 border border-slate-100 dark:border-slate-800 rounded-2xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors font-medium text-sm"
             >
               <Github className="w-4 h-4" /> GitHub

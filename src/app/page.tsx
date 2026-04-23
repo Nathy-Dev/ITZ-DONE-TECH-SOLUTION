@@ -10,13 +10,34 @@ import { MoveRight, PlayCircle, Users, CheckCircle2 } from "lucide-react";
 import Link from "next/link";
 import { useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 /**
  * Main ITS-DONE TECH SOLUTION Landing Page.
  * Assembles various sections to create a high-converting experience.
  */
 export default function Home() {
+  const { data: session, status } = useSession();
+  const router = useRouter();
   const stats = useQuery(api.analytics.getPlatformStats);
+
+  // Redirect authenticated users to the dashboard
+  useEffect(() => {
+    if (status === "authenticated") {
+      router.replace("/dashboard");
+    }
+  }, [status, router]);
+
+  // Show loading while checking auth status
+  if (status === "loading" || status === "authenticated") {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-white dark:bg-slate-950">
+        <div className="w-12 h-12 border-4 border-blue-800 border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full overflow-x-hidden pt-16">
