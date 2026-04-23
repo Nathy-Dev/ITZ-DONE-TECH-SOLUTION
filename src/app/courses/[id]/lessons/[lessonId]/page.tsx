@@ -16,13 +16,15 @@ import {
   FileText,
   CheckCircle2,
   Circle,
-  Lock
+  Lock,
+  BookOpen
 } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
+import Image from "next/image";
 import MarkdownRenderer from "@/components/courses/MarkdownRenderer";
 import LessonDiscussion from "@/components/lessons/LessonDiscussion";
 import CertificateButton from "@/components/courses/CertificateButton";
@@ -206,10 +208,12 @@ export default function LessonViewerPage({ params }: PageProps) {
 
           {session?.user?.image && (
             <div className="hidden sm:block">
-              <img 
+              <Image 
                 src={session.user.image} 
                 alt="Profile" 
-                className="w-10 h-10 rounded-2xl border-2 border-white dark:border-slate-800 shadow-sm"
+                width={40}
+                height={40}
+                className="rounded-2xl border-2 border-white dark:border-slate-800 shadow-sm"
               />
             </div>
           )}
