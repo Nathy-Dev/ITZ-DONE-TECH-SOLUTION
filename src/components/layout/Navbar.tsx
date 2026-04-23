@@ -21,9 +21,6 @@ const Navbar = () => {
   const { data: session } = useSession();
   const pathname = usePathname();
   
-  // Hide Navbar on lesson player routes
-  if (pathname?.includes("/lessons/")) return null;
-  
   const isSignedIn = !!session;
   const { theme, toggleTheme } = useTheme();
   const [isScrolled, setIsScrolled] = useState(false);
@@ -86,8 +83,11 @@ const Navbar = () => {
     }
   };
 
-const { itemCount, items, removeItem, totalPrice } = useCart();
+  const { itemCount, items, removeItem, totalPrice } = useCart();
   const [cartPreviewOpen, setCartPreviewOpen] = useState(false);
+
+  // Hide Navbar on lesson player routes
+  if (pathname?.includes("/lessons/")) return null;
 
   return (
     <header
