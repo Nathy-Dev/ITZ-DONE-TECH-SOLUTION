@@ -180,7 +180,6 @@ export default function CoursesPage() {
                   image={course.thumbnailUrl}
                   level={course.level}
                   duration={course.duration}
-                  reviews={120} // Fixed value instead of Math.random
                 />
               ))}
             </div>

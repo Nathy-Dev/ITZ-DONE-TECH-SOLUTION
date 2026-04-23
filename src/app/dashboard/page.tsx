@@ -113,8 +113,10 @@ export default function DashboardPage() {
               <div className="flex items-center gap-4 bg-blue-800 text-white px-6 py-3 rounded-2xl shadow-lg shadow-blue-800/20">
                 <Trophy className="w-5 h-5 text-amber-400" />
                 <div className="text-sm">
-                  <p className="font-black">1,250 XP</p>
-                  <p className="text-[10px] text-blue-200 uppercase font-black tracking-widest">Level 12 Scholar</p>
+                  <p className="font-black">{enrolledCourses?.length || 0} Enrolled</p>
+                  <p className="text-[10px] text-blue-200 uppercase font-black tracking-widest">
+                    {enrolledCourses?.filter((e: any) => e.progress?.percentage === 100).length || 0} Completed
+                  </p>
                 </div>
               </div>
             )}
@@ -263,16 +265,7 @@ function LearnerDashboard({ enrolledCourses, allCourses }: {
           <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-white/5 rounded-full blur-3xl group-hover:scale-125 transition-transform duration-1000" />
           <h3 className="font-black text-xl mb-6 relative z-10">Your Stats</h3>
           <div className="space-y-6 relative z-10">
-            <div>
-              <div className="flex justify-between text-xs font-black uppercase tracking-widest mb-2 opacity-80">
-                <span>Weekly Goal</span>
-                <span>4 / 6h</span>
-              </div>
-              <div className="h-2 bg-white/20 rounded-full overflow-hidden">
-                <div className="h-full bg-cyan-400 rounded-full w-[65%]" />
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-4 pt-4">
+            <div className="grid grid-cols-2 gap-4">
               <div className="p-4 bg-white/10 rounded-2xl border border-white/10">
                 <p className="text-[9px] text-blue-200 uppercase font-black tracking-widest mb-1">Enrolled</p>
                 <p className="text-2xl font-black">{enrolledCourses?.length || 0}</p>
@@ -287,32 +280,25 @@ function LearnerDashboard({ enrolledCourses, allCourses }: {
           </div>
         </div>
 
-        {/* Recent Announcements */}
+        {/* Tips Section */}
         <div className="bg-white dark:bg-slate-900 rounded-[32px] p-8 border border-slate-100 dark:border-slate-800 shadow-xl shadow-blue-800/5">
-          <h3 className="font-black text-xl mb-6">Latest Updates</h3>
-          <div className="space-y-6">
-            {[
-              {
-                date: "Today",
-                title: "New AI Engineering Path launched!",
-                description: "Start your journey into GenAI and LLMs."
-              },
-              {
-                date: "Yesterday",
-                title: "Live Q&A with Sarah Drasner",
-                description: "Don't miss the session on Next.js 15."
-              }
-            ].map((item, i) => (
-              <div key={i} className="group cursor-pointer">
-                <p className="text-[10px] text-blue-800 dark:text-cyan-500 font-black uppercase tracking-[0.2em] mb-1">{item.date}</p>
-                <h4 className="font-black text-sm group-hover:text-blue-800 transition-colors leading-tight">{item.title}</h4>
-                <p className="text-xs text-muted-foreground mt-2 line-clamp-2 font-medium">{item.description}</p>
-              </div>
-            ))}
+          <h3 className="font-black text-xl mb-6">Quick Links</h3>
+          <div className="space-y-4">
+            <Link 
+              href="/courses" 
+              className="block p-4 rounded-2xl bg-slate-50 dark:bg-slate-800 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors group"
+            >
+              <h4 className="font-black text-sm group-hover:text-blue-800 transition-colors">Browse Courses</h4>
+              <p className="text-xs text-muted-foreground mt-1 font-medium">Discover new courses to expand your skills.</p>
+            </Link>
+            <Link 
+              href="/mentorship" 
+              className="block p-4 rounded-2xl bg-slate-50 dark:bg-slate-800 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors group"
+            >
+              <h4 className="font-black text-sm group-hover:text-blue-800 transition-colors">Find a Mentor</h4>
+              <p className="text-xs text-muted-foreground mt-1 font-medium">Get 1-on-1 guidance from industry experts.</p>
+            </Link>
           </div>
-          <button className="w-full mt-8 py-3 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-300 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
-            View All Updates
-          </button>
         </div>
       </div>
     </div>

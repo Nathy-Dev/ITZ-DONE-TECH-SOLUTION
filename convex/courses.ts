@@ -149,3 +149,59 @@ export const listFiltered = query({
     });
   },
 });
+
+export const listFeatured = query({
+  args: { limit: v.optional(v.number()) },
+  handler: async (ctx, args) => {
+    const courses = await ctx.db
+      .query("courses")
+      .withIndex("by_published_category", (q) => q.eq("isPublished", true))
+      .collect();
+
+    // Sort by students enrolled descending to get the most popular
+    courses.sort((a, b) => (b.studentsEnrolled || 0) - (a.studentsEnrolled || 0));
+
+    const limited = courses.slice(0, args.limit ?? 4);
+
+    // Enrich with instructor name and review count
+    return await Promise.all(
+      limited.map(async (course) => {
+        const instructor = await ctx.db
+          .query("users")
+          .withIndex("by_provider_id", (q) => q.eq("providerId", course.instructorId))
+          .unique();
+
+        const reviews = await ctx.db
+          .query("reviews")
+          .withIndex("by_course", (q) => q.eq("courseId", course._id))
+          .collect();
+
+        return {
+          ...course,
+          instructorName: instructor?.name || "Instructor",
+          totalReviews: reviews.length,
+        };
+      })
+    );
+  },
+});
+
+export const getCategoriesWithCounts = query({
+  args: {},
+  handler: async (ctx) => {
+    const courses = await ctx.db
+      .query("courses")
+      .filter((q) => q.eq(q.field("isPublished"), true))
+      .collect();
+
+    const counts: Record<string, number> = {};
+    for (const course of courses) {
+      const cat = course.category || "Other";
+      counts[cat] = (counts[cat] || 0) + 1;
+    }
+
+    return Object.entries(counts)
+      .map(([name, count]) => ({ name, count }))
+      .sort((a, b) => b.count - a.count);
+  },
+});

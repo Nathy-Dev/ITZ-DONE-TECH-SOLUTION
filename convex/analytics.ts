@@ -59,3 +59,36 @@ export const getInstructorStats = query({
     };
   },
 });
+
+export const getPlatformStats = query({
+  args: {},
+  handler: async (ctx) => {
+    const courses = await ctx.db
+      .query("courses")
+      .filter((q) => q.eq(q.field("isPublished"), true))
+      .collect();
+
+    const totalCourses = courses.length;
+    const totalStudents = courses.reduce((acc, c) => acc + (c.studentsEnrolled || 0), 0);
+
+    const mentors = await ctx.db
+      .query("mentorProfiles")
+      .collect();
+    const totalMentors = mentors.length;
+
+    const reviews = await ctx.db.query("reviews").collect();
+    const totalReviews = reviews.length;
+
+    const avgSatisfaction = reviews.length > 0
+      ? Math.round((reviews.reduce((acc, r) => acc + r.rating, 0) / reviews.length) * 20)
+      : 0;
+
+    return {
+      totalCourses,
+      totalStudents,
+      totalMentors,
+      totalReviews,
+      satisfactionRate: avgSatisfaction,
+    };
+  },
+});

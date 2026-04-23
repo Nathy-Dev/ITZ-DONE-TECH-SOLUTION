@@ -82,3 +82,14 @@ export const getReviewsByCourse = query({
     );
   },
 });
+
+export const getReviewCountByCourse = query({
+  args: { courseId: v.id("courses") },
+  handler: async (ctx, args) => {
+    const reviews = await ctx.db
+      .query("reviews")
+      .withIndex("by_course", (q) => q.eq("courseId", args.courseId))
+      .collect();
+    return reviews.length;
+  },
+});

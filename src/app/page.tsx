@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 import Hero from "@/components/home/Hero";
 import FeaturedCategories from "@/components/home/FeaturedCategories";
@@ -6,12 +8,16 @@ import FeaturedCourses from "@/components/home/FeaturedCourses";
 import HowItWorks from "@/components/home/HowItWorks";
 import { MoveRight, PlayCircle, Users, CheckCircle2 } from "lucide-react";
 import Link from "next/link";
+import { useQuery } from "convex/react";
+import { api } from "../../convex/_generated/api";
 
 /**
  * Main ITS-DONE TECH SOLUTION Landing Page.
  * Assembles various sections to create a high-converting experience.
  */
 export default function Home() {
+  const stats = useQuery(api.analytics.getPlatformStats);
+
   return (
     <div className="w-full overflow-x-hidden pt-16">
       {/* Hero Section */}
@@ -90,19 +96,27 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-6 md:px-12">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
             <div className="text-center space-y-2 group">
-              <h3 className="text-4xl font-extrabold text-blue-800 group-hover:scale-110 transition-transform">500+</h3>
+              <h3 className="text-4xl font-extrabold text-blue-800 group-hover:scale-110 transition-transform">
+                {stats ? `${stats.totalCourses}+` : "..."}
+              </h3>
               <p className="text-sm text-muted-foreground font-medium uppercase tracking-wider">Expert Courses</p>
             </div>
             <div className="text-center space-y-2 group">
-              <h3 className="text-4xl font-extrabold text-blue-800 group-hover:scale-110 transition-transform">250k+</h3>
+              <h3 className="text-4xl font-extrabold text-blue-800 group-hover:scale-110 transition-transform">
+                {stats ? `${stats.totalStudents.toLocaleString()}+` : "..."}
+              </h3>
               <p className="text-sm text-muted-foreground font-medium uppercase tracking-wider">Active Students</p>
             </div>
             <div className="text-center space-y-2 group">
-              <h3 className="text-4xl font-extrabold text-blue-800 group-hover:scale-110 transition-transform">120+</h3>
+              <h3 className="text-4xl font-extrabold text-blue-800 group-hover:scale-110 transition-transform">
+                {stats ? `${stats.totalMentors}+` : "..."}
+              </h3>
               <p className="text-sm text-muted-foreground font-medium uppercase tracking-wider">Elite Mentors</p>
             </div>
             <div className="text-center space-y-2 group">
-              <h3 className="text-4xl font-extrabold text-blue-800 group-hover:scale-110 transition-transform">98%</h3>
+              <h3 className="text-4xl font-extrabold text-blue-800 group-hover:scale-110 transition-transform">
+                {stats ? `${stats.satisfactionRate}%` : "..."}
+              </h3>
               <p className="text-sm text-muted-foreground font-medium uppercase tracking-wider">Satisfaction Rate</p>
             </div>
           </div>

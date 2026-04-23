@@ -3,6 +3,8 @@
 import React from "react";
 import Link from "next/link";
 import { Play, ArrowRight, Star, ShieldCheck, Users } from "lucide-react";
+import { useQuery } from "convex/react";
+import { api } from "../../../convex/_generated/api";
 
 /**
  * Hero component for the landing page.
@@ -10,6 +12,8 @@ import { Play, ArrowRight, Star, ShieldCheck, Users } from "lucide-react";
  * Features background decorative elements for a premium feel.
  */
 const Hero = () => {
+  const stats = useQuery(api.analytics.getPlatformStats);
+
   return (
     <section className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden">
       {/* Background Decorative Elements */}
@@ -24,7 +28,7 @@ const Hero = () => {
         <div className="space-y-8 max-w-2xl">
           <div className="inline-flex items-center gap-2 px-3 py-1 bg-blue-50 dark:bg-blue-950/30 border border-blue-100 dark:border-blue-900 rounded-full text-blue-800 dark:text-cyan-400 text-sm font-medium">
             <span className="flex h-2 w-2 rounded-full bg-cyan-500 animate-pulse" />
-            New: Master Next.js 15 & AI Engineering
+            New: Master Next.js 15 &amp; AI Engineering
           </div>
 
           <p className="text-2xl md:text-3xl font-extrabold tracking-wider uppercase text-blue-800 dark:text-blue-300">
@@ -75,7 +79,10 @@ const Hero = () => {
                   <Star className="w-3 h-3 fill-current" />
                   <Star className="w-3 h-3 fill-current" />
                 </div>
-                <p className="font-bold">10k+ <span className="font-normal text-muted-foreground">Reviews</span></p>
+                <p className="font-bold">
+                  {stats ? `${stats.totalReviews.toLocaleString()}+` : "..."}{" "}
+                  <span className="font-normal text-muted-foreground">Reviews</span>
+                </p>
               </div>
             </div>
           </div>
@@ -110,7 +117,9 @@ const Hero = () => {
                     <Users className="w-5 h-5 text-cyan-400" />
                   </div>
                   <div>
-                    <p className="text-white text-xs font-bold">2,450 students</p>
+                    <p className="text-white text-xs font-bold">
+                      {stats ? `${stats.totalStudents.toLocaleString()} students` : "Loading..."}
+                    </p>
                     <p className="text-white/60 text-[10px] items-center flex gap-1">Enrolled right now <span className="inline-block w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" /></p>
                   </div>
                 </div>
