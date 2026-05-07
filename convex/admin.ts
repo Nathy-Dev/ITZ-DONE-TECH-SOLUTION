@@ -28,10 +28,10 @@ export const getPlatformStats = query({
     const totalCourses = courses.length;
     const totalEnrollments = enrollments.length;
     
-    // In a real app, revenue might be tracked in a separate payments table.
-    // For now, we estimate based on course price * students enrolled, or similar.
-    const totalRevenue = courses.reduce((sum, course) => {
-      return sum + ((course.price || 0) * (course.studentsEnrolled || 0));
+    // Calculate revenue based on actual successful enrollments
+    const totalRevenue = enrollments.reduce((sum, enrollment) => {
+      const course = courses.find((c) => c._id === enrollment.courseId);
+      return sum + (course?.price || 0);
     }, 0);
 
     return {

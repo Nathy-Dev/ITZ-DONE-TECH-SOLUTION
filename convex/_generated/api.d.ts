@@ -14,6 +14,7 @@ import type * as certificates from "../certificates.js";
 import type * as content from "../content.js";
 import type * as courses from "../courses.js";
 import type * as debug from "../debug.js";
+import type * as deleteMockCourses from "../deleteMockCourses.js";
 import type * as discussions from "../discussions.js";
 import type * as emails from "../emails.js";
 import type * as enrollments from "../enrollments.js";
@@ -40,6 +41,7 @@ declare const fullApi: ApiFromModules<{
   content: typeof content;
   courses: typeof courses;
   debug: typeof debug;
+  deleteMockCourses: typeof deleteMockCourses;
   discussions: typeof discussions;
   emails: typeof emails;
   enrollments: typeof enrollments;
