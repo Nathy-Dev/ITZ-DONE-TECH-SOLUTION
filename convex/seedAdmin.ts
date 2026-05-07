@@ -1,7 +1,7 @@
 import { mutation } from "./_generated/server";
 import { v } from "convex/values";
 
-// Run this via: npx convex run seedAdmin:bootstrapAdmin -d '{"email": "your-email@example.com"}'
+// Run this via: npx convex run seedAdmin:bootstrapAdmin '{"email": "your-email@example.com"}'
 export const bootstrapAdmin = mutation({
   args: { email: v.string() },
   handler: async (ctx, args) => {

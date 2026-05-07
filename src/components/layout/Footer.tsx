@@ -12,8 +12,8 @@ import { usePathname } from "next/navigation";
 const Footer = () => {
   const pathname = usePathname();
   
-  // Hide Footer on lesson player routes
-  if (pathname?.includes("/lessons/")) return null;
+  // Hide Footer on lesson player routes and admin dashboard
+  if (pathname?.includes("/lessons/") || pathname?.startsWith("/admin")) return null;
 
   return (
     <footer className="bg-slate-50 dark:bg-slate-950 border-t border-slate-200 dark:border-slate-900 pt-16 pb-8">

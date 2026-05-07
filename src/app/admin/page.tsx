@@ -38,7 +38,6 @@ export default function AdminDashboardPage() {
             title="Total Users"
             value={stats.totalUsers}
             icon={Users}
-            trend="+12% this month"
             colorClass="text-blue-600 dark:text-cyan-400"
             bgClass="bg-blue-100 dark:bg-blue-900/30"
           />
@@ -46,7 +45,6 @@ export default function AdminDashboardPage() {
             title="Total Courses"
             value={stats.totalCourses}
             icon={BookOpen}
-            trend="+3 this month"
             colorClass="text-purple-600 dark:text-purple-400"
             bgClass="bg-purple-100 dark:bg-purple-900/30"
           />
@@ -54,7 +52,6 @@ export default function AdminDashboardPage() {
             title="Total Enrollments"
             value={stats.totalEnrollments}
             icon={GraduationCap}
-            trend="+18% this month"
             colorClass="text-emerald-600 dark:text-emerald-400"
             bgClass="bg-emerald-100 dark:bg-emerald-900/30"
           />
@@ -62,25 +59,11 @@ export default function AdminDashboardPage() {
             title="Est. Revenue"
             value={formatPrice(stats.totalRevenue)}
             icon={DollarSign}
-            trend="+24% this month"
             colorClass="text-amber-600 dark:text-amber-400"
             bgClass="bg-amber-100 dark:bg-amber-900/30"
           />
         </div>
       )}
-
-      {/* Placeholder for future charts or recent activity */}
-      <div className="bg-white dark:bg-slate-900 rounded-[32px] p-8 border border-slate-100 dark:border-slate-800 shadow-xl shadow-blue-800/5 min-h-[400px] flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-16 h-16 bg-slate-100 dark:bg-slate-800 rounded-2xl mx-auto flex items-center justify-center mb-4">
-             <span className="text-2xl">📊</span>
-          </div>
-          <h3 className="text-xl font-black mb-2">Detailed Analytics Coming Soon</h3>
-          <p className="text-muted-foreground font-medium max-w-sm mx-auto">
-             Visual charts for revenue growth and user acquisition will appear here in future updates.
-          </p>
-        </div>
-      </div>
     </div>
   );
 }

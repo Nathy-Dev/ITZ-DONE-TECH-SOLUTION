@@ -86,8 +86,8 @@ const Navbar = () => {
   const { itemCount, items, removeItem, totalPrice } = useCart();
   const [cartPreviewOpen, setCartPreviewOpen] = useState(false);
 
-  // Hide Navbar on lesson player routes
-  if (pathname?.includes("/lessons/")) return null;
+  // Hide Navbar on lesson player routes and admin dashboard
+  if (pathname?.includes("/lessons/") || pathname?.startsWith("/admin")) return null;
 
   return (
     <header
