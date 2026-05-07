@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
 import { useSession } from "next-auth/react";
-import { Search, Eye, CheckCircle, XCircle, X, PlayCircle, Video } from "lucide-react";
+import { Search, Eye, CheckCircle, XCircle, X, PlayCircle, Video, FileText } from "lucide-react";
 import Image from "next/image";
 import { formatPrice } from "@/lib/format";
 import { cn } from "@/lib/utils";
@@ -230,21 +230,85 @@ export default function AdminCoursesPage() {
 
 function CoursePreview({ courseId }: { courseId: any }) {
   const sections = useQuery(api.content.listSections, { courseId });
+  const media = useQuery(api.files.listMedia, { courseId });
+  const [previewResource, setPreviewResource] = useState<{ url: string, type: 'video' | 'document', title: string } | null>(null);
   
   if (!sections) return <div className="p-4 text-center text-sm text-slate-500 animate-pulse">Loading curriculum...</div>;
-  if (sections.length === 0) return <div className="p-4 text-center text-sm text-slate-500 bg-slate-50 dark:bg-slate-800/50 rounded-xl">No sections added yet.</div>;
 
   return (
-    <div className="space-y-4 pr-2">
-      {sections.sort((a, b) => a.order - b.order).map(section => (
-        <SectionPreview key={section._id} section={section} />
-      ))}
-    </div>
+    <>
+      <div className="space-y-4 pr-2">
+        {sections.length === 0 ? (
+          <div className="p-4 text-center text-sm text-slate-500 bg-slate-50 dark:bg-slate-800/50 rounded-xl">No sections added yet.</div>
+        ) : (
+          sections.sort((a, b) => a.order - b.order).map(section => (
+            <SectionPreview key={section._id} section={section} setPreviewResource={setPreviewResource} />
+          ))
+        )}
+
+        {media && media.length > 0 && (
+          <div className="border border-slate-100 dark:border-slate-800 rounded-xl overflow-hidden bg-white dark:bg-slate-900 mt-6">
+            <div className="bg-slate-50 dark:bg-slate-800/50 px-4 py-3 font-bold text-sm">
+              Course Attachments
+            </div>
+            <div className="divide-y divide-slate-100 dark:divide-slate-800">
+               {media.map((m: any) => (
+                 <div key={m._id} className="p-3 pl-8 text-sm flex items-center justify-between group">
+                   <span className="font-medium text-slate-700 dark:text-slate-300 flex items-center gap-2">
+                     <FileText className="w-3.5 h-3.5 text-blue-500" />
+                     {m.name}
+                   </span>
+                   {m.resolvedUrl && (
+                     <button onClick={() => setPreviewResource({ url: m.resolvedUrl, type: 'document', title: m.name })} className="text-xs text-blue-600 hover:underline flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                       <Eye className="w-3 h-3" /> View
+                     </button>
+                   )}
+                 </div>
+               ))}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {previewResource && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-slate-950/80 backdrop-blur-sm p-4">
+          <div className="bg-slate-900 w-full max-w-5xl h-[85vh] rounded-2xl shadow-2xl overflow-hidden flex flex-col border border-slate-800">
+            <div className="p-4 border-b border-slate-800 flex items-center justify-between">
+              <h3 className="text-white font-bold">{previewResource.title}</h3>
+              <button onClick={() => setPreviewResource(null)} className="p-2 hover:bg-slate-800 rounded-full text-slate-400 hover:text-white transition-colors">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="flex-1 bg-black relative">
+              <iframe src={previewResource.url} className="absolute inset-0 w-full h-full border-0" allowFullScreen></iframe>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 }
 
-function SectionPreview({ section }: { section: any }) {
+function SectionPreview({ section, setPreviewResource }: { section: any, setPreviewResource: any }) {
   const lessons = useQuery(api.content.listLessons, { sectionId: section._id });
+
+  const getEmbedUrl = (url: string) => {
+    if (!url) return "";
+    try {
+      const parsed = new URL(url);
+      if (parsed.hostname.includes("youtube.com") || parsed.hostname.includes("youtu.be")) {
+        const videoId = parsed.searchParams.get("v") || parsed.pathname.split("/").pop();
+        return `https://www.youtube.com/embed/${videoId}`;
+      }
+      if (parsed.hostname.includes("vimeo.com")) {
+        const videoId = parsed.pathname.split("/").pop();
+        return `https://player.vimeo.com/video/${videoId}`;
+      }
+      return url;
+    } catch (e) {
+      return url;
+    }
+  };
 
   return (
     <div className="border border-slate-100 dark:border-slate-800 rounded-xl overflow-hidden bg-white dark:bg-slate-900">
@@ -258,7 +322,7 @@ function SectionPreview({ section }: { section: any }) {
           <div className="p-3 text-xs text-slate-400 pl-8">Empty section</div>
         ) : (
           lessons.sort((a, b) => a.order - b.order).map((lesson: any) => (
-            <div key={lesson._id} className="p-3 pl-8 text-sm flex flex-col gap-1">
+            <div key={lesson._id} className="p-3 pl-8 text-sm flex flex-col gap-1 group">
               <div className="flex items-center justify-between">
                 <span className="font-medium text-slate-700 dark:text-slate-300 flex items-center gap-2">
                   <PlayCircle className="w-3.5 h-3.5 text-blue-500" />
@@ -267,9 +331,12 @@ function SectionPreview({ section }: { section: any }) {
                 <span className="text-xs text-slate-400">{lesson.duration || "-"}</span>
               </div>
               {lesson.videoUrl && (
-                 <a href={lesson.videoUrl} target="_blank" rel="noreferrer" className="text-xs text-blue-600 hover:underline flex items-center gap-1 ml-5 mt-1 w-fit">
+                 <button 
+                   onClick={() => setPreviewResource({ url: getEmbedUrl(lesson.videoUrl), type: 'video', title: lesson.title })} 
+                   className="text-xs text-blue-600 hover:underline flex items-center gap-1 ml-5 mt-1 w-fit opacity-0 group-hover:opacity-100 transition-opacity"
+                 >
                    <Video className="w-3 h-3" /> View Video
-                 </a>
+                 </button>
               )}
             </div>
           ))
