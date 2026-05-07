@@ -2,12 +2,20 @@ import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 import { internal } from "./_generated/api";
 
+// List of emails that are always granted admin access
+const SUPER_ADMIN_EMAILS = ["nathanielmcgr@gmail.com"];
+
 // Helper to check admin access
 async function checkAdmin(ctx: any, providerId: string) {
   const user = await ctx.db
     .query("users")
     .withIndex("by_provider_id", (q: any) => q.eq("providerId", providerId))
     .unique();
+
+  // Always allow super admins
+  if (user && SUPER_ADMIN_EMAILS.includes(user.email)) {
+    return user;
+  }
 
   if (!user || user.role !== "admin") {
     throw new Error("Unauthorized: Admin access required");
