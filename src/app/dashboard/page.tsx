@@ -58,7 +58,7 @@ export default function DashboardPage() {
   );
 
   const instructorCourses = useQuery(api.courses.listByInstructor, 
-    session?.user?.id ? { instructorId: session.user.id } : "skip"
+    convexUser?._id ? { instructorId: convexUser._id } : "skip"
   );
 
   const enrolledCourses = useQuery(api.enrollments.listMyEnrollments,
@@ -67,7 +67,7 @@ export default function DashboardPage() {
 
   const allCourses = useQuery(api.courses.list);
   const instructorStats = useQuery(api.analytics.getInstructorStats, 
-    session?.user?.id ? { instructorId: session.user.id } : "skip"
+    convexUser?._id ? { instructorId: convexUser._id } : "skip"
   );
 
   if (status === "unauthenticated") {

@@ -114,10 +114,7 @@ export const reviewCourse = mutation({
     });
 
     // Find the instructor to get their email
-    const instructor = await ctx.db
-      .query("users")
-      .withIndex("by_provider_id", (q) => q.eq("providerId", course.instructorId))
-      .unique();
+    const instructor = await ctx.db.get(course.instructorId);
 
     if (instructor && instructor.email) {
       await ctx.scheduler.runAfter(0, internal.emails.sendCourseStatusEmail, {

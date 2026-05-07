@@ -6,7 +6,7 @@ export default defineSchema({
     title: v.string(),
     description: v.string(),
     price: v.number(),
-    instructorId: v.string(),
+    instructorId: v.id("users"),
     duration: v.string(),
     thumbnailUrl: v.string(),
     category: v.string(),

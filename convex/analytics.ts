@@ -2,7 +2,7 @@ import { v } from "convex/values";
 import { query } from "./_generated/server";
 
 export const getInstructorStats = query({
-  args: { instructorId: v.string() },
+  args: { instructorId: v.id("users") },
   handler: async (ctx, args) => {
     const courses = await ctx.db
       .query("courses")

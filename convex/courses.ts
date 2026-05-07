@@ -21,10 +21,7 @@ export const getByIdDetailed = query({
     const course = await ctx.db.get(args.id);
     if (!course) return null;
 
-    const instructor = await ctx.db
-      .query("users")
-      .withIndex("by_provider_id", (q) => q.eq("providerId", course.instructorId))
-      .unique();
+    const instructor = await ctx.db.get(course.instructorId);
 
     const reviews = await ctx.db
       .query("reviews")
@@ -44,7 +41,7 @@ export const getByIdDetailed = query({
 });
 
 export const listByInstructor = query({
-  args: { instructorId: v.string() },
+  args: { instructorId: v.id("users") },
   handler: async (ctx, args) => {
     return await ctx.db
       .query("courses")
@@ -58,7 +55,7 @@ export const create = mutation({
     title: v.string(),
     description: v.string(),
     price: v.number(),
-    instructorId: v.string(),
+    instructorId: v.id("users"),
     duration: v.string(),
     thumbnailUrl: v.string(),
     category: v.string(),
@@ -170,10 +167,7 @@ export const listFeatured = query({
     // Enrich with instructor name and review count
     return await Promise.all(
       limited.map(async (course) => {
-        const instructor = await ctx.db
-          .query("users")
-          .withIndex("by_provider_id", (q) => q.eq("providerId", course.instructorId))
-          .unique();
+        const instructor = await ctx.db.get(course.instructorId);
 
         const reviews = await ctx.db
           .query("reviews")

@@ -7,7 +7,7 @@ export const seed = mutation({
       {
         title: "Mastering Next.js 15: The Complete Full-Stack Guide",
         description: "Learn Next.js 15, TypeScript, and Tailwind CSS by building real-world projects.",
-        instructorId: "Nathy Dev",
+        instructorId: "Nathy Dev" as any,
         rating: 4.9,
         price: 49.99,
         thumbnailUrl: "https://images.unsplash.com/photo-1618477247222-acbdb0e159b3?q=80&w=1000",
@@ -21,7 +21,7 @@ export const seed = mutation({
       {
         title: "AI Engineering with Python & OpenAI API",
         description: "Build intelligent applications using Python and the OpenAI API.",
-        instructorId: "Sarah Johnson",
+        instructorId: "Sarah Johnson" as any,
         rating: 4.8,
         price: 89.99,
         thumbnailUrl: "https://images.unsplash.com/photo-1677442136019-21780ecad995?q=80&w=1000",
@@ -35,7 +35,7 @@ export const seed = mutation({
       {
         title: "Modern UI/UX Design with Figma & Framer",
         description: "Master digital product design with Figma and Framer.",
-        instructorId: "Alex Rivera",
+        instructorId: "Alex Rivera" as any,
         rating: 4.7,
         price: 39.99,
         thumbnailUrl: "https://images.unsplash.com/photo-1586717791821-3f44a563eb4c?q=80&w=1000",

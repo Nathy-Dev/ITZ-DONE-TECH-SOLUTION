@@ -38,6 +38,13 @@ export default function CreateCoursePage() {
   const createCourse = useMutation(api.courses.create);
   const generateUploadUrl = useMutation(api.files.generateUploadUrl);
   
+  const convexUser = useQuery(api.users.getUserByProviderId, 
+    session?.user?.id ? { 
+      providerId: session.user.id,
+      email: session.user.email ?? undefined 
+    } : "skip"
+  );
+  
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [formData, setFormData] = useState({
     title: "",
@@ -103,7 +110,7 @@ export default function CreateCoursePage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!session?.user?.id) return;
+    if (!convexUser?._id) return;
     if (!formData.thumbnailUrl) {
       alert("Please upload a thumbnail first!");
       return;
@@ -115,7 +122,7 @@ export default function CreateCoursePage() {
         title: formData.title,
         description: formData.description,
         price: parseFloat(formData.price),
-        instructorId: session.user.id,
+        instructorId: convexUser._id,
         duration: formData.duration,
         thumbnailUrl: formData.thumbnailUrl, // This is now a storageId (string)
         category: formData.category,
