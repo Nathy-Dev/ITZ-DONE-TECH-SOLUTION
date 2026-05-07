@@ -116,13 +116,7 @@ export default function AdminCoursesPage() {
                   <tr key={course._id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors group">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-4">
-                         <div className="w-16 h-10 rounded-lg overflow-hidden bg-slate-200 dark:bg-slate-800 flex-shrink-0 relative">
-                            {course.thumbnailUrl && course.thumbnailUrl.startsWith("http") ? (
-                               <Image src={course.thumbnailUrl} alt={course.title} fill className="object-cover" />
-                            ) : (
-                               <div className="absolute inset-0 bg-blue-100 dark:bg-blue-900/30"></div>
-                            )}
-                         </div>
+                         <AdminCourseThumbnail title={course.title} thumbnailUrl={course.thumbnailUrl} />
                          <span className="font-bold text-slate-900 dark:text-white line-clamp-1 max-w-[200px]">{course.title}</span>
                       </div>
                     </td>
@@ -224,6 +218,24 @@ export default function AdminCoursesPage() {
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+function AdminCourseThumbnail({ title, thumbnailUrl }: { title: string, thumbnailUrl?: string }) {
+  const isStorageId = thumbnailUrl && !thumbnailUrl.startsWith("http") && !thumbnailUrl.startsWith("/");
+  const resolvedUrl = useQuery(api.files.getImageUrl, 
+    isStorageId ? { storageId: thumbnailUrl as string } : "skip"
+  );
+  const displayImage = isStorageId ? resolvedUrl : thumbnailUrl;
+
+  return (
+    <div className="w-16 h-10 rounded-lg overflow-hidden bg-slate-200 dark:bg-slate-800 flex-shrink-0 relative">
+       {displayImage ? (
+          <Image src={displayImage} alt={title} fill className="object-cover" />
+       ) : (
+          <div className="absolute inset-0 bg-blue-100 dark:bg-blue-900/30 font-bold text-[8px] flex items-center justify-center text-blue-800/20 uppercase tracking-tighter">ITZ-DONE</div>
+       )}
     </div>
   );
 }
