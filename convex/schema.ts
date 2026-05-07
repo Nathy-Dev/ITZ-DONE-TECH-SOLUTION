@@ -13,13 +13,16 @@ export default defineSchema({
     level: v.string(),
     studentsEnrolled: v.number(),
     rating: v.number(),
-    isPublished: v.boolean(),
+    isPublished: v.optional(v.boolean()), // Deprecated, use status
+    status: v.optional(v.string()), // "draft", "in_review", "published", "rejected"
+    rejectionReason: v.optional(v.string()),
     publishedAt: v.optional(v.number()),
   }).index("by_title", ["title"])
     .index("by_published_category", ["isPublished", "category"])
+    .index("by_status_category", ["status", "category"])
     .searchIndex("search_courses", {
       searchField: "title",
-      filterFields: ["category", "isPublished"],
+      filterFields: ["category", "isPublished", "status"],
     }),
   users: defineTable({
     name: v.string(),

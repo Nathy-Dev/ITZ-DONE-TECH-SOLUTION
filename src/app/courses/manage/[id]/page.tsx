@@ -44,7 +44,7 @@ export default function ManageCoursePage({ params }: PageProps) {
   const createLesson = useMutation(api.content.createLesson);
   const updateLesson = useMutation(api.content.updateLesson);
   const deleteLesson = useMutation(api.content.deleteLesson);
-  const togglePublish = useMutation(api.courses.togglePublish);
+  const submitForReview = useMutation(api.courses.submitForReview);
   
   const reorderSections = useMutation(api.content.reorderSections);
   const reorderLessons = useMutation(api.content.reorderLessons);
@@ -102,10 +102,10 @@ export default function ManageCoursePage({ params }: PageProps) {
     setAddingLessonToSection(null);
   };
 
-  const handleTogglePublish = async () => {
+  const handleSubmitForReview = async () => {
     setIsPublishing(true);
     try {
-      await togglePublish({ id: courseId });
+      await submitForReview({ id: courseId });
     } catch (error) {
        console.error(error);
     } finally {
@@ -150,9 +150,15 @@ export default function ManageCoursePage({ params }: PageProps) {
               <h1 className="text-3xl font-bold tracking-tight">{course.title}</h1>
               <span className={cn(
                 "px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest",
-                course.isPublished ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700"
+                course.status === "published" ? "bg-emerald-100 text-emerald-700" : 
+                course.status === "in_review" ? "bg-blue-100 text-blue-700" :
+                course.status === "rejected" ? "bg-red-100 text-red-700" :
+                "bg-amber-100 text-amber-700"
               )}>
-                {course.isPublished ? "Published" : "Draft"}
+                {course.status === "published" ? "Published" : 
+                 course.status === "in_review" ? "In Review" :
+                 course.status === "rejected" ? "Changes Requested" :
+                 "Draft"}
               </span>
             </div>
             <p className="text-muted-foreground mt-1">Curriculum Builder & Course Management</p>
@@ -161,25 +167,37 @@ export default function ManageCoursePage({ params }: PageProps) {
              <button className="px-6 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl font-bold hover:bg-slate-50 transition-all text-sm">
                Settings
              </button>
-             <button 
-               disabled={isPublishing}
-               onClick={handleTogglePublish}
-               className={cn(
-                 "flex items-center gap-2 px-6 py-3 rounded-2xl font-bold transition-all text-sm",
-                 course.isPublished 
-                  ? "bg-slate-200 text-slate-800 dark:bg-slate-800 dark:text-slate-200 hover:bg-slate-300" 
-                  : "bg-blue-800 text-white hover:bg-blue-900 shadow-lg shadow-blue-800/20"
-               )}
-             >
-               {isPublishing ? "Processing..." : (
-                 <>
-                   <Rocket className="w-4 h-4" />
-                   {course.isPublished ? "Unpublish Course" : "Publish Course"}
-                 </>
-               )}
-             </button>
+             {course.status !== "published" && course.status !== "in_review" && (
+               <button 
+                 disabled={isPublishing}
+                 onClick={handleSubmitForReview}
+                 className={cn(
+                   "flex items-center gap-2 px-6 py-3 rounded-2xl font-bold transition-all text-sm",
+                   "bg-blue-800 text-white hover:bg-blue-900 shadow-lg shadow-blue-800/20"
+                 )}
+               >
+                 {isPublishing ? "Submitting..." : (
+                   <>
+                     <Rocket className="w-4 h-4" />
+                     Submit for Review
+                   </>
+                 )}
+               </button>
+             )}
+             {course.status === "in_review" && (
+               <div className="px-6 py-3 bg-blue-50 text-blue-800 font-bold rounded-2xl text-sm border border-blue-100">
+                 Under Review
+               </div>
+             )}
           </div>
         </div>
+
+        {course.status === "rejected" && course.rejectionReason && (
+          <div className="mb-8 p-6 bg-red-50 dark:bg-red-900/10 border border-red-200 dark:border-red-900/30 rounded-[32px]">
+            <h3 className="text-red-800 dark:text-red-400 font-bold text-lg mb-2">Changes Requested</h3>
+            <p className="text-red-900/70 dark:text-red-200/70">{course.rejectionReason}</p>
+          </div>
+        )}
 
         <div className="grid lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-6">

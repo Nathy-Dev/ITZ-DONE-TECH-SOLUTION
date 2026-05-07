@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
 import { useSession } from "next-auth/react";
-import { Search, MoreVertical, Eye, EyeOff } from "lucide-react";
+import { Search, Eye, CheckCircle, XCircle, X } from "lucide-react";
 import Image from "next/image";
 import { formatPrice } from "@/lib/format";
 import { cn } from "@/lib/utils";
@@ -12,24 +12,51 @@ import { cn } from "@/lib/utils";
 export default function AdminCoursesPage() {
   const { data: session } = useSession();
   const [searchTerm, setSearchTerm] = useState("");
+  const [reviewModalOpen, setReviewModalOpen] = useState(false);
+  const [selectedCourse, setSelectedCourse] = useState<any>(null);
+  const [rejectionReason, setRejectionReason] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const courses = useQuery(api.admin.listCourses, 
     session?.user?.id ? { providerId: session.user.id } : "skip"
   );
 
-  const togglePublishStatus = useMutation(api.admin.toggleCoursePublishStatus);
+  const reviewCourse = useMutation(api.admin.reviewCourse);
 
-  const handleTogglePublish = async (courseId: any, currentStatus: boolean) => {
-    if (!session?.user?.id) return;
+  const handleOpenReview = (course: any) => {
+    setSelectedCourse(course);
+    setRejectionReason(course.rejectionReason || "");
+    setReviewModalOpen(true);
+  };
+
+  const handleCloseReview = () => {
+    setReviewModalOpen(false);
+    setSelectedCourse(null);
+    setRejectionReason("");
+  };
+
+  const handleSubmitReview = async (status: "published" | "rejected") => {
+    if (!session?.user?.id || !selectedCourse) return;
+    
+    if (status === "rejected" && !rejectionReason.trim()) {
+      alert("Please provide a reason for rejecting the course.");
+      return;
+    }
+
+    setIsSubmitting(true);
     try {
-      await togglePublishStatus({
+      await reviewCourse({
         providerId: session.user.id,
-        courseId: courseId,
-        isPublished: !currentStatus
+        courseId: selectedCourse._id,
+        status,
+        rejectionReason: status === "rejected" ? rejectionReason : undefined,
       });
+      handleCloseReview();
     } catch (error) {
-      console.error("Failed to toggle publish status:", error);
+      console.error("Failed to review course:", error);
       alert("Failed to update course status");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -89,14 +116,14 @@ export default function AdminCoursesPage() {
                   <tr key={course._id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors group">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-4">
-                        <div className="w-16 h-10 rounded-lg overflow-hidden bg-slate-200 dark:bg-slate-800 flex-shrink-0 relative">
-                           {course.thumbnailUrl && course.thumbnailUrl.startsWith("http") ? (
-                              <Image src={course.thumbnailUrl} alt={course.title} fill className="object-cover" />
-                           ) : (
-                              <div className="absolute inset-0 bg-blue-100 dark:bg-blue-900/30"></div>
-                           )}
-                        </div>
-                        <span className="font-bold text-slate-900 dark:text-white line-clamp-1 max-w-[200px]">{course.title}</span>
+                         <div className="w-16 h-10 rounded-lg overflow-hidden bg-slate-200 dark:bg-slate-800 flex-shrink-0 relative">
+                            {course.thumbnailUrl && course.thumbnailUrl.startsWith("http") ? (
+                               <Image src={course.thumbnailUrl} alt={course.title} fill className="object-cover" />
+                            ) : (
+                               <div className="absolute inset-0 bg-blue-100 dark:bg-blue-900/30"></div>
+                            )}
+                         </div>
+                         <span className="font-bold text-slate-900 dark:text-white line-clamp-1 max-w-[200px]">{course.title}</span>
                       </div>
                     </td>
                     <td className="px-6 py-4 text-slate-600 dark:text-slate-400 font-medium">
@@ -111,26 +138,29 @@ export default function AdminCoursesPage() {
                     <td className="px-6 py-4">
                       <span className={cn(
                         "text-xs font-black uppercase tracking-wider px-2.5 py-1 rounded-md flex items-center gap-1.5 w-fit",
-                        course.isPublished ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400" : "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
+                        course.status === "published" ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400" : 
+                        course.status === "in_review" ? "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-cyan-400 animate-pulse" :
+                        course.status === "rejected" ? "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400" :
+                        "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
                       )}>
-                        {course.isPublished ? "Published" : "Draft"}
+                        {course.status === "published" ? "Published" : 
+                         course.status === "in_review" ? "In Review" :
+                         course.status === "rejected" ? "Rejected" :
+                         "Draft"}
                       </span>
                     </td>
                     <td className="px-6 py-4 text-right">
                       <button 
-                        onClick={() => handleTogglePublish(course._id, course.isPublished)}
+                        onClick={() => handleOpenReview(course)}
                         className={cn(
                           "px-4 py-2 rounded-xl text-sm font-bold transition-all flex items-center gap-2 ml-auto",
-                          course.isPublished 
-                            ? "bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700" 
-                            : "bg-blue-100 text-blue-700 hover:bg-blue-200 dark:bg-blue-900/30 dark:text-cyan-400 dark:hover:bg-blue-900/50"
+                          course.status === "in_review" 
+                            ? "bg-blue-800 text-white hover:bg-blue-900 shadow-lg shadow-blue-800/20" 
+                            : "bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
                         )}
                       >
-                        {course.isPublished ? (
-                          <><EyeOff className="w-4 h-4" /> Unpublish</>
-                        ) : (
-                          <><Eye className="w-4 h-4" /> Publish</>
-                        )}
+                        <Eye className="w-4 h-4" /> 
+                        Review
                       </button>
                     </td>
                   </tr>
@@ -140,6 +170,55 @@ export default function AdminCoursesPage() {
           </table>
         </div>
       </div>
+
+      {reviewModalOpen && selectedCourse && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/40 backdrop-blur-sm p-6">
+          <div className="bg-white dark:bg-slate-900 w-full max-w-xl rounded-[32px] shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+            <div className="p-8 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+               <div>
+                 <h2 className="text-2xl font-bold">Course Review</h2>
+                 <p className="text-sm text-muted-foreground mt-1">Reviewing: <span className="font-bold text-slate-900 dark:text-white">{selectedCourse.title}</span></p>
+               </div>
+               <button onClick={handleCloseReview} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors">
+                 <X className="w-5 h-5" />
+               </button>
+            </div>
+            
+            <div className="p-8 space-y-6">
+               <div className="space-y-3">
+                 <label className="text-sm font-bold block">Rejection Reason (if rejecting)</label>
+                 <textarea 
+                   placeholder="Provide detailed feedback on what the instructor needs to fix before this course can be published..."
+                   rows={4}
+                   value={rejectionReason}
+                   onChange={(e) => setRejectionReason(e.target.value)}
+                   className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-800/20 resize-none text-sm"
+                 />
+                 <p className="text-xs text-muted-foreground">This feedback will be emailed directly to the instructor.</p>
+               </div>
+            </div>
+
+            <div className="p-8 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50 flex flex-col sm:flex-row gap-3 justify-end">
+               <button 
+                 disabled={isSubmitting}
+                 onClick={() => handleSubmitReview("rejected")}
+                 className="px-6 py-3 bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-900/50 rounded-2xl font-bold transition-all flex items-center justify-center gap-2"
+               >
+                 <XCircle className="w-5 h-5" />
+                 Reject & Return to Draft
+               </button>
+               <button 
+                 disabled={isSubmitting}
+                 onClick={() => handleSubmitReview("published")}
+                 className="px-6 py-3 bg-emerald-600 text-white hover:bg-emerald-700 shadow-lg shadow-emerald-600/20 rounded-2xl font-bold transition-all flex items-center justify-center gap-2"
+               >
+                 <CheckCircle className="w-5 h-5" />
+                 Approve & Publish
+               </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

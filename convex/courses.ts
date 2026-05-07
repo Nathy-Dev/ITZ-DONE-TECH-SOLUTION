@@ -70,23 +70,27 @@ export const create = mutation({
       studentsEnrolled: 0,
       rating: 0,
       isPublished: false,
+      status: "draft",
     });
     return courseId;
   },
 });
 
-export const togglePublish = mutation({
+export const submitForReview = mutation({
   args: { id: v.id("courses") },
   handler: async (ctx, args) => {
     const course = await ctx.db.get(args.id);
     if (!course) throw new Error("Course not found");
 
-    const newStatus = !course.isPublished;
+    if (course.status !== "draft" && course.status !== "rejected") {
+      throw new Error("Course is not in a valid state to be submitted for review");
+    }
+
     await ctx.db.patch(args.id, {
-      isPublished: newStatus,
-      publishedAt: newStatus ? Date.now() : undefined,
+      status: "in_review",
     });
-    return newStatus;
+    
+    return true;
   },
 });
 
@@ -100,7 +104,7 @@ export const search = query({
   handler: async (ctx, args) => {
     const q = ctx.db.query("courses")
       .withSearchIndex("search_courses", (q) => {
-        let searchQ = q.search("title", args.searchQuery).eq("isPublished", true);
+        let searchQ = q.search("title", args.searchQuery).eq("status", "published");
         if (args.category) {
           searchQ = searchQ.eq("category", args.category);
         }
@@ -129,12 +133,12 @@ export const listFiltered = query({
   },
   handler: async (ctx, args) => {
     let q = ctx.db.query("courses")
-      .withIndex("by_published_category", (q) => q.eq("isPublished", true));
+      .withIndex("by_status_category", (q) => q.eq("status", "published"));
     
     if (args.category) {
       q = ctx.db.query("courses")
-        .withIndex("by_published_category", (q) => 
-          q.eq("isPublished", true).eq("category", args.category as string)
+        .withIndex("by_status_category", (q) => 
+          q.eq("status", "published").eq("category", args.category as string)
         );
     }
 
@@ -155,7 +159,7 @@ export const listFeatured = query({
   handler: async (ctx, args) => {
     const courses = await ctx.db
       .query("courses")
-      .withIndex("by_published_category", (q) => q.eq("isPublished", true))
+      .withIndex("by_status_category", (q) => q.eq("status", "published"))
       .collect();
 
     // Sort by students enrolled descending to get the most popular
@@ -191,7 +195,7 @@ export const getCategoriesWithCounts = query({
   handler: async (ctx) => {
     const courses = await ctx.db
       .query("courses")
-      .filter((q) => q.eq(q.field("isPublished"), true))
+      .filter((q) => q.eq(q.field("status"), "published"))
       .collect();
 
     const counts: Record<string, number> = {};

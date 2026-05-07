@@ -1,5 +1,6 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
+import { internal } from "./_generated/api";
 
 // Helper to check admin access
 async function checkAdmin(ctx: any, providerId: string) {
@@ -87,11 +88,12 @@ export const updateUserRole = mutation({
   },
 });
 
-export const toggleCoursePublishStatus = mutation({
+export const reviewCourse = mutation({
   args: {
     providerId: v.string(), // The admin's providerId
     courseId: v.id("courses"),
-    isPublished: v.boolean(),
+    status: v.string(), // "published" or "rejected"
+    rejectionReason: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     await checkAdmin(ctx, args.providerId);
@@ -101,9 +103,31 @@ export const toggleCoursePublishStatus = mutation({
       throw new Error("Course not found");
     }
 
+    if (args.status !== "published" && args.status !== "rejected") {
+      throw new Error("Invalid status");
+    }
+
     await ctx.db.patch(args.courseId, {
-      isPublished: args.isPublished,
+      status: args.status,
+      rejectionReason: args.status === "rejected" ? args.rejectionReason : undefined,
+      publishedAt: args.status === "published" ? Date.now() : undefined,
     });
+
+    // Find the instructor to get their email
+    const instructor = await ctx.db
+      .query("users")
+      .withIndex("by_provider_id", (q) => q.eq("providerId", course.instructorId))
+      .unique();
+
+    if (instructor && instructor.email) {
+      await ctx.scheduler.runAfter(0, internal.emails.sendCourseStatusEmail, {
+        email: instructor.email,
+        courseTitle: course.title,
+        status: args.status,
+        rejectionReason: args.status === "rejected" ? args.rejectionReason : undefined,
+      });
+    }
+
     return true;
   },
 });
