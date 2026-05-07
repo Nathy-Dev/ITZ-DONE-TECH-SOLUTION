@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
 import { useSession } from "next-auth/react";
-import { Search, Eye, CheckCircle, XCircle, X } from "lucide-react";
+import { Search, Eye, CheckCircle, XCircle, X, PlayCircle, Video } from "lucide-react";
 import Image from "next/image";
 import { formatPrice } from "@/lib/format";
 import { cn } from "@/lib/utils";
@@ -184,7 +184,12 @@ export default function AdminCoursesPage() {
                </button>
             </div>
             
-            <div className="p-8 space-y-6">
+            <div className="p-8 space-y-6 max-h-[60vh] overflow-y-auto custom-scrollbar">
+               <div className="space-y-3">
+                 <label className="text-sm font-bold block">Course Curriculum Preview</label>
+                 <CoursePreview courseId={selectedCourse._id} />
+               </div>
+
                <div className="space-y-3">
                  <label className="text-sm font-bold block">Rejection Reason (if rejecting)</label>
                  <textarea 
@@ -219,6 +224,57 @@ export default function AdminCoursesPage() {
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+function CoursePreview({ courseId }: { courseId: any }) {
+  const sections = useQuery(api.content.listSections, { courseId });
+  
+  if (!sections) return <div className="p-4 text-center text-sm text-slate-500 animate-pulse">Loading curriculum...</div>;
+  if (sections.length === 0) return <div className="p-4 text-center text-sm text-slate-500 bg-slate-50 dark:bg-slate-800/50 rounded-xl">No sections added yet.</div>;
+
+  return (
+    <div className="space-y-4 pr-2">
+      {sections.sort((a, b) => a.order - b.order).map(section => (
+        <SectionPreview key={section._id} section={section} />
+      ))}
+    </div>
+  );
+}
+
+function SectionPreview({ section }: { section: any }) {
+  const lessons = useQuery(api.content.listLessons, { sectionId: section._id });
+
+  return (
+    <div className="border border-slate-100 dark:border-slate-800 rounded-xl overflow-hidden bg-white dark:bg-slate-900">
+      <div className="bg-slate-50 dark:bg-slate-800/50 px-4 py-3 font-bold text-sm">
+        {section.title}
+      </div>
+      <div className="divide-y divide-slate-100 dark:divide-slate-800">
+        {!lessons ? (
+          <div className="p-3 text-xs text-slate-400 pl-8">Loading lessons...</div>
+        ) : lessons.length === 0 ? (
+          <div className="p-3 text-xs text-slate-400 pl-8">Empty section</div>
+        ) : (
+          lessons.sort((a, b) => a.order - b.order).map((lesson: any) => (
+            <div key={lesson._id} className="p-3 pl-8 text-sm flex flex-col gap-1">
+              <div className="flex items-center justify-between">
+                <span className="font-medium text-slate-700 dark:text-slate-300 flex items-center gap-2">
+                  <PlayCircle className="w-3.5 h-3.5 text-blue-500" />
+                  {lesson.title}
+                </span>
+                <span className="text-xs text-slate-400">{lesson.duration || "-"}</span>
+              </div>
+              {lesson.videoUrl && (
+                 <a href={lesson.videoUrl} target="_blank" rel="noreferrer" className="text-xs text-blue-600 hover:underline flex items-center gap-1 ml-5 mt-1 w-fit">
+                   <Video className="w-3 h-3" /> View Video
+                 </a>
+              )}
+            </div>
+          ))
+        )}
+      </div>
     </div>
   );
 }
