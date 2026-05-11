@@ -11,6 +11,7 @@
 import type * as admin from "../admin.js";
 import type * as analytics from "../analytics.js";
 import type * as certificates from "../certificates.js";
+import type * as constants from "../constants.js";
 import type * as content from "../content.js";
 import type * as courses from "../courses.js";
 import type * as debug from "../debug.js";
@@ -37,6 +38,7 @@ declare const fullApi: ApiFromModules<{
   admin: typeof admin;
   analytics: typeof analytics;
   certificates: typeof certificates;
+  constants: typeof constants;
   content: typeof content;
   courses: typeof courses;
   debug: typeof debug;
