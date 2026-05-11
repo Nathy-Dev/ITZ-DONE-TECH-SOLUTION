@@ -8,7 +8,8 @@ import { cn } from "@/lib/utils";
 import { signOut, useSession } from "next-auth/react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../../convex/_generated/api";
-import { GraduationCap, BookOpen, UserCircle, Sun, Moon, LogOut, ArrowRightLeft, User } from "lucide-react";
+import { GraduationCap, BookOpen, UserCircle, Sun, Moon, LogOut, ArrowRightLeft, User, ShieldCheck } from "lucide-react";
+
 import { useRef } from "react";
 import { useCart } from "@/components/providers/CartProvider";
 import { useTheme } from "@/components/providers/ThemeProvider";
@@ -109,7 +110,13 @@ const Navbar = () => {
         <nav className="hidden lg:flex items-center gap-8 text-sm font-medium">
           <Link href="/courses" className="hover:text-cyan-600 transition-colors">Courses</Link>
           {isSignedIn && <Link href="/dashboard" className="hover:text-cyan-600 transition-colors font-bold text-blue-800">Dashboard</Link>}
+          {convexUser?.role === "admin" && (
+            <Link href="/admin" className="px-3 py-1 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 rounded-lg text-xs font-bold hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors">
+              Admin
+            </Link>
+          )}
           <Link href="/mentorship" className="hover:text-cyan-600 transition-colors">Mentorship</Link>
+
           <Link href="/business" className="hover:text-cyan-600 transition-colors">For Business</Link>
         </nav>
 
@@ -267,6 +274,17 @@ const Navbar = () => {
 
                     {/* Menu Items */}
                     <div className="space-y-0.5">
+                      {convexUser?.role === "admin" && (
+                        <Link 
+                          href="/admin" 
+                          className="flex items-center gap-3 px-4 py-2.5 text-sm font-bold text-red-600 rounded-xl hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                          onClick={() => setUserMenuOpen(false)}
+                        >
+                          <ShieldCheck className="w-4 h-4" />
+                          Admin Dashboard
+                        </Link>
+                      )}
+                      
                       <Link 
                         href="/profile" 
                         className="flex items-center gap-3 px-4 py-2.5 text-sm font-medium rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
@@ -275,6 +293,7 @@ const Navbar = () => {
                         <User className="w-4 h-4 text-slate-500" />
                         Profile Settings
                       </Link>
+
                       
                       <button 
                         onClick={toggleTheme}
@@ -328,7 +347,13 @@ const Navbar = () => {
             <Link href="/courses" onClick={() => setMobileMenuOpen(false)}>Courses</Link>
             <Link href="/mentorship" onClick={() => setMobileMenuOpen(false)}>Mentorship</Link>
             <Link href="/business" onClick={() => setMobileMenuOpen(false)}>For Business</Link>
+            {convexUser?.role === "admin" && (
+              <Link href="/admin" onClick={() => setMobileMenuOpen(false)} className="text-red-600 font-bold">
+                Admin Dashboard
+              </Link>
+            )}
             <div className="h-px bg-slate-100 dark:bg-slate-800 my-2" />
+
             {!isSignedIn ? (
               <>
                 <Link 

@@ -1,5 +1,7 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
+import { SUPER_ADMIN_EMAILS } from "./constants";
+
 
 export const getUserByEmail = query({
   args: { email: v.string() },
@@ -26,6 +28,10 @@ export const getUserByProviderId = query({
         .withIndex("by_email", (q) => q.eq("email", email))
         .unique();
     }
+    if (user && user.email && SUPER_ADMIN_EMAILS.includes(user.email)) {
+      return { ...user, role: "admin" };
+    }
+
     return user;
   },
 });
@@ -55,22 +61,26 @@ export const createOrUpdateUser = mutation({
 
     if (user) {
       // Update existing user
+      const isSuperAdmin = SUPER_ADMIN_EMAILS.includes(args.email);
       await ctx.db.patch(user._id, {
         name: args.name,
         email: args.email,
         profileImage: args.profileImage,
-        providerId: args.providerId, // Sync provider ID (crucial for role switching)
+        providerId: args.providerId,
+        ...(isSuperAdmin ? { role: "admin" } : {}),
       });
     } else {
       // Create new user
+      const isSuperAdmin = SUPER_ADMIN_EMAILS.includes(args.email);
       await ctx.db.insert("users", {
         providerId: args.providerId,
         name: args.name,
         email: args.email,
         profileImage: args.profileImage,
-        role: args.role ?? "learner",
+        role: isSuperAdmin ? "admin" : (args.role ?? "learner"),
       });
     }
+
   },
 });
 

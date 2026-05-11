@@ -3,7 +3,8 @@ import { mutation, query } from "./_generated/server";
 import { internal } from "./_generated/api";
 
 // List of emails that are always granted admin access
-const SUPER_ADMIN_EMAILS = ["nathanielmcgr@gmail.com"];
+import { SUPER_ADMIN_EMAILS } from "./constants";
+
 
 // Helper to check admin access
 async function checkAdmin(ctx: any, providerId: string) {
