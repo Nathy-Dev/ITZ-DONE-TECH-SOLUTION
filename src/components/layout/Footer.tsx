@@ -4,6 +4,7 @@ import React from "react";
 import Link from "next/link";
 import { Youtube, Twitter, Linkedin, Github, Mail } from "lucide-react";
 import { usePathname } from "next/navigation";
+import { Logo } from "./Logo";
 
 /**
  * Footer component for ITS-DONE TECH SOLUTION.
@@ -21,13 +22,8 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
           {/* Brand Section */}
           <div className="space-y-6">
-            <Link href="/" className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-blue-800 rounded-lg flex items-center justify-center text-white font-bold text-sm">
-                ITZ
-              </div>
-              <span className="font-bold text-xl tracking-tight">
-                ITS-DONE <span className="text-blue-800">TECH</span>
-              </span>
+            <Link href="/" className="flex items-center">
+              <Logo width={140} height={40} />
             </Link>
             <p className="text-muted-foreground text-sm leading-relaxed">
               Empowering the next generation of tech leaders through industry-leading courses and hands-on mentorship.

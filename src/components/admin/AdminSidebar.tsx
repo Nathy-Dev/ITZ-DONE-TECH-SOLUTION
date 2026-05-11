@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { signOut } from "next-auth/react";
+import { Logo } from "../layout/Logo";
 
 const navItems = [
   { name: "Overview", href: "/admin", icon: LayoutDashboard },
@@ -41,15 +42,14 @@ export function AdminSidebar() {
       </button>
 
       <div className={cn("p-6 flex items-center", isCollapsed ? "justify-center px-0" : "")}>
-        <Link href="/" className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-blue-800 rounded-lg flex items-center justify-center shrink-0">
-            <span className="text-white font-black text-xl">I</span>
-          </div>
-          {!isCollapsed && (
+        <Link href="/" className="flex items-center">
+          {isCollapsed ? (
+            <div className="w-8 h-8 bg-blue-800 rounded-lg flex items-center justify-center shrink-0">
+               <span className="text-white font-black text-xl">I</span>
+            </div>
+          ) : (
             <div className="flex items-center">
-              <span className="font-black text-xl tracking-tight text-slate-900 dark:text-white truncate max-w-[120px]">
-                ITZ-DONE
-              </span>
+              <Logo width={120} height={35} />
               <span className="text-[10px] bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400 px-1.5 py-0.5 rounded-full font-black uppercase tracking-wider ml-1 shrink-0">
                 Admin
               </span>

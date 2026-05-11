@@ -13,6 +13,7 @@ import { useRef } from "react";
 import { useCart } from "@/components/providers/CartProvider";
 import { useTheme } from "@/components/providers/ThemeProvider";
 import { usePathname } from "next/navigation";
+import { Logo } from "./Logo";
 
 /**
  * Navbar component for ITS-DONE TECH SOLUTION.
@@ -100,13 +101,8 @@ const Navbar = () => {
     >
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2 group">
-          <div className="w-10 h-10 bg-blue-800 rounded-xl flex items-center justify-center text-white font-bold text-xl group-hover:rotate-12 transition-transform">
-            ITZ
-          </div>
-          <span className="font-bold text-xl tracking-tight hidden sm:block">
-            ITS-DONE <span className="text-blue-800">TECH</span>
-          </span>
+        <Link href="/" className="flex items-center group">
+          <Logo width={160} height={45} priority />
         </Link>
 
         {/* Desktop Navigation */}

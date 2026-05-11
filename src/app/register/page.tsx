@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { signIn } from "next-auth/react";
 import { Mail, Lock, User, Github, ArrowRight, Loader2, CheckCircle2 } from "lucide-react";
+import { Logo } from "@/components/layout/Logo";
 import { registerUserAction } from "../actions/auth";
 
 export default function RegisterPage() {
@@ -70,9 +71,9 @@ export default function RegisterPage() {
         <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-xl shadow-blue-800/5 border border-slate-100 dark:border-slate-800 p-8 md:p-12">
           {/* Header */}
           <div className="text-center mb-10">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-800 rounded-2xl text-white font-bold text-2xl mb-6 shadow-lg shadow-blue-800/20">
-              ITS
-            </div>
+            <Link href="/" className="inline-flex justify-center mb-6">
+              <Logo width={120} height={40} />
+            </Link>
             <h1 className="text-3xl font-bold tracking-tight mb-2">Create Account</h1>
             <p className="text-slate-500 dark:text-slate-400">
               Join ITS-DONE TECH SOLUTION today
