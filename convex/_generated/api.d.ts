@@ -21,6 +21,8 @@ import type * as enrollments from "../enrollments.js";
 import type * as files from "../files.js";
 import type * as mentors from "../mentors.js";
 import type * as migration from "../migration.js";
+import type * as payments from "../payments.js";
+import type * as payouts from "../payouts.js";
 import type * as progress from "../progress.js";
 import type * as reviews from "../reviews.js";
 import type * as seed from "../seed.js";
@@ -48,6 +50,8 @@ declare const fullApi: ApiFromModules<{
   files: typeof files;
   mentors: typeof mentors;
   migration: typeof migration;
+  payments: typeof payments;
+  payouts: typeof payouts;
   progress: typeof progress;
   reviews: typeof reviews;
   seed: typeof seed;

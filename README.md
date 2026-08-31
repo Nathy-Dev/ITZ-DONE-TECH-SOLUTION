@@ -1,4 +1,6 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# ITZ-DONE TECH SOLUTION
+
+A course marketplace built with Next.js, Convex, and Flutterwave.
 
 ## Getting Started
 
@@ -6,31 +8,106 @@ First, run the development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Payments & Payouts (Flutterwave)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+This platform uses [Flutterwave](https://flutterwave.com) for course payments and instructor payouts.
 
-## Learn More
+### Business Model
 
-To learn more about Next.js, take a look at the following resources:
+When a student pays for a course, the revenue is split automatically:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+| Share   | Recipient           |
+| ------- | ------------------- |
+| **60%** | Course instructor   |
+| **40%** | ITZ-DONE (platform) |
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Environment Variables
+
+Add these to `.env.local` (or your hosting provider's environment settings):
+
+```bash
+# Flutterwave API keys — https://app.flutterwave.com/dashboard/settings/apis
+FLUTTERWAVE_SECRET_KEY=FLWSECK-xxxxxxxxxxxxxxxxxxxxx-X
+
+# Webhook signature hash — set the SAME value in
+# Flutterwave Dashboard > Settings > Webhooks
+FLUTTERWAVE_SECRET_HASH=your-secret-hash
+
+# Public app URL (payment redirect URLs) — set to your production domain
+NEXT_PUBLIC_APP_URL=https://yourdomain.com
+
+# Shared secret guarding server-to-server Convex mutations (payment
+# completion, payout processing). Generate one with:
+#   node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+# Set the SAME value in your Convex deployment env vars
+# (Dashboard > Settings > Environment Variables).
+CONVEX_MUTATION_SECRET=<random-64-char-hex>
+```
+
+### Flutterwave Dashboard Setup (Production)
+
+1. **API Keys**: Copy your **Secret Key** (live mode) into `FLUTTERWAVE_SECRET_KEY`.
+2. **Webhooks**: In Dashboard → Settings → Webhooks, set the secret hash to match
+   `FLUTTERWAVE_SECRET_HASH`, and register these webhook URLs:
+   - Payment confirmations: `https://yourdomain.com/api/payments/webhook`
+   - Payout transfer updates: `https://yourdomain.com/api/payouts/webhook`
+3. **Transfers**: Payouts use Flutterwave Transfers. Ensure your Flutterwave balance
+   is funded and your account is approved for live transfers.
+
+### How It Works
+
+**Student pays for a course:**
+
+1. Student clicks _Complete Enrollment_ on `/checkout`.
+2. The server ([`src/app/api/payments/initiate/route.ts`](src/app/api/payments/initiate/route.ts))
+   re-computes prices from the database (client totals are never trusted), creates a
+   `pending` payment record, and requests a Flutterwave hosted-checkout link.
+3. Student pays on Flutterwave (card, transfer, USSD, etc.).
+4. Flutterwave calls our webhook
+   ([`src/app/api/payments/webhook/route.ts`](src/app/api/payments/webhook/route.ts)),
+   which verifies the SHA-256 signature **and** re-verifies the transaction against
+   Flutterwave's API before granting access.
+5. [`convex/payments.ts`](convex/payments.ts) then (idempotently):
+   - marks the payment `successful`,
+   - enrolls the student,
+   - splits revenue — 60% instructor earning, 40% platform earning.
+6. The success page also self-verifies via
+   [`src/app/api/payments/verify/route.ts`](src/app/api/payments/verify/route.ts)
+   as a fallback if the webhook is delayed.
+
+**Tutor receives payouts:**
+
+1. Tutor adds their local bank account in **Profile → Payout Account**
+   ([`src/components/profile/PayoutSettings.tsx`](src/components/profile/PayoutSettings.tsx)).
+   The account name is resolved and verified via Flutterwave's bank lookup.
+2. Tutor requests a payout from **Dashboard → Earnings & Payouts**
+   ([`src/components/dashboard/EarningsPanel.tsx`](src/components/dashboard/EarningsPanel.tsx))
+   — withdraws their full available balance (min ₦1,000).
+3. Admin reviews the request at **Admin → Payouts**
+   ([`src/app/admin/payouts/page.tsx`](src/app/admin/payouts/page.tsx)) and clicks
+   _Approve & Pay_, which executes a real Flutterwave transfer
+   ([`src/app/api/admin/payouts/route.ts`](src/app/api/admin/payouts/route.ts)).
+4. Transfer status updates arrive via the payouts webhook and earnings are marked `paid`.
+
+### Security Notes
+
+- All amounts are computed **server-side** from the database.
+- Webhooks are rejected unless the `verif-hash` signature matches, and successful
+  charges are re-verified against Flutterwave's API before enrollment.
+- Payment completion is **idempotent** — duplicate webhooks can't double-enroll or
+  double-credit earnings.
+- Admin payout operations are restricted to `SUPER_ADMIN_EMAILS`
+  (see [`convex/constants.ts`](convex/constants.ts)).
+- Card details never touch our servers — Flutterwave handles the entire checkout.
 
 ## Deploy on Vercel
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new).
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Remember to set all environment variables (including the Convex and Flutterwave keys)
+in your hosting provider's dashboard, and run `npx convex deploy` to push the latest
+Convex functions to production.

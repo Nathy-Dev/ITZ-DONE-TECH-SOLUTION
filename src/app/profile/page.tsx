@@ -1,10 +1,10 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import PayoutSettings from "@/components/profile/PayoutSettings";
 import { useSession } from "next-auth/react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../../convex/_generated/api";
-import { cn } from "@/lib/utils";
 import { 
   User, 
   Mail, 
@@ -195,6 +195,11 @@ export default function ProfilePage() {
                 </div>
               </form>
             </div>
+
+            {/* Payout settings for instructors */}
+            {(convexUser.role === "instructor" || convexUser.role === "admin") && (
+              <PayoutSettings />
+            )}
           </div>
         </div>
       </div>

@@ -120,4 +120,78 @@ export default defineSchema({
     createdAt: v.number(),
   }).index("by_user", ["userId"])
     .index("by_availability", ["isAvailable"]),
+
+  // ─── Payments (Flutterwave) ────────────────────────────────────────────
+  payments: defineTable({
+    txRef: v.string(), // Unique transaction reference (ITZDONE-<random>-<ts>)
+    userId: v.id("users"),
+    items: v.array(
+      v.object({
+        courseId: v.id("courses"),
+        title: v.string(),
+        price: v.number(), // Snapshot of price at purchase time
+        instructorId: v.id("users"),
+      })
+    ),
+    amountExpected: v.number(), // Server-computed from DB prices (never client)
+    amountPaid: v.optional(v.number()),
+    currency: v.string(), // "NGN"
+    status: v.string(), // "pending" | "successful" | "failed" | "cancelled"
+    flutterwaveTransactionId: v.optional(v.number()),
+    paymentMethod: v.optional(v.string()), // e.g. "card", "bank_transfer"
+    createdAt: v.number(),
+    completedAt: v.optional(v.number()),
+  })
+    .index("by_tx_ref", ["txRef"])
+    .index("by_user", ["userId"])
+    .index("by_status", ["status"]),
+
+  // ─── Instructor earnings (60/40 revenue split) ─────────────────────────
+  earnings: defineTable({
+    instructorId: v.id("users"),
+    paymentId: v.id("payments"),
+    courseId: v.id("courses"),
+    studentId: v.id("users"),
+    coursePrice: v.number(),
+    instructorAmount: v.number(), // 60% of course price
+    platformAmount: v.number(), // 40% to ITZ-DONE
+    status: v.string(), // "available" | "processing" | "paid"
+    payoutId: v.optional(v.id("payouts")),
+    createdAt: v.number(),
+  })
+    .index("by_instructor", ["instructorId"])
+    .index("by_payment", ["paymentId"])
+    .index("by_instructor_status", ["instructorId", "status"])
+    .index("by_payout", ["payoutId"]),
+
+  // ─── Tutor local bank accounts (for receiving payouts) ─────────────────
+  payoutAccounts: defineTable({
+    userId: v.id("users"),
+    bankName: v.string(),
+    bankCode: v.string(), // Flutterwave bank code
+    accountNumber: v.string(),
+    accountName: v.string(), // Resolved via Flutterwave account verification
+    isVerified: v.boolean(),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  }).index("by_user", ["userId"]),
+
+  // ─── Payouts to instructors ────────────────────────────────────────────
+  payouts: defineTable({
+    instructorId: v.id("users"),
+    amount: v.number(),
+    status: v.string(), // "requested" | "processing" | "paid" | "failed"
+    reference: v.string(), // Unique payout reference
+    earningIds: v.array(v.id("earnings")),
+    bankName: v.optional(v.string()),
+    bankCode: v.optional(v.string()),
+    accountNumber: v.optional(v.string()),
+    accountName: v.optional(v.string()),
+    flutterwaveTransferId: v.optional(v.number()),
+    failureReason: v.optional(v.string()),
+    requestedAt: v.number(),
+    processedAt: v.optional(v.number()),
+  })
+    .index("by_instructor", ["instructorId"])
+    .index("by_status", ["status"]),
 });

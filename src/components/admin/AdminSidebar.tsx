@@ -3,11 +3,12 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { 
-  LayoutDashboard, 
-  Users, 
-  BookOpen, 
+import {
+  LayoutDashboard,
+  Users,
+  BookOpen,
   ListOrdered,
+  Wallet,
   LogOut,
   ChevronLeft,
   ChevronRight
@@ -20,6 +21,7 @@ const navItems = [
   { name: "Overview", href: "/admin", icon: LayoutDashboard },
   { name: "Users", href: "/admin/users", icon: Users },
   { name: "Courses", href: "/admin/courses", icon: BookOpen },
+  { name: "Payouts", href: "/admin/payouts", icon: Wallet },
   { name: "Waitlist", href: "/admin/waitlist", icon: ListOrdered },
 ];
 

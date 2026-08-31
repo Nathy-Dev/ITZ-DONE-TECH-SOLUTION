@@ -1,6 +1,6 @@
 "use client";
 
-import React, { use, useState } from "react";
+import React, { use, useState, useEffect } from "react";
 import { 
   Star, PlayCircle, Globe, Clock, 
   BarChart, Users, CheckCircle2, 
@@ -32,6 +32,8 @@ export default function CourseDetailPage({ params }: PageProps) {
   const { data: session } = useSession();
   const router = useRouter();
   const [isEnrolling, setIsEnrolling] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
+  const [shareCopied, setShareCopied] = useState(false);
 
   const course = useQuery(api.courses.getByIdDetailed, { id: courseId });
   const sections = useQuery(api.content.listSections, { courseId });
@@ -59,6 +61,17 @@ export default function CourseDetailPage({ params }: PageProps) {
   );
   const displayImage = isStorageId ? resolvedUrl : rawImage;
 
+  // Load saved state from localStorage on mount (before early returns
+  // to keep hook order stable)
+  useEffect(() => {
+    try {
+      const saved: string[] = JSON.parse(localStorage.getItem("itz_done_saved_courses") ?? "[]");
+      setIsSaved(saved.includes(courseId));
+    } catch {
+      // Corrupt localStorage — ignore
+    }
+  }, [courseId]);
+
   if (!course) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950">
@@ -75,17 +88,69 @@ export default function CourseDetailPage({ params }: PageProps) {
 
     if (!convexUser) return;
 
-    setIsEnrolling(true);
-    try {
-      await createEnrollment({
-        courseId,
-        userId: convexUser._id,
-      });
-      // Refresh or redirect is handled by reactive useQuery 'enrollment'
-    } catch (error) {
-      console.error("Enrollment failed:", error);
-    } finally {
-      setIsEnrolling(false);
+    // Free course: enroll directly (no payment needed)
+    if (course.price === 0) {
+      setIsEnrolling(true);
+      try {
+        await createEnrollment({
+          courseId,
+          userId: convexUser._id,
+        });
+        // Refresh is handled by the reactive useQuery 'enrollment'
+      } catch (error) {
+        console.error("Enrollment failed:", error);
+      } finally {
+        setIsEnrolling(false);
+      }
+      return;
+    }
+
+    // Paid course: add to cart and go through Flutterwave checkout
+    addItem({
+      id: course._id,
+      title: course.title,
+      price: course.price,
+      image: displayImage || undefined,
+      instructor: course.instructor?.name || "Instructor",
+    });
+    router.push("/checkout");
+  };
+
+  const handleShare = async () => {
+    const url = window.location.href;
+    const shareData = {
+      title: course.title,
+      text: `Check out "${course.title}" on ITZ-DONE TECH SOLUTION`,
+      url,
+    };
+
+    if (navigator.share) {
+      try {
+        await navigator.share(shareData);
+      } catch {
+        // User cancelled the share dialog — no action needed
+      }
+    } else {
+      try {
+        await navigator.clipboard.writeText(url);
+        setShareCopied(true);
+        setTimeout(() => setShareCopied(false), 2000);
+      } catch {
+        // Clipboard unavailable — no action needed
+      }
+    }
+  };
+
+  const handleSave = () => {
+    // Toggle saved state (persisted to localStorage)
+    const key = "itz_done_saved_courses";
+    const saved: string[] = JSON.parse(localStorage.getItem(key) ?? "[]");
+    if (saved.includes(courseId)) {
+      localStorage.setItem(key, JSON.stringify(saved.filter((id) => id !== courseId)));
+      setIsSaved(false);
+    } else {
+      localStorage.setItem(key, JSON.stringify([...saved, courseId]));
+      setIsSaved(true);
     }
   };
 
@@ -364,8 +429,21 @@ export default function CourseDetailPage({ params }: PageProps) {
               </div>
 
               <div className="flex justify-between items-center pt-6">
-                <button className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-slate-400 hover:text-blue-800 transition-all"><Share2 className="w-4 h-4" /> Share</button>
-                <button className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-slate-400 hover:text-red-500 transition-all"><Heart className="w-4 h-4" /> Save</button>
+                <button
+                  onClick={handleShare}
+                  className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-slate-400 hover:text-blue-800 transition-all"
+                >
+                  <Share2 className="w-4 h-4" /> {shareCopied ? "Link Copied!" : "Share"}
+                </button>
+                <button
+                  onClick={handleSave}
+                  className={cn(
+                    "flex items-center gap-2 text-xs font-black uppercase tracking-widest transition-all",
+                    isSaved ? "text-red-500" : "text-slate-400 hover:text-red-500"
+                  )}
+                >
+                  <Heart className={cn("w-4 h-4", isSaved && "fill-current")} /> {isSaved ? "Saved" : "Save"}
+                </button>
               </div>
             </div>
           </div>

@@ -3,10 +3,10 @@
 import React, { useState } from "react";
 import { useSession } from "next-auth/react";
 import { redirect } from "next/navigation";
-import { 
-  Trophy, 
-  Clock, 
-  ArrowRight, 
+import {
+  Trophy,
+  Clock,
+  ArrowRight,
   LayoutGrid,
   Zap,
   Bell,
@@ -17,12 +17,14 @@ import {
   Video,
   PlayCircle,
   PlusIcon,
-  Edit2
+  Edit2,
+  Loader2
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import CourseCard from "@/components/courses/CourseCard";
 import EarningsAnalytics from "@/components/dashboard/EarningsAnalytics";
+import EarningsPanel from "@/components/dashboard/EarningsPanel";
 import MentorRegister from "@/components/mentorship/MentorRegister";
 import { cn } from "@/lib/utils";
 import { useQuery } from "convex/react";
@@ -39,12 +41,17 @@ interface EnrollmentWithCourse extends Doc<"enrollments"> {
   };
 }
 
+interface ChartPoint {
+  name: string;
+  amount: number;
+}
+
 interface InstructorStats {
   totalStudents: number;
   totalRevenue: number;
   averageRating: number;
   totalCourses: number;
-  recentEarnings: any[]; // Keeping any for complex chart data for now but could refine later
+  recentEarnings: ChartPoint[];
 }
 
 export default function DashboardPage() {
@@ -115,7 +122,7 @@ export default function DashboardPage() {
                 <div className="text-sm">
                   <p className="font-black">{enrolledCourses?.length || 0} Enrolled</p>
                   <p className="text-[10px] text-blue-200 uppercase font-black tracking-widest">
-                    {enrolledCourses?.filter((e: any) => e.progress?.percentage === 100).length || 0} Completed
+                    {enrolledCourses?.filter((e) => e.progress?.percentage === 100).length || 0} Completed
                   </p>
                 </div>
               </div>
@@ -126,7 +133,7 @@ export default function DashboardPage() {
         {isInstructor ? (
           <InstructorDashboard courses={instructorCourses} stats={instructorStats} />
         ) : (
-          <LearnerDashboard enrolledCourses={enrolledCourses as any} allCourses={allCourses} />
+          <LearnerDashboard enrolledCourses={enrolledCourses} allCourses={allCourses} />
         )}
       </div>
     </div>
@@ -273,7 +280,7 @@ function LearnerDashboard({ enrolledCourses, allCourses }: {
               <div className="p-4 bg-white/10 rounded-2xl border border-white/10">
                 <p className="text-[9px] text-blue-200 uppercase font-black tracking-widest mb-1">Completed</p>
                 <p className="text-2xl font-black">
-                  {enrolledCourses?.filter((e: any) => e.progress?.percentage === 100).length || 0}
+                  {enrolledCourses?.filter((e) => e.progress?.percentage === 100).length || 0}
                 </p>
               </div>
             </div>
@@ -309,7 +316,7 @@ function InstructorDashboard({ courses, stats }: {
   courses: Doc<"courses">[] | undefined;
   stats: InstructorStats | undefined;
 }) {
-  const [activeInstructorTab, setActiveInstructorTab] = useState<"courses" | "mentorship">("courses");
+  const [activeInstructorTab, setActiveInstructorTab] = useState<"courses" | "earnings" | "mentorship">("courses");
   const { data: session } = useSession();
   const convexUser = useQuery(api.users.getUserByProviderId, 
     session?.user?.id ? { providerId: session.user.id } : "skip"
@@ -340,7 +347,7 @@ function InstructorDashboard({ courses, stats }: {
       {/* Main Instructor Area */}
       <div className="lg:col-span-3 space-y-8 mt-4">
         <div className="flex bg-slate-100 dark:bg-slate-800 p-1.5 rounded-2xl w-fit">
-          <button 
+          <button
             onClick={() => setActiveInstructorTab("courses")}
             className={cn(
               "px-6 py-2 rounded-xl text-sm font-bold transition-all",
@@ -349,7 +356,16 @@ function InstructorDashboard({ courses, stats }: {
           >
             My Courses
           </button>
-          <button 
+          <button
+            onClick={() => setActiveInstructorTab("earnings")}
+            className={cn(
+              "px-6 py-2 rounded-xl text-sm font-bold transition-all",
+              activeInstructorTab === "earnings" ? "bg-white dark:bg-slate-900 shadow-sm text-blue-800 dark:text-cyan-400" : "text-slate-500 hover:text-slate-700"
+            )}
+          >
+            Earnings & Payouts
+          </button>
+          <button
             onClick={() => setActiveInstructorTab("mentorship")}
             className={cn(
               "px-6 py-2 rounded-xl text-sm font-bold transition-all",
@@ -360,7 +376,9 @@ function InstructorDashboard({ courses, stats }: {
           </button>
         </div>
 
-        {activeInstructorTab === "courses" ? (
+        {activeInstructorTab === "earnings" ? (
+          <EarningsPanel />
+        ) : activeInstructorTab === "courses" ? (
           <>
             <EarningsAnalytics chartData={stats?.recentEarnings} />
             <div className="bg-white dark:bg-slate-900 rounded-[32px] p-8 border border-slate-100 dark:border-slate-800 shadow-xl shadow-blue-800/5">
@@ -418,7 +436,13 @@ function InstructorDashboard({ courses, stats }: {
             </div>
           </>
         ) : (
-          <MentorRegister userId={convexUser?._id as any} />
+          convexUser ? (
+            <MentorRegister userId={convexUser._id} />
+          ) : (
+            <div className="flex items-center justify-center py-12">
+              <Loader2 className="w-8 h-8 text-blue-800 animate-spin" />
+            </div>
+          )
         )}
       </div>
 
