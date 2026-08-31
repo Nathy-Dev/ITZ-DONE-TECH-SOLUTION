@@ -9,6 +9,7 @@ import { api } from "../../../convex/_generated/api";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { useCart } from "@/components/providers/CartProvider";
+import { useSession } from "next-auth/react";
 
 interface CourseCardProps {
   id?: string;
@@ -30,14 +31,24 @@ interface CourseCardProps {
 /**
  * Reusable Course Card component.
  */
-const CourseCard = ({ 
-  id, _id, title, instructor, rating, reviews = 0, price, 
-  originalPrice, level, duration, badge, image, thumbnailUrl 
+const CourseCard = ({
+  id, _id, title, instructor, rating, reviews = 0, price,
+  originalPrice, level, duration, badge, image, thumbnailUrl
 }: CourseCardProps) => {
   const courseId = (_id || id) as string;
   const displayInstructor = instructor || "ITS-DONE Instructor";
   const rawImage = thumbnailUrl || image;
   
+  const { data: session } = useSession();
+  const convexUser = useQuery(api.users.getUserByProviderId,
+    session?.user?.id ? {
+      providerId: session.user.id,
+      email: session.user.email ?? undefined
+    } : "skip"
+  );
+  // Cart is a learner feature — hidden for instructor accounts
+  const isLearner = convexUser?.role !== "instructor";
+
   const { addItem, isInCart } = useCart();
   const inCart = isInCart(courseId);
   
@@ -127,22 +138,24 @@ const CourseCard = ({
               )}
             </div>
             
-            <button 
-              onClick={handleAddToCart}
-              disabled={inCart}
-              className={cn(
-                "p-2.5 rounded-xl transition-all active:scale-95 shadow-lg",
-                inCart 
-                  ? "bg-emerald-500 text-white shadow-emerald-500/20" 
-                  : "bg-blue-800 text-white hover:bg-blue-900 shadow-blue-800/20"
-              )}
-            >
-              {inCart ? (
-                <CheckCircle2 className="w-5 h-5" />
-              ) : (
-                <ShoppingCart className="w-5 h-5" />
-              )}
-            </button>
+            {isLearner && (
+              <button
+                onClick={handleAddToCart}
+                disabled={inCart}
+                className={cn(
+                  "p-2.5 rounded-xl transition-all active:scale-95 shadow-lg",
+                  inCart
+                    ? "bg-emerald-500 text-white shadow-emerald-500/20"
+                    : "bg-blue-800 text-white hover:bg-blue-900 shadow-blue-800/20"
+                )}
+              >
+                {inCart ? (
+                  <CheckCircle2 className="w-5 h-5" />
+                ) : (
+                  <ShoppingCart className="w-5 h-5" />
+                )}
+              </button>
+            )}
           </div>
         </div>
       </Link>

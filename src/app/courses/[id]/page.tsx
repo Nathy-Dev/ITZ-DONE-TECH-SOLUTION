@@ -12,6 +12,7 @@ import {
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { formatPrice, ngnToUsd } from "@/lib/format";
+import { useFxRate } from "@/hooks/useFxRate";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
 import { Id, Doc } from "../../../../convex/_generated/dataModel";
@@ -31,6 +32,7 @@ export default function CourseDetailPage({ params }: PageProps) {
   const courseId = resolvedParams.id as Id<"courses">;
   const { data: session } = useSession();
   const router = useRouter();
+  const fxRate = useFxRate();
   const [isEnrolling, setIsEnrolling] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
   const [shareCopied, setShareCopied] = useState(false);
@@ -345,7 +347,7 @@ export default function CourseDetailPage({ params }: PageProps) {
               </div>
               {course.price > 0 && (
                 <p className="text-xs text-muted-foreground font-bold">
-                  ≈ {formatPrice(ngnToUsd(course.price), "USD")} for international students
+                  ≈ {formatPrice(ngnToUsd(course.price, fxRate), "USD")} for international students
                 </p>
               )}
 
@@ -367,8 +369,9 @@ export default function CourseDetailPage({ params }: PageProps) {
                   </button>
                 )}
                 
-                {!isEnrolled && (
-                  <button 
+                {/* Add to Cart is a learner feature — hidden for instructors */}
+                {!isEnrolled && convexUser?.role !== "instructor" && (
+                  <button
                     onClick={() => {
                       if (course) {
                         addItem({

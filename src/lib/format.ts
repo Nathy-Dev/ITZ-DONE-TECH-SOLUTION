@@ -25,22 +25,24 @@ export function formatPrice(amount: number, currency: string = "NGN"): string {
  * payouts are processed in Naira). USD is shown only as a reference
  * equivalent so international students understand the price.
  *
- * The conversion rate is configurable via NEXT_PUBLIC_USD_TO_NGN_RATE.
+ * The live rate comes from /api/fx-rate (ExchangeRate-API's free
+ * daily-updated feed). This env value is only the fallback.
  */
 export const USD_TO_NGN_RATE = Number(process.env.NEXT_PUBLIC_USD_TO_NGN_RATE) || 1550;
 
 /**
  * Convert an NGN amount to its approximate USD equivalent.
+ * Pass a live rate when available (from the useFxRate hook).
  */
-export function ngnToUsd(amountNgn: number): number {
-  return Math.round((amountNgn / USD_TO_NGN_RATE) * 100) / 100;
+export function ngnToUsd(amountNgn: number, rate: number = USD_TO_NGN_RATE): number {
+  return Math.round((amountNgn / rate) * 100) / 100;
 }
 
 /**
  * Format an NGN amount with its approximate USD equivalent, e.g.
  * "₦25,000 (~$16.13)". Falls back to NGN-only when the amount is 0.
  */
-export function formatPriceWithUsd(amountNgn: number): string {
+export function formatPriceWithUsd(amountNgn: number, rate: number = USD_TO_NGN_RATE): string {
   if (!amountNgn || amountNgn <= 0) return formatPrice(0);
-  return `${formatPrice(amountNgn)} (~${formatPrice(ngnToUsd(amountNgn), "USD")})`;
+  return `${formatPrice(amountNgn)} (~${formatPrice(ngnToUsd(amountNgn, rate), "USD")})`;
 }

@@ -21,7 +21,8 @@ import {
 import Link from "next/link";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
-import { formatPrice, ngnToUsd, USD_TO_NGN_RATE } from "@/lib/format";
+import { formatPrice, ngnToUsd } from "@/lib/format";
+import { useFxRate } from "@/hooks/useFxRate";
 
 const CATEGORIES = [
   "Development",
@@ -71,6 +72,7 @@ export default function CreateCoursePage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [previewUrl, setPreviewUrl] = useState("");
+  const fxRate = useFxRate();
 
   if (status === "unauthenticated") {
     router.push("/login");
@@ -320,7 +322,7 @@ export default function CreateCoursePage() {
                   {formData.price !== "" && !isNaN(parseFloat(formData.price)) && parseFloat(formData.price) > 0 && (
                     <div className="p-3 bg-blue-50 dark:bg-blue-900/10 rounded-xl space-y-1">
                       <p className="text-xs font-bold text-blue-800 dark:text-cyan-400">
-                        ≈ {formatPrice(ngnToUsd(parseFloat(formData.price)), "USD")} for international students
+                        ≈ {formatPrice(ngnToUsd(parseFloat(formData.price), fxRate), "USD")} for international students
                       </p>
                       <p className="text-xs text-muted-foreground font-medium">
                         You earn {formatPrice(Math.round(parseFloat(formData.price) * 0.6))} per sale (60% share).
@@ -328,7 +330,7 @@ export default function CreateCoursePage() {
                     </div>
                   )}
                   <p className="text-[10px] text-slate-400 font-medium px-1">
-                    All payments are processed in Naira. USD is shown as a reference (~₦{USD_TO_NGN_RATE}/$).
+                    All payments are processed in Naira. USD is shown as a live reference (~₦{fxRate}/$).
                   </p>
                 </div>
 

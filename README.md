@@ -40,8 +40,8 @@ FLUTTERWAVE_SECRET_HASH=your-secret-hash
 # Public app URL (payment redirect URLs) — set to your production domain
 NEXT_PUBLIC_APP_URL=https://yourdomain.com
 
-# USD→NGN reference rate used to show approximate USD equivalents
-# (settlement is always in NGN; update periodically to match the market)
+# USD→NGN fallback rate if the live FX feed is unreachable
+# (live rates come automatically from ExchangeRate-API via /api/fx-rate)
 NEXT_PUBLIC_USD_TO_NGN_RATE=1550
 
 # Shared secret guarding server-to-server Convex mutations (payment
@@ -70,10 +70,33 @@ currency and no conversion conflicts. To serve international students,
 USD equivalents (e.g. "₦25,000 (~$16.13)") are shown as **reference only**
 next to prices on the course page, checkout, and course creation form.
 
-- The rate is configurable via `NEXT_PUBLIC_USD_TO_NGN_RATE` — update it
-  periodically to reflect the current market rate.
+- **Live rates are automatic**: [`/api/fx-rate`](src/app/api/fx-rate/route.ts)
+  proxies ExchangeRate-API's free open endpoint (no API key, refreshed
+  daily) with 6-hour server-side caching. `NEXT_PUBLIC_USD_TO_NGN_RATE` is
+  only a fallback if the feed is ever unreachable.
 - Instructors set prices in ₦ and see their 60% earnings share per sale.
 - Students always pay the exact ₦ amount shown at Flutterwave checkout.
+
+### Role-Based Feature Separation
+
+The platform enforces a clean learner/instructor split — each account type
+only sees features relevant to it:
+
+| Feature                      | Learner | Instructor               |
+| ---------------------------- | ------- | ------------------------ |
+| Browse/search courses        | ✅      | ✅                       |
+| Cart, checkout, payments     | ✅      | ❌ (hidden + redirected) |
+| "Add to Cart" buttons        | ✅      | ❌                       |
+| Enroll & take lessons        | ✅      | ✅ (for reference)       |
+| Create/manage courses        | ❌      | ✅                       |
+| Earnings & payouts dashboard | ❌      | ✅                       |
+| Payout bank account settings | ❌      | ✅                       |
+| Admin dashboard              | ❌      | admin only               |
+
+Users can switch between Learner and Instructor modes from the profile menu —
+the UI and available features update accordingly. All instructor-only
+mutations (course CRUD, curriculum editing, payouts) are additionally
+protected by **server-side role and ownership checks** in Convex.
 
 ### How It Works
 

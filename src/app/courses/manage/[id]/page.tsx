@@ -32,6 +32,7 @@ import {
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { formatPrice, ngnToUsd } from "@/lib/format";
+import { useFxRate } from "@/hooks/useFxRate";
 import UploadCenter from "@/components/courses/UploadCenter";
 
 interface PageProps {
@@ -479,6 +480,7 @@ function CourseSettingsModal({ course, onClose, providerId }: {
   const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const fxRate = useFxRate();
 
   const handleThumbnailChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -577,7 +579,7 @@ function CourseSettingsModal({ course, onClose, providerId }: {
               </div>
               {parseFloat(formData.price) > 0 && (
                 <p className="text-[10px] text-muted-foreground font-medium">
-                  ≈ {formatPrice(ngnToUsd(parseFloat(formData.price)), "USD")} • you earn {formatPrice(Math.round(parseFloat(formData.price) * 0.6))}/sale
+                  ≈ {formatPrice(ngnToUsd(parseFloat(formData.price), fxRate), "USD")} • you earn {formatPrice(Math.round(parseFloat(formData.price) * 0.6))}/sale
                 </p>
               )}
             </div>

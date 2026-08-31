@@ -131,7 +131,9 @@ const Navbar = () => {
             />
           </div>
 
-          <div 
+          {/* Cart is a learner feature — hidden for instructor accounts */}
+          {convexUser?.role !== "instructor" && (
+          <div
             className="relative"
             onMouseEnter={() => setCartPreviewOpen(true)}
             onMouseLeave={() => setCartPreviewOpen(false)}
@@ -188,6 +190,7 @@ const Navbar = () => {
               </div>
             )}
           </div>
+          )}
 
           <div className="hidden sm:flex items-center gap-3">
             {!isSignedIn ? (

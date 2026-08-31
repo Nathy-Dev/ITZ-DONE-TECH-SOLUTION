@@ -19,11 +19,13 @@ import Link from "next/link";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { formatPrice, ngnToUsd } from "@/lib/format";
+import { useFxRate } from "@/hooks/useFxRate";
 
 export default function CheckoutPage() {
   const { data: session, status } = useSession();
   const { items, totalPrice, clearCart, itemCount } = useCart();
   const router = useRouter();
+  const fxRate = useFxRate();
 
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -40,6 +42,11 @@ export default function CheckoutPage() {
 
   if (status === "unauthenticated") {
     redirect("/login?callbackUrl=/checkout");
+  }
+
+  // Checkout is a learner flow — instructors don't purchase courses
+  if (convexUser?.role === "instructor") {
+    redirect("/courses");
   }
 
   if (itemCount === 0) {
@@ -213,7 +220,7 @@ export default function CheckoutPage() {
                   </div>
                   {totalPrice > 0 && (
                     <p className="text-xs text-muted-foreground font-medium text-right">
-                      ≈ {formatPrice(ngnToUsd(totalPrice), "USD")} • charged in Naira
+                      ≈ {formatPrice(ngnToUsd(totalPrice, fxRate), "USD")} • charged in Naira
                     </p>
                   )}
                 </div>
