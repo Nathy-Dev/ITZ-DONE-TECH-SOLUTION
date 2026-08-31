@@ -18,7 +18,7 @@ import {
 import Link from "next/link";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
-import { formatPrice } from "@/lib/format";
+import { formatPrice, ngnToUsd } from "@/lib/format";
 
 export default function CheckoutPage() {
   const { data: session, status } = useSession();
@@ -211,6 +211,11 @@ export default function CheckoutPage() {
                       {formatPrice(totalPrice)}
                     </span>
                   </div>
+                  {totalPrice > 0 && (
+                    <p className="text-xs text-muted-foreground font-medium text-right">
+                      ≈ {formatPrice(ngnToUsd(totalPrice), "USD")} • charged in Naira
+                    </p>
+                  )}
                 </div>
 
                 {error && (

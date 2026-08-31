@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import { formatPrice } from "@/lib/format";
+import { formatPrice, ngnToUsd } from "@/lib/format";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
 import { Id, Doc } from "../../../../convex/_generated/dataModel";
@@ -332,15 +332,22 @@ export default function CourseDetailPage({ params }: PageProps) {
             </div>
 
             <div className="p-10 space-y-8">
-              <div className="flex items-center gap-4">
-                <span className="text-5xl font-black tracking-tighter">{formatPrice(course.price)}</span>
+              <div className="flex items-center gap-4 flex-wrap">
+                <span className="text-4xl sm:text-5xl font-black tracking-tighter">{formatPrice(course.price)}</span>
                 <div className="flex flex-col">
                   {course.price > 0 && (
-                    <span className="text-lg text-slate-400 line-through font-bold">{formatPrice(Math.round(course.price * 2.5))}</span>
+                    <>
+                      <span className="text-sm sm:text-lg text-slate-400 line-through font-bold">{formatPrice(Math.round(course.price * 2.5))}</span>
+                      <span className="text-blue-800 dark:text-cyan-400 font-black text-xs uppercase tracking-widest">60% OFF</span>
+                    </>
                   )}
-                  <span className="text-blue-800 dark:text-cyan-400 font-black text-xs uppercase tracking-widest">60% OFF</span>
                 </div>
               </div>
+              {course.price > 0 && (
+                <p className="text-xs text-muted-foreground font-bold">
+                  ≈ {formatPrice(ngnToUsd(course.price), "USD")} for international students
+                </p>
+              )}
 
               <div className="space-y-4">
                 {isEnrolled ? (

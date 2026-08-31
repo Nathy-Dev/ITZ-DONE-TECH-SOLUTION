@@ -40,6 +40,10 @@ FLUTTERWAVE_SECRET_HASH=your-secret-hash
 # Public app URL (payment redirect URLs) — set to your production domain
 NEXT_PUBLIC_APP_URL=https://yourdomain.com
 
+# USD→NGN reference rate used to show approximate USD equivalents
+# (settlement is always in NGN; update periodically to match the market)
+NEXT_PUBLIC_USD_TO_NGN_RATE=1550
+
 # Shared secret guarding server-to-server Convex mutations (payment
 # completion, payout processing). Generate one with:
 #   node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
@@ -57,6 +61,19 @@ CONVEX_MUTATION_SECRET=<random-64-char-hex>
    - Payout transfer updates: `https://yourdomain.com/api/payouts/webhook`
 3. **Transfers**: Payouts use Flutterwave Transfers. Ensure your Flutterwave balance
    is funded and your account is approved for live transfers.
+
+### Currency Model (NGN + USD display)
+
+All prices are **set and charged in Naira (₦)** — Flutterwave processes the
+payment and instructor payouts in NGN, so there is a single settlement
+currency and no conversion conflicts. To serve international students,
+USD equivalents (e.g. "₦25,000 (~$16.13)") are shown as **reference only**
+next to prices on the course page, checkout, and course creation form.
+
+- The rate is configurable via `NEXT_PUBLIC_USD_TO_NGN_RATE` — update it
+  periodically to reflect the current market rate.
+- Instructors set prices in ₦ and see their 60% earnings share per sale.
+- Students always pay the exact ₦ amount shown at Flutterwave checkout.
 
 ### How It Works
 

@@ -15,39 +15,40 @@ export const getInstructorStats = query({
         totalRevenue: 0,
         averageRating: 0,
         totalCourses: 0,
-        recentEarnings: [
-          { name: "Jan", amount: 0 },
-          { name: "Feb", amount: 0 },
-          { name: "Mar", amount: 0 },
-          { name: "Apr", amount: 0 },
-          { name: "May", amount: 0 },
-          { name: "Jun", amount: 0 },
-        ],
+        recentEarnings: [] as { name: string; amount: number }[],
       };
     }
 
     const totalStudents = courses.reduce((acc, course) => acc + (course.studentsEnrolled || 0), 0);
-    const totalRevenue = courses.reduce((acc, course) => acc + (course.price * (course.studentsEnrolled || 0)), 0);
-    
+
+    // Real instructor revenue: sum of actual earnings records (60% share)
+    const earnings = await ctx.db
+      .query("earnings")
+      .withIndex("by_instructor", (q) => q.eq("instructorId", args.instructorId))
+      .collect();
+    const totalRevenue = earnings.reduce((acc, e) => acc + e.instructorAmount, 0);
+
     const ratedCourses = courses.filter(c => (c.rating ?? 0) > 0);
-    const averageRating = ratedCourses.length > 0 
+    const averageRating = ratedCourses.length > 0
       ? ratedCourses.reduce((acc, course) => acc + (course.rating || 0), 0) / ratedCourses.length
       : 0;
 
-    // Simulation of monthly earnings for the chart
-    // In a real app, this would query an 'orders' or 'transactions' table
+    // Real monthly earnings for the last 6 months from earnings records
     const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-    const currentMonth = new Date().getMonth();
-    const recentEarnings = [];
-    
+    const now = new Date();
+    const recentEarnings: { name: string; amount: number }[] = [];
+
     for (let i = 5; i >= 0; i--) {
-      const monthIdx = (currentMonth - i + 12) % 12;
-      // Mocking some distribution of existing revenue across recent months
-      const amount = totalRevenue > 0 ? (totalRevenue / (6 + Math.random() * 4)) : 0;
-      recentEarnings.push({
-        name: months[monthIdx],
-        amount: Math.round(amount),
-      });
+      const monthDate = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const monthStart = monthDate.getTime();
+      const monthEnd = new Date(now.getFullYear(), now.getMonth() - i + 1, 1).getTime();
+      const monthName = months[monthDate.getMonth()];
+
+      const monthTotal = earnings
+        .filter(e => e.createdAt >= monthStart && e.createdAt < monthEnd)
+        .reduce((acc, e) => acc + e.instructorAmount, 0);
+
+      recentEarnings.push({ name: monthName, amount: monthTotal });
     }
 
     return {

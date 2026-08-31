@@ -4,11 +4,11 @@ import React, { use, useState, useEffect } from "react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../../../../../convex/_generated/api";
 import { Id, Doc } from "../../../../../../convex/_generated/dataModel";
-import { 
-  Play, 
-  ChevronLeft, 
-  ChevronRight, 
-  Menu, 
+import {
+  Play,
+  ChevronLeft,
+  ChevronRight,
+  Menu,
   ChevronDown,
   PlayCircle,
   Clock,
@@ -17,7 +17,8 @@ import {
   CheckCircle2,
   Circle,
   Lock,
-  BookOpen
+  BookOpen,
+  X
 } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
@@ -77,7 +78,7 @@ export default function LessonViewerPage({ params }: PageProps) {
 
   const toggleCompletion = useMutation(api.progress.toggleLessonCompletion);
 
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const firstLesson = useQuery(api.content.getFirstLesson, { courseId });
   const allLessons = useQuery(api.content.listAllLessonsOrdered, { courseId });
@@ -148,14 +149,15 @@ export default function LessonViewerPage({ params }: PageProps) {
   const nextLesson = currentIndex < (allLessons?.length ?? 0) - 1 ? allLessons?.[currentIndex + 1] : null;
 
   const navigateTo = (lId: string) => {
+    setSidebarOpen(false); // Close the mobile sidebar on navigation
     router.push(`/courses/${courseId}/lessons/${lId}`);
   };
 
   return (
-    <div className="flex flex-col h-screen bg-white dark:bg-slate-950 overflow-hidden">
+    <div className="flex flex-col h-[100dvh] bg-white dark:bg-slate-950 overflow-hidden">
       {/* Top Navbar */}
-      <header className="h-20 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between px-8 shrink-0 bg-white/80 dark:bg-slate-950/80 backdrop-blur-xl z-20">
-        <div className="flex items-center gap-6">
+      <header className="h-16 md:h-20 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between px-3 sm:px-8 shrink-0 bg-white/80 dark:bg-slate-950/80 backdrop-blur-xl z-20">
+        <div className="flex items-center gap-3 sm:gap-6 min-w-0">
           <Link 
             href={`/courses/${courseId}`} 
             className="group flex items-center gap-3 p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-2xl transition-all"
@@ -177,10 +179,10 @@ export default function LessonViewerPage({ params }: PageProps) {
           </div>
         </div>
         
-        <div className="flex items-center gap-8">
+        <div className="flex items-center gap-4 sm:gap-8 shrink-0">
           {progress && (
             <div className="flex flex-col items-end gap-1.5">
-              <div className="flex items-center gap-3">
+              <div className="hidden sm:flex items-center gap-3">
                 <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">
                   Your Progress
                 </span>
@@ -188,11 +190,23 @@ export default function LessonViewerPage({ params }: PageProps) {
                   {progress.percentage}%
                 </span>
               </div>
-              <div className="h-1.5 w-48 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden relative">
-                 <div 
-                  className="h-full bg-blue-800 dark:bg-cyan-500 transition-all duration-1000 shadow-[0_0_10px_rgba(30,64,175,0.3)]" 
-                  style={{ width: `${progress.percentage}%` }} 
-                />
+              {/* Compact progress ring for mobile */}
+              <div className="sm:hidden flex items-center gap-1.5">
+                <div className="h-1.5 w-16 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden relative">
+                  <div
+                    className="h-full bg-blue-800 dark:bg-cyan-500 transition-all duration-1000"
+                    style={{ width: `${progress.percentage}%` }}
+                  />
+                </div>
+                <span className="text-[10px] font-black text-blue-800 dark:text-cyan-400">
+                  {progress.percentage}%
+                </span>
+              </div>
+              <div className="hidden sm:block h-1.5 w-48 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden relative">
+                 <div
+                   className="h-full bg-blue-800 dark:bg-cyan-500 transition-all duration-1000 shadow-[0_0_10px_rgba(30,64,175,0.3)]"
+                   style={{ width: `${progress.percentage}%` }}
+                 />
               </div>
             </div>
           )}
@@ -220,12 +234,27 @@ export default function LessonViewerPage({ params }: PageProps) {
         </div>
       </header>
 
-      <div className="flex flex-grow overflow-hidden">
+      <div className="flex flex-grow overflow-hidden relative">
+        {/* Mobile backdrop */}
+        {sidebarOpen && (
+          <div
+            className="lg:hidden fixed inset-0 bg-slate-950/50 backdrop-blur-sm z-20"
+            onClick={() => setSidebarOpen(false)}
+          />
+        )}
         {/* Sidebar Navigation */}
         <aside className={cn(
-          "w-85 border-r border-slate-100 dark:border-slate-800 flex flex-col shrink-0 bg-slate-50/40 dark:bg-slate-900/40 backdrop-blur-xl transition-all duration-300 lg:translate-x-0",
-          sidebarOpen ? "translate-x-0" : "-translate-x-full absolute lg:relative z-30 h-full"
+          "w-80 max-w-[85vw] border-r border-slate-100 dark:border-slate-800 flex flex-col shrink-0 bg-slate-50/95 dark:bg-slate-900/95 lg:bg-slate-50/40 dark:lg:bg-slate-900/40 backdrop-blur-xl transition-transform duration-300 lg:translate-x-0",
+          sidebarOpen ? "translate-x-0 fixed lg:relative inset-y-0 left-0 z-30 shadow-2xl lg:shadow-none" : "-translate-x-full fixed lg:relative z-30 h-full"
         )}>
+          {/* Close button (mobile) */}
+          <button
+            onClick={() => setSidebarOpen(false)}
+            className="lg:hidden absolute top-4 right-4 p-2 bg-white dark:bg-slate-800 rounded-xl shadow-md z-10"
+            aria-label="Close course content"
+          >
+            <X className="w-4 h-4" />
+          </button>
           <div className="p-8 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
              <h2 className="font-black text-[11px] uppercase tracking-[0.25em] text-blue-800 dark:text-cyan-400">Course Content</h2>
              {progress && (
@@ -264,9 +293,9 @@ export default function LessonViewerPage({ params }: PageProps) {
           ) : (
             <>
               {/* Video Player Section */}
-              <div className="bg-slate-50 dark:bg-slate-900/50 p-4 lg:p-8">
+              <div className="bg-slate-50 dark:bg-slate-900/50 p-2 sm:p-4 lg:p-8">
                 <div className="max-w-6xl mx-auto">
-                  <div className="aspect-video w-full bg-slate-950 rounded-[2.5rem] overflow-hidden shadow-2xl relative group ring-1 ring-slate-200 dark:ring-slate-800">
+                  <div className="aspect-video w-full bg-slate-950 rounded-[1.25rem] sm:rounded-[2.5rem] overflow-hidden shadow-2xl relative group ring-1 ring-slate-200 dark:ring-slate-800">
                     {lesson?.videoUrl ? (
                       <VideoPlayer 
                         url={lesson.videoUrl} 
@@ -293,15 +322,15 @@ export default function LessonViewerPage({ params }: PageProps) {
               </div>
 
               {/* Lesson Text Content */}
-              <div className="max-w-4xl mx-auto px-8 py-12 lg:py-16 space-y-12">
+              <div className="max-w-4xl mx-auto px-4 sm:px-8 py-8 sm:py-12 lg:py-16 space-y-8 sm:space-y-12 pb-24 lg:pb-16">
                 <div className="flex flex-col md:flex-row justify-between items-start gap-8">
-                  <div className="space-y-6">
+                  <div className="space-y-4 sm:space-y-6">
                     <div className="flex items-center gap-3">
                       <span className="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-cyan-400 text-[10px] font-black uppercase tracking-widest rounded-full">
                         Module Content
                       </span>
                     </div>
-                    <h2 className="text-4xl lg:text-5xl font-black tracking-tight leading-tight">
+                    <h2 className="text-2xl sm:text-4xl lg:text-5xl font-black tracking-tight leading-tight">
                       {lesson?.title}
                     </h2>
                     <div className="flex flex-wrap items-center gap-6 text-[11px] font-black uppercase tracking-widest text-slate-400">
@@ -361,7 +390,7 @@ export default function LessonViewerPage({ params }: PageProps) {
                 )}
 
                 {/* Navigation Buttons */}
-                <div className="pt-16 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row justify-between gap-6">
+                <div className="pt-8 sm:pt-16 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row justify-between gap-4 sm:gap-6">
                   <button 
                     onClick={() => prevLesson && navigateTo(prevLesson._id)}
                     disabled={!prevLesson}
@@ -401,6 +430,45 @@ export default function LessonViewerPage({ params }: PageProps) {
           )}
         </main>
       </div>
+
+      {/* Sticky mobile bottom nav */}
+      {lessonId !== "start" && lesson && isEnrolled && (
+        <div className="lg:hidden sticky bottom-0 z-20 bg-white/95 dark:bg-slate-950/95 backdrop-blur-xl border-t border-slate-100 dark:border-slate-800 px-3 py-2.5 flex items-center justify-between gap-2 shrink-0">
+          <button
+            onClick={() => prevLesson && navigateTo(prevLesson._id)}
+            disabled={!prevLesson}
+            className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl font-black text-[11px] uppercase tracking-widest bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 transition-all disabled:opacity-30 active:scale-95"
+          >
+            <ChevronLeft className="w-4 h-4" />
+            Prev
+          </button>
+          
+          <button
+            onClick={handleToggleComplete}
+            className={cn(
+              "flex items-center gap-2 px-4 py-2.5 rounded-xl font-black text-[11px] uppercase tracking-widest transition-all active:scale-95",
+              completedLessonIds.includes(lesson._id)
+                ? "bg-emerald-500 text-white"
+                : "bg-blue-800 text-white"
+            )}
+          >
+            {completedLessonIds.includes(lesson._id) ? (
+              <><CheckCircle2 className="w-4 h-4" /> Done</>
+            ) : (
+              <><Circle className="w-4 h-4" /> Complete</>
+            )}
+          </button>
+          
+          <button
+            onClick={() => nextLesson && navigateTo(nextLesson._id)}
+            disabled={!nextLesson}
+            className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl font-black text-[11px] uppercase tracking-widest bg-blue-800 text-white transition-all disabled:opacity-30 active:scale-95"
+          >
+            Next
+            <ChevronRight className="w-4 h-4" />
+          </button>
+        </div>
+      )}
     </div>
   );
 }

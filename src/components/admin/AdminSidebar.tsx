@@ -25,7 +25,7 @@ const navItems = [
   { name: "Waitlist", href: "/admin/waitlist", icon: ListOrdered },
 ];
 
-export function AdminSidebar() {
+export function AdminSidebar({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = usePathname();
   const [isCollapsed, setIsCollapsed] = useState(false);
 
@@ -67,6 +67,7 @@ export function AdminSidebar() {
             <div key={item.href} className="relative group">
               <Link
                 href={item.href}
+                onClick={onNavigate}
                 className={cn(
                   "flex items-center rounded-xl font-bold transition-all relative",
                   isCollapsed ? "justify-center p-3" : "gap-3 px-4 py-3",

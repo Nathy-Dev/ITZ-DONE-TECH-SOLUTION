@@ -1,154 +1,70 @@
 "use client";
 
-import React, { useState } from "react";
-import { 
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  LineChart, Line, AreaChart, Area
+import React from "react";
+import {
+  XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+  AreaChart, Area
 } from "recharts";
-import { TrendingUp, Users, Video } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { TrendingUp } from "lucide-react";
 import { formatPrice } from "@/lib/format";
-
-// Mock Data
-const revenueData = [
-  { name: 'Jan', current: 4000, previous: 2400 },
-  { name: 'Feb', current: 3000, previous: 1398 },
-  { name: 'Mar', current: 2000, previous: 9800 },
-  { name: 'Apr', current: 2780, previous: 3908 },
-  { name: 'May', current: 1890, previous: 4800 },
-  { name: 'Jun', current: 2390, previous: 3800 },
-  { name: 'Jul', current: 3490, previous: 4300 },
-];
-
-const enrollmentData = [
-  { name: 'Mon', students: 12 },
-  { name: 'Tue', students: 19 },
-  { name: 'Wed', students: 15 },
-  { name: 'Thu', students: 22 },
-  { name: 'Fri', students: 28 },
-  { name: 'Sat', students: 35 },
-  { name: 'Sun', students: 42 },
-];
-
-const completionData = [
-  { name: 'Week 1', rate: 20 },
-  { name: 'Week 2', rate: 45 },
-  { name: 'Week 3', rate: 65 },
-  { name: 'Week 4', rate: 85 },
-];
 
 interface EarningsAnalyticsProps {
   chartData?: { name: string; amount: number }[];
 }
 
+/**
+ * Revenue analytics for instructors — powered by REAL earnings data
+ * (the 60% instructor share from actual course sales), grouped by month.
+ */
 export default function EarningsAnalytics({ chartData }: EarningsAnalyticsProps) {
-  const [activeTab, setActiveTab] = useState<"revenue" | "enrollment" | "completion">("revenue");
-
-  // Format data for chart
-  const revenueChartData = chartData ? chartData.map(d => ({
-    name: d.name,
-    current: d.amount,
-    previous: Math.round(d.amount * 0.8) // Mocking previous for visual depth
-  })) : revenueData;
+  const data = chartData ?? [];
+  const hasData = data.some(d => d.amount > 0);
 
   return (
-    <div className="bg-white dark:bg-slate-900 rounded-[32px] p-8 border border-slate-100 dark:border-slate-800 shadow-xl shadow-blue-800/5 mt-8 mb-8">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
+    <div className="bg-white dark:bg-slate-900 rounded-[24px] md:rounded-[32px] p-5 sm:p-8 border border-slate-100 dark:border-slate-800 shadow-xl shadow-blue-800/5 mt-8 mb-8">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
         <div>
-          <h2 className="text-2xl font-black">Performance Analytics</h2>
-          <p className="text-sm text-muted-foreground font-medium mt-1">Track your course metrics and revenue growth.</p>
+          <h2 className="text-xl sm:text-2xl font-black">Revenue Analytics</h2>
+          <p className="text-sm text-muted-foreground font-medium mt-1">
+            Your 60% earnings share from course sales, by month.
+          </p>
         </div>
-        
-        <div className="flex bg-slate-100 dark:bg-slate-800 p-1.5 rounded-2xl w-fit">
-          <button 
-            onClick={() => setActiveTab("revenue")}
-            className={cn(
-              "px-6 py-2 rounded-xl text-sm font-bold transition-all flex items-center gap-2",
-              activeTab === "revenue" ? "bg-white dark:bg-slate-900 shadow-sm text-blue-800 dark:text-cyan-400" : "text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
-            )}
-          >
-            <TrendingUp className="w-4 h-4" /> Revenue
-          </button>
-          <button 
-            onClick={() => setActiveTab("enrollment")}
-            className={cn(
-              "px-6 py-2 rounded-xl text-sm font-bold transition-all flex items-center gap-2",
-              activeTab === "enrollment" ? "bg-white dark:bg-slate-900 shadow-sm text-blue-800 dark:text-cyan-400" : "text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
-            )}
-          >
-            <Users className="w-4 h-4" /> Enrollments
-          </button>
-          <button 
-            onClick={() => setActiveTab("completion")}
-            className={cn(
-              "px-6 py-2 rounded-xl text-sm font-bold transition-all flex items-center gap-2",
-              activeTab === "completion" ? "bg-white dark:bg-slate-900 shadow-sm text-blue-800 dark:text-cyan-400" : "text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
-            )}
-          >
-            <Video className="w-4 h-4" /> Completion
-          </button>
+        <div className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-blue-800 dark:text-cyan-400 bg-blue-50 dark:bg-blue-900/20 px-4 py-2 rounded-xl w-fit">
+          <TrendingUp className="w-4 h-4" />
+          Last 6 Months
         </div>
       </div>
 
-      <div className="h-[300px] w-full mt-4">
-        {activeTab === "revenue" && (
+      <div className="h-[240px] sm:h-[300px] w-full mt-4">
+        {hasData ? (
           <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={revenueChartData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+            <AreaChart data={data} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
               <defs>
                 <linearGradient id="colorCurrent" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor="#2563eb" stopOpacity={0.3}/>
                   <stop offset="95%" stopColor="#2563eb" stopOpacity={0}/>
                 </linearGradient>
-                <linearGradient id="colorPrevious" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#94a3b8" stopOpacity={0.1}/>
-                  <stop offset="95%" stopColor="#94a3b8" stopOpacity={0}/>
-                </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
-              <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748b', fontWeight: 600 }} dy={10} />
-              <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748b', fontWeight: 600 }} tickFormatter={(value) => formatPrice(value)} />
+              <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#64748b', fontWeight: 600 }} dy={10} />
+              <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#64748b', fontWeight: 600 }} tickFormatter={(value) => formatPrice(value)} width={70} />
               <Tooltip 
                 contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)' }}
                 labelStyle={{ fontWeight: 800, color: '#0f172a', marginBottom: '4px' }}
                 itemStyle={{ fontWeight: 600, fontSize: '14px' }}
+                formatter={(value) => [formatPrice(Number(value)), 'Earnings']}
               />
-              <Area type="monotone" dataKey="previous" stroke="#94a3b8" strokeWidth={2} fillOpacity={1} fill="url(#colorPrevious)" name="Previous Period" />
-              <Area type="monotone" dataKey="current" stroke="#2563eb" strokeWidth={3} fillOpacity={1} fill="url(#colorCurrent)" name="Current Period" />
+              <Area type="monotone" dataKey="amount" stroke="#2563eb" strokeWidth={3} fillOpacity={1} fill="url(#colorCurrent)" name="Earnings" />
             </AreaChart>
           </ResponsiveContainer>
-        )}
-
-        {activeTab === "enrollment" && (
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={enrollmentData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
-              <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748b', fontWeight: 600 }} dy={10} />
-              <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748b', fontWeight: 600 }} />
-              <Tooltip 
-                 cursor={{ fill: 'transparent' }}
-                 contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)' }}
-                 labelStyle={{ fontWeight: 800, color: '#0f172a', marginBottom: '4px' }}
-                 itemStyle={{ fontWeight: 600, fontSize: '14px', color: '#06b6d4' }}
-              />
-              <Bar dataKey="students" fill="#06b6d4" radius={[6, 6, 0, 0]} name="New Enrollments" barSize={40} />
-            </BarChart>
-          </ResponsiveContainer>
-        )}
-
-        {activeTab === "completion" && (
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={completionData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
-              <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748b', fontWeight: 600 }} dy={10} />
-              <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748b', fontWeight: 600 }} tickFormatter={(val) => `${val}%`} />
-              <Tooltip 
-                contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)' }}
-                labelStyle={{ fontWeight: 800, color: '#0f172a', marginBottom: '4px' }}
-                itemStyle={{ fontWeight: 600, fontSize: '14px', color: '#10b981' }}
-              />
-              <Line type="monotone" dataKey="rate" stroke="#10b981" strokeWidth={4} dot={{ strokeWidth: 2, r: 6, fill: '#fff', stroke: '#10b981' }} activeDot={{ r: 8 }} name="Avg. Completion Rate" />
-            </LineChart>
-          </ResponsiveContainer>
+        ) : (
+          <div className="h-full flex flex-col items-center justify-center text-center border-2 border-dashed border-slate-100 dark:border-slate-800 rounded-3xl p-8">
+            <TrendingUp className="w-10 h-10 text-slate-200 dark:text-slate-700 mb-4" />
+            <p className="font-bold text-muted-foreground">No earnings data yet</p>
+            <p className="text-xs text-slate-400 mt-1 max-w-xs">
+              Publish a course and your monthly revenue will appear here once students start enrolling.
+            </p>
+          </div>
         )}
       </div>
     </div>

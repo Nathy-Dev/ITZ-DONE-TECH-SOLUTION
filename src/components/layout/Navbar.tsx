@@ -342,11 +342,28 @@ const Navbar = () => {
 
       {/* Mobile Menu */}
       {mobileMenuOpen && (
-        <div className="lg:hidden absolute top-full left-0 right-0 bg-white dark:bg-slate-950 border-t border-slate-100 dark:border-slate-800 p-6 shadow-xl animate-in fade-in slide-in-from-top-4">
+        <div className="lg:hidden absolute top-full left-0 right-0 bg-white dark:bg-slate-950 border-t border-slate-100 dark:border-slate-800 p-6 shadow-xl animate-in fade-in slide-in-from-top-4 max-h-[calc(100dvh-80px)] overflow-y-auto">
           <nav className="flex flex-col gap-4 text-lg font-medium">
+            {/* Mobile search */}
+            <div className="flex items-center relative mb-2">
+              <Search className="absolute left-3 w-4 h-4 text-muted-foreground" />
+              <input
+                type="text"
+                placeholder="Search courses..."
+                className="w-full pl-10 pr-4 py-2.5 bg-slate-100 dark:bg-slate-800 rounded-full text-sm outline-none focus:ring-2 focus:ring-cyan-500/20"
+              />
+            </div>
             <Link href="/courses" onClick={() => setMobileMenuOpen(false)}>Courses</Link>
+            {isSignedIn && (
+              <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)} className="text-blue-800 dark:text-cyan-400 font-bold">
+                Dashboard
+              </Link>
+            )}
             <Link href="/mentorship" onClick={() => setMobileMenuOpen(false)}>Mentorship</Link>
             <Link href="/business" onClick={() => setMobileMenuOpen(false)}>For Business</Link>
+            {isSignedIn && (
+              <Link href="/profile" onClick={() => setMobileMenuOpen(false)}>Profile Settings</Link>
+            )}
             {convexUser?.role === "admin" && (
               <Link href="/admin" onClick={() => setMobileMenuOpen(false)} className="text-red-600 font-bold">
                 Admin Dashboard

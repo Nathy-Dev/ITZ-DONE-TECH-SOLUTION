@@ -9,7 +9,6 @@ import {
   ArrowRight,
   LayoutGrid,
   Zap,
-  Bell,
   CheckCircle2,
   Plus,
   Users,
@@ -25,6 +24,7 @@ import Image from "next/image";
 import CourseCard from "@/components/courses/CourseCard";
 import EarningsAnalytics from "@/components/dashboard/EarningsAnalytics";
 import EarningsPanel from "@/components/dashboard/EarningsPanel";
+import NotificationsBell from "@/components/dashboard/NotificationsBell";
 import MentorRegister from "@/components/mentorship/MentorRegister";
 import { cn } from "@/lib/utils";
 import { useQuery } from "convex/react";
@@ -107,10 +107,7 @@ export default function DashboardPage() {
             </p>
           </div>
           <div className="flex items-center gap-3">
-            <button className="p-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl hover:bg-slate-50 transition-all relative">
-              <Bell className="w-6 h-6 text-slate-600 dark:text-slate-400" />
-              <span className="absolute top-3 right-3 w-2 h-2 bg-red-500 rounded-full border-2 border-white dark:border-slate-900"></span>
-            </button>
+            <NotificationsBell />
             {isInstructor ? (
                <Link href="/courses/create" className="flex items-center gap-2 bg-blue-800 text-white px-6 py-3 rounded-2xl shadow-lg shadow-blue-800/20 hover:bg-blue-900 transition-all">
                   <Plus className="w-5 h-5" />
@@ -323,22 +320,22 @@ function InstructorDashboard({ courses, stats }: {
   );
 
   return (
-    <div className="grid lg:grid-cols-4 gap-6">
+    <div className="grid lg:grid-cols-4 gap-4 sm:gap-6">
       {/* Stats Overview */}
       {[
         { label: "Total Students", value: stats?.totalStudents || 0, icon: Users, color: "text-blue-600", bg: "bg-blue-100 dark:bg-blue-900/30" },
-        { label: "Course Revenue", value: formatPrice(stats?.totalRevenue || 0), icon: DollarSign, color: "text-emerald-600", bg: "bg-emerald-100 dark:bg-emerald-900/30" },
+        { label: "Your Earnings", value: formatPrice(stats?.totalRevenue || 0), icon: DollarSign, color: "text-emerald-600", bg: "bg-emerald-100 dark:bg-emerald-900/30" },
         { label: "Course Rating", value: stats?.averageRating?.toFixed(1) || "0.0", icon: Trophy, color: "text-amber-600", bg: "bg-amber-100 dark:bg-amber-900/30" },
         { label: "My Courses", value: stats?.totalCourses || 0, icon: Video, color: "text-purple-600", bg: "bg-purple-100 dark:bg-purple-900/30" },
       ].map((stat, i) => (
-        <div key={i} className="bg-white dark:bg-slate-900 p-6 rounded-[24px] border border-slate-100 dark:border-slate-800 shadow-sm">
-          <div className="flex items-center gap-4">
-            <div className={`w-12 h-12 ${stat.bg} ${stat.color} rounded-xl flex items-center justify-center`}>
-              <stat.icon className="w-6 h-6" />
+        <div key={i} className="bg-white dark:bg-slate-900 p-4 sm:p-6 rounded-[20px] sm:rounded-[24px] border border-slate-100 dark:border-slate-800 shadow-sm">
+          <div className="flex items-center gap-3 sm:gap-4">
+            <div className={`w-10 h-10 sm:w-12 sm:h-12 ${stat.bg} ${stat.color} rounded-xl flex items-center justify-center shrink-0`}>
+              <stat.icon className="w-5 h-5 sm:w-6 sm:h-6" />
             </div>
-            <div>
-              <p className="text-[10px] text-muted-foreground font-black uppercase tracking-widest">{stat.label}</p>
-              <p className="text-2xl font-black">{stat.value}</p>
+            <div className="min-w-0">
+              <p className="text-[9px] sm:text-[10px] text-muted-foreground font-black uppercase tracking-widest truncate">{stat.label}</p>
+              <p className="text-lg sm:text-2xl font-black truncate">{stat.value}</p>
             </div>
           </div>
         </div>

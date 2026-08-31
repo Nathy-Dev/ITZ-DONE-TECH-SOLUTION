@@ -1,5 +1,40 @@
 import { v } from "convex/values";
 import { query, mutation } from "./_generated/server";
+import type { QueryCtx } from "./_generated/server";
+import type { Doc, Id } from "./_generated/dataModel";
+
+/**
+ * Verify the caller (identified by providerId) is allowed to act as an
+ * instructor — either has the instructor role or is an admin.
+ */
+async function requireInstructor(ctx: QueryCtx, providerId: string) {
+  const user = await ctx.db
+    .query("users")
+    .withIndex("by_provider_id", (q) => q.eq("providerId", providerId))
+    .unique();
+  if (!user) throw new Error("Unauthorized: user not found");
+  if (user.role !== "instructor" && user.role !== "admin") {
+    throw new Error("Forbidden: only instructors can perform this action");
+  }
+  return user;
+}
+
+/**
+ * Verify the caller owns the given course (or is an admin).
+ */
+async function requireCourseOwner(
+  ctx: QueryCtx,
+  courseId: Id<"courses">,
+  providerId: string
+): Promise<{ user: Doc<"users">; course: Doc<"courses"> }> {
+  const user = await requireInstructor(ctx, providerId);
+  const course = await ctx.db.get(courseId);
+  if (!course) throw new Error("Course not found");
+  if (user.role !== "admin" && course.instructorId !== user._id) {
+    throw new Error("Forbidden: you do not own this course");
+  }
+  return { user, course };
+}
 
 export const list = query({
   args: {},
@@ -52,6 +87,7 @@ export const listByInstructor = query({
 
 export const create = mutation({
   args: {
+    providerId: v.string(),
     title: v.string(),
     description: v.string(),
     price: v.number(),
@@ -62,8 +98,16 @@ export const create = mutation({
     level: v.string(),
   },
   handler: async (ctx, args) => {
+    const user = await requireInstructor(ctx, args.providerId);
+    // The course must belong to the authenticated instructor
+    if (user.role !== "admin" && args.instructorId !== user._id) {
+      throw new Error("Forbidden: you can only create courses for yourself");
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { providerId, ...courseData } = args;
     const courseId = await ctx.db.insert("courses", {
-      ...args,
+      ...courseData,
       studentsEnrolled: 0,
       rating: 0,
       isPublished: false,
@@ -73,11 +117,35 @@ export const create = mutation({
   },
 });
 
-export const submitForReview = mutation({
-  args: { id: v.id("courses") },
+/**
+ * Update course details (title, description, price, etc.).
+ * Ownership-checked: only the course owner (or an admin) can update.
+ */
+export const updateCourse = mutation({
+  args: {
+    providerId: v.string(),
+    id: v.id("courses"),
+    title: v.optional(v.string()),
+    description: v.optional(v.string()),
+    price: v.optional(v.number()),
+    duration: v.optional(v.string()),
+    thumbnailUrl: v.optional(v.string()),
+    category: v.optional(v.string()),
+    level: v.optional(v.string()),
+  },
   handler: async (ctx, args) => {
-    const course = await ctx.db.get(args.id);
-    if (!course) throw new Error("Course not found");
+    await requireCourseOwner(ctx, args.id, args.providerId);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { id, providerId, ...updates } = args;
+    await ctx.db.patch(id, updates);
+    return true;
+  },
+});
+
+export const submitForReview = mutation({
+  args: { providerId: v.string(), id: v.id("courses") },
+  handler: async (ctx, args) => {
+    const { course } = await requireCourseOwner(ctx, args.id, args.providerId);
 
     if (course.status !== "draft" && course.status !== "rejected") {
       throw new Error("Course is not in a valid state to be submitted for review");

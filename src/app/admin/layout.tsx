@@ -6,9 +6,11 @@ import { redirect } from "next/navigation";
 import { useQuery } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import { AdminSidebar } from "@/components/admin/AdminSidebar";
+import { Menu } from "lucide-react";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const { data: session, status } = useSession();
+  const [sidebarOpen, setSidebarOpen] = React.useState(false);
 
   const convexUser = useQuery(api.users.getUserByProviderId, 
     session?.user?.id ? { 
@@ -35,9 +37,33 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   }
 
   return (
-    <div className="flex h-screen bg-slate-50 dark:bg-slate-950 overflow-hidden">
-      <AdminSidebar />
-      <main className="flex-1 overflow-y-auto p-8">
+    <div className="flex h-[100dvh] bg-slate-50 dark:bg-slate-950 overflow-hidden relative">
+      {/* Mobile backdrop */}
+      {sidebarOpen && (
+        <div 
+          className="lg:hidden fixed inset-0 bg-slate-950/50 backdrop-blur-sm z-30"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
+      {/* Sidebar: fixed overlay on mobile, static column on desktop */}
+      <div className={`
+        fixed lg:relative inset-y-0 left-0 z-40 lg:z-auto
+        ${sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
+        transition-transform duration-300
+      `}>
+        <AdminSidebar onNavigate={() => setSidebarOpen(false)} />
+      </div>
+
+      <main className="flex-1 overflow-y-auto p-4 sm:p-8">
+        {/* Mobile menu toggle */}
+        <button
+          onClick={() => setSidebarOpen(true)}
+          className="lg:hidden mb-6 p-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm"
+          aria-label="Open admin menu"
+        >
+          <Menu className="w-5 h-5" />
+        </button>
         <div className="max-w-6xl mx-auto">
           {children}
         </div>

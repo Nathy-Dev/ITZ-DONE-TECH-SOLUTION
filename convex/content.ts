@@ -1,5 +1,59 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
+import type { QueryCtx } from "./_generated/server";
+import type { Doc, Id } from "./_generated/dataModel";
+
+/**
+ * Verify the caller (by providerId) owns the course that a section belongs
+ * to (or is an admin). Returns the caller's user doc.
+ */
+async function requireSectionOwner(ctx: QueryCtx, sectionId: Id<"sections">, providerId: string) {
+  const user = await ctx.db
+    .query("users")
+    .withIndex("by_provider_id", (q) => q.eq("providerId", providerId))
+    .unique();
+  if (!user) throw new Error("Unauthorized: user not found");
+
+  const section = await ctx.db.get(sectionId);
+  if (!section) throw new Error("Section not found");
+
+  const course = await ctx.db.get(section.courseId);
+  if (!course) throw new Error("Course not found");
+
+  if (user.role !== "admin" && course.instructorId !== user._id) {
+    throw new Error("Forbidden: you do not own this course");
+  }
+  return { user, section, course };
+}
+
+/**
+ * Verify the caller owns the course (or is an admin).
+ */
+async function requireCourseOwner(ctx: QueryCtx, courseId: Id<"courses">, providerId: string) {
+  const user = await ctx.db
+    .query("users")
+    .withIndex("by_provider_id", (q) => q.eq("providerId", providerId))
+    .unique();
+  if (!user) throw new Error("Unauthorized: user not found");
+
+  const course = await ctx.db.get(courseId);
+  if (!course) throw new Error("Course not found");
+
+  if (user.role !== "admin" && course.instructorId !== user._id) {
+    throw new Error("Forbidden: you do not own this course");
+  }
+  return { user, course };
+}
+
+/**
+ * Verify the caller owns the course that a lesson belongs to (or is an admin).
+ */
+async function requireLessonOwner(ctx: QueryCtx, lessonId: Id<"lessons">, providerId: string) {
+  const lesson = await ctx.db.get(lessonId);
+  if (!lesson) throw new Error("Lesson not found");
+  const { user, course } = await requireSectionOwner(ctx, lesson.sectionId, providerId);
+  return { user, course, lesson };
+}
 
 // --- Sections ---
 
@@ -15,30 +69,39 @@ export const listSections = query({
 
 export const createSection = mutation({
   args: {
+    providerId: v.string(),
     courseId: v.id("courses"),
     title: v.string(),
     order: v.number(),
   },
   handler: async (ctx, args) => {
-    return await ctx.db.insert("sections", args);
+    await requireCourseOwner(ctx, args.courseId, args.providerId);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { providerId, ...sectionData } = args;
+    return await ctx.db.insert("sections", sectionData);
   },
 });
 
 export const updateSection = mutation({
   args: {
+    providerId: v.string(),
     id: v.id("sections"),
     title: v.optional(v.string()),
     order: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
-    const { id, ...updates } = args;
+    await requireSectionOwner(ctx, args.id, args.providerId);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { id, providerId, ...updates } = args;
     await ctx.db.patch(id, updates);
   },
 });
 
 export const deleteSection = mutation({
-  args: { id: v.id("sections") },
+  args: { providerId: v.string(), id: v.id("sections") },
   handler: async (ctx, args) => {
+    await requireSectionOwner(ctx, args.id, args.providerId);
+
     // Also delete lessons in this section
     const lessons = await ctx.db
       .query("lessons")
@@ -74,6 +137,7 @@ export const getLessonById = query({
 
 export const createLesson = mutation({
   args: {
+    providerId: v.string(),
     sectionId: v.id("sections"),
     title: v.string(),
     content: v.optional(v.string()),
@@ -83,12 +147,16 @@ export const createLesson = mutation({
     isFree: v.boolean(),
   },
   handler: async (ctx, args) => {
-    return await ctx.db.insert("lessons", args);
+    await requireSectionOwner(ctx, args.sectionId, args.providerId);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { providerId, ...lessonData } = args;
+    return await ctx.db.insert("lessons", lessonData);
   },
 });
 
 export const updateLesson = mutation({
   args: {
+    providerId: v.string(),
     id: v.id("lessons"),
     title: v.optional(v.string()),
     content: v.optional(v.string()),
@@ -98,14 +166,17 @@ export const updateLesson = mutation({
     isFree: v.optional(v.boolean()),
   },
   handler: async (ctx, args) => {
-    const { id, ...updates } = args;
+    await requireLessonOwner(ctx, args.id, args.providerId);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { id, providerId, ...updates } = args;
     await ctx.db.patch(id, updates);
   },
 });
 
 export const deleteLesson = mutation({
-  args: { id: v.id("lessons") },
+  args: { providerId: v.string(), id: v.id("lessons") },
   handler: async (ctx, args) => {
+    await requireLessonOwner(ctx, args.id, args.providerId);
     await ctx.db.delete(args.id);
   },
 });
@@ -148,7 +219,7 @@ export const listAllLessonsOrdered = query({
       .collect();
 
     const sortedSections = sections.sort((a, b) => a.order - b.order);
-    const allLessons: any[] = [];
+    const allLessons: Doc<"lessons">[] = [];
 
     for (const section of sortedSections) {
       const lessons = await ctx.db
@@ -166,9 +237,14 @@ export const listAllLessonsOrdered = query({
 
 export const reorderSections = mutation({
   args: {
+    providerId: v.string(),
     updates: v.array(v.object({ id: v.id("sections"), order: v.number() }))
   },
   handler: async (ctx, args) => {
+    // Verify ownership of every section being reordered
+    for (const update of args.updates) {
+      await requireSectionOwner(ctx, update.id, args.providerId);
+    }
     for (const update of args.updates) {
       await ctx.db.patch(update.id, { order: update.order });
     }
@@ -178,9 +254,14 @@ export const reorderSections = mutation({
 
 export const reorderLessons = mutation({
   args: {
+    providerId: v.string(),
     updates: v.array(v.object({ id: v.id("lessons"), order: v.number() }))
   },
   handler: async (ctx, args) => {
+    // Verify ownership of every lesson being reordered
+    for (const update of args.updates) {
+      await requireLessonOwner(ctx, update.id, args.providerId);
+    }
     for (const update of args.updates) {
       await ctx.db.patch(update.id, { order: update.order });
     }
