@@ -237,16 +237,18 @@ export const listMyPayouts = query({
 
 // ─── Admin operations ────────────────────────────────────────────────────
 
-async function requireAdmin(ctx: QueryCtx) {
-  const identity = await ctx.auth.getUserIdentity();
-  if (!identity) throw new Error("Unauthorized");
-  const email = identity.email ?? identity.tokenIdentifier;
+async function requireAdmin(ctx: QueryCtx, providerId: string) {
   const user = await ctx.db
     .query("users")
-    .withIndex("by_email", (q) => q.eq("email", email))
+    .withIndex("by_provider_id", (q) => q.eq("providerId", providerId))
     .unique();
-  if (!user || !user.email || !SUPER_ADMIN_EMAILS.some((e) => e.toLowerCase() === user.email?.toLowerCase())) {
-    throw new Error("Forbidden: admin only");
+  if (
+    !user ||
+    (user.role !== "admin" &&
+      (!user.email ||
+        !SUPER_ADMIN_EMAILS.some((e) => e.toLowerCase() === user.email.toLowerCase())))
+  ) {
+    throw new Error("Unauthorized: Admin access required");
   }
   return user;
 }
@@ -255,9 +257,9 @@ async function requireAdmin(ctx: QueryCtx) {
  * Admin lists all payout requests (optionally filtered by status).
  */
 export const adminListPayouts = query({
-  args: { status: v.optional(v.string()) },
+  args: { providerId: v.string(), status: v.optional(v.string()) },
   handler: async (ctx, args) => {
-    await requireAdmin(ctx);
+    await requireAdmin(ctx, args.providerId);
     const payouts = await ctx.db
       .query("payouts")
       .withIndex("by_status", (q) => q.eq("status", args.status ?? "requested"))
@@ -278,13 +280,28 @@ export const adminListPayouts = query({
 });
 
 /**
+ * Find a payout for the Flutterwave webhook handler. This is intentionally
+ * protected by the server secret because webhooks do not have a user session.
+ */
+export const getPayoutByReference = query({
+  args: { serverSecret: v.string(), reference: v.string() },
+  handler: async (ctx, args) => {
+    await requireServerSecret(args.serverSecret);
+    return await ctx.db
+      .query("payouts")
+      .filter((q) => q.eq(q.field("reference"), args.reference))
+      .first();
+  },
+});
+
+/**
  * Admin platform revenue overview: total platform earnings (40% share),
  * total instructor payouts, and recent successful payments.
  */
 export const adminGetRevenueOverview = query({
-  args: {},
-  handler: async (ctx) => {
-    await requireAdmin(ctx);
+  args: { providerId: v.string() },
+  handler: async (ctx, args) => {
+    await requireAdmin(ctx, args.providerId);
 
     const allEarnings = await ctx.db.query("earnings").collect();
     let platformRevenue = 0;

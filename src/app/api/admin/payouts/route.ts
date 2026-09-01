@@ -15,7 +15,12 @@ export async function POST(req: NextRequest) {
     // 1. Authenticate + authorize admin
     const session = await auth();
     const userEmail = session?.user?.email;
-    if (!userEmail || !SUPER_ADMIN_EMAILS.some((e) => e.toLowerCase() === userEmail.toLowerCase())) {
+    const providerId = session?.user?.id;
+    if (
+      !userEmail ||
+      !providerId ||
+      !SUPER_ADMIN_EMAILS.some((e) => e.toLowerCase() === userEmail.toLowerCase())
+    ) {
       return NextResponse.json({ error: "Forbidden: admin only" }, { status: 403 });
     }
 
@@ -37,7 +42,7 @@ export async function POST(req: NextRequest) {
     const convex = new ConvexHttpClient(convexUrl);
 
     // 2. Fetch the payout and validate its state
-    const payouts = await convex.query(api.payouts.adminListPayouts, {});
+    const payouts = await convex.query(api.payouts.adminListPayouts, { providerId });
     const payout = payouts.find((p) => p._id === payoutId);
     if (!payout) {
       return NextResponse.json({ error: "Payout not found" }, { status: 404 });

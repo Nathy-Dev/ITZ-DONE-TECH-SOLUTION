@@ -19,14 +19,18 @@ import {
 
 export default function AdminPayoutsPage() {
   const { data: session, status } = useSession();
+  const providerId = session?.user?.id;
 
   const overview = useQuery(
     api.payouts.adminGetRevenueOverview,
-    session?.user?.email ? {} : "skip"
+    providerId ? { providerId } : "skip"
   );
 
   const [statusFilter, setStatusFilter] = useState<string>("requested");
-  const payouts = useQuery(api.payouts.adminListPayouts, { status: statusFilter });
+  const payouts = useQuery(
+    api.payouts.adminListPayouts,
+    providerId ? { providerId, status: statusFilter } : "skip"
+  );
 
   const [processingId, setProcessingId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);

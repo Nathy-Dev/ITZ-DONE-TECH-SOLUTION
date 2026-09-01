@@ -29,9 +29,11 @@ export async function POST(req: NextRequest) {
     }
     const convex = new ConvexHttpClient(convexUrl);
 
-    // Find the payout by its reference
-    const payouts = await convex.query(api.payouts.adminListPayouts, {});
-    const payout = payouts.find((p) => p.reference === data.reference);
+    // Find the payout by its reference using the server-only lookup.
+    const payout = await convex.query(api.payouts.getPayoutByReference, {
+      serverSecret: getConvexMutationSecret(),
+      reference: data.reference,
+    });
     if (!payout) {
       console.warn(`[payouts/webhook] No payout found for reference ${data.reference}`);
       return NextResponse.json({ received: true });
