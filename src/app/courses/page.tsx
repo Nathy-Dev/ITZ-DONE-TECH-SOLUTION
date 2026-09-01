@@ -57,10 +57,10 @@ export default function CoursesPage() {
   };
 
   return (
-    <div className="pt-28 pb-20">
-      <div className="max-w-7xl mx-auto px-6 md:px-12">
+    <div className="pt-20 pb-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Page Header */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-8">
           <div>
             <h1 className="text-4xl font-bold mb-2">Tech Courses</h1>
             <p className="text-muted-foreground">Master the latest skills with our curated collection of technical courses.</p>
@@ -72,20 +72,20 @@ export default function CoursesPage() {
               <input 
                 type="text" 
                 placeholder="Search for anything..." 
-                className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl outline-none focus:ring-2 focus:ring-cyan-500/20 transition-all font-medium"
+                className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500/20 transition-all font-medium"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
-            <button className="hidden sm:flex items-center gap-2 p-2.5 border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 rounded-xl hover:bg-slate-50 transition-all">
+            <button className="hidden sm:flex items-center gap-2 p-2.5 border border-slate-200 bg-white rounded-xl hover:bg-slate-50 transition-all">
               <Filter className="w-4 h-4" />
             </button>
           </div>
         </div>
 
-        <div className="flex flex-col lg:flex-row gap-12">
+        <div className="flex flex-col lg:flex-row gap-8">
           {/* Sidebar Filters */}
-          <aside className="w-full lg:w-64 shrink-0 space-y-10 hidden lg:block">
+          <aside className="w-full lg:w-64 shrink-0 space-y-6 hidden lg:block">
             <div className="space-y-4">
               <h4 className="font-bold text-sm uppercase tracking-wider text-muted-foreground">Categories</h4>
               <div className="space-y-2">
@@ -93,7 +93,7 @@ export default function CoursesPage() {
                   onClick={() => setSelectedCategory("All")}
                   className={cn(
                     "w-full text-left px-4 py-2 rounded-xl text-sm font-medium transition-all",
-                    selectedCategory === "All" ? "bg-blue-800 text-white shadow-lg shadow-blue-800/20" : "hover:bg-slate-100 dark:hover:bg-slate-800"
+                    selectedCategory === "All" ? "bg-blue-600 text-white shadow-sm shadow-blue-600/20" : "hover:bg-slate-100 "
                   )}
                 >
                   All Categories
@@ -104,7 +104,7 @@ export default function CoursesPage() {
                     onClick={() => setSelectedCategory(cat)}
                     className={cn(
                       "w-full text-left px-4 py-2 rounded-xl text-sm font-medium transition-all text-muted-foreground hover:text-foreground",
-                      selectedCategory === cat ? "bg-blue-800 text-white shadow-lg shadow-blue-800/20" : "hover:bg-slate-100 dark:hover:bg-slate-800"
+                      selectedCategory === cat ? "bg-blue-600 text-white shadow-sm shadow-blue-600/20" : "hover:bg-slate-100 "
                     )}
                   >
                     {cat}
@@ -120,11 +120,11 @@ export default function CoursesPage() {
                   <label key={price} className="flex items-center gap-3 cursor-pointer group">
                     <input 
                       type="checkbox" 
-                      className="w-4 h-4 rounded border-slate-300 text-blue-800 focus:ring-blue-800"
+                      className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-600"
                       checked={selectedPrice.includes(price)}
                       onChange={() => togglePrice(price)}
                     />
-                    <span className="text-sm group-hover:text-cyan-500 transition-colors">{price}</span>
+                    <span className="text-sm group-hover:text-blue-600 transition-colors">{price}</span>
                   </label>
                 ))}
               </div>
@@ -137,11 +137,11 @@ export default function CoursesPage() {
                   <label key={level} className="flex items-center gap-3 cursor-pointer group">
                     <input 
                       type="checkbox" 
-                      className="w-4 h-4 rounded border-slate-300 text-blue-800 focus:ring-blue-800"
+                      className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-600"
                       checked={selectedLevels.includes(level)}
                       onChange={() => toggleLevel(level)}
                     />
-                    <span className="text-sm group-hover:text-cyan-500 transition-colors">{level}</span>
+                    <span className="text-sm group-hover:text-blue-600 transition-colors">{level}</span>
                   </label>
                 ))}
               </div>
@@ -150,15 +150,15 @@ export default function CoursesPage() {
 
           {/* Main Content */}
           <div className="flex-grow">
-            <div className="flex items-center justify-between mb-8 pb-4 border-b border-slate-100 dark:border-slate-900">
-              <p className="text-sm font-medium">Showing <span className="font-bold text-blue-800">{courses.length}</span> results</p>
+            <div className="flex items-center justify-between mb-8 pb-4 border-b border-slate-100">
+              <p className="text-sm font-medium">Showing <span className="font-bold text-blue-600">{courses.length}</span> results</p>
               
               <div className="flex items-center gap-6">
                 <div className="flex items-center gap-2 group cursor-pointer text-sm font-medium">
-                  Sort By: <span className="font-bold text-blue-800 flex items-center gap-1">Newest First <ChevronDown className="w-4 h-4" /></span>
+                  Sort By: <span className="font-bold text-blue-600 flex items-center gap-1">Newest First <ChevronDown className="w-4 h-4" /></span>
                 </div>
-                <div className="hidden sm:flex items-center gap-1 bg-slate-100 dark:bg-slate-900 p-1 rounded-lg">
-                  <button className="p-1 px-2.5 bg-white dark:bg-slate-800 rounded-md shadow-sm">
+                <div className="hidden sm:flex items-center gap-1 bg-slate-100 p-1 rounded-lg">
+                  <button className="p-1 px-2.5 bg-white rounded-md shadow-sm">
                     <LayoutGrid className="w-4 h-4" />
                   </button>
                   <button className="p-1 px-2.5 text-muted-foreground hover:bg-white/50 transition-all rounded-md">
@@ -186,11 +186,11 @@ export default function CoursesPage() {
 
             {/* Pagination Placeholder */}
             <div className="mt-16 flex items-center justify-center gap-2">
-              <button className="w-10 h-10 rounded-xl border border-slate-200 dark:border-slate-800 flex items-center justify-center font-bold bg-blue-800 text-white">1</button>
-              <button className="w-10 h-10 rounded-xl border border-slate-200 dark:border-slate-800 flex items-center justify-center font-bold hover:bg-slate-50 transition-all">2</button>
-              <button className="w-10 h-10 rounded-xl border border-slate-200 dark:border-slate-800 flex items-center justify-center font-bold hover:bg-slate-50 transition-all">3</button>
+              <button className="w-10 h-10 rounded-xl border border-slate-200 flex items-center justify-center font-bold bg-blue-600 text-white">1</button>
+              <button className="w-10 h-10 rounded-xl border border-slate-200 flex items-center justify-center font-bold hover:bg-slate-50 transition-all">2</button>
+              <button className="w-10 h-10 rounded-xl border border-slate-200 flex items-center justify-center font-bold hover:bg-slate-50 transition-all">3</button>
               <span className="px-2">...</span>
-              <button className="w-10 h-10 rounded-xl border border-slate-200 dark:border-slate-800 flex items-center justify-center font-bold hover:bg-slate-50 transition-all">12</button>
+              <button className="w-10 h-10 rounded-xl border border-slate-200 flex items-center justify-center font-bold hover:bg-slate-50 transition-all">12</button>
             </div>
           </div>
         </div>

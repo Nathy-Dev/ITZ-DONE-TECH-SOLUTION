@@ -83,8 +83,8 @@ export default function DashboardPage() {
 
   if (status === "loading" || (session && convexUser === undefined)) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950">
-        <div className="w-12 h-12 border-4 border-blue-800 border-t-transparent rounded-full animate-spin"></div>
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+        <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
       </div>
     );
   }
@@ -92,13 +92,13 @@ export default function DashboardPage() {
   const isInstructor = convexUser?.role === "instructor";
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pt-24 pb-20">
-      <div className="max-w-7xl mx-auto px-6 md:px-12">
+    <div className="min-h-screen bg-slate-50 pt-20 pb-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Welcome Header */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
           <div>
-            <h1 className="text-3xl md:text-4xl font-black tracking-tight">
-              Welcome back, <span className="text-blue-800 dark:text-cyan-400">{session?.user?.name?.split(" ")[0]}!</span>
+            <h1 className="text-2xl md:text-3xl font-bold tracking-tight">
+              Welcome back, <span className="text-blue-600">{session?.user?.name?.split(" ")[0]}!</span>
             </h1>
             <p className="text-muted-foreground mt-2 font-medium">
               {isInstructor 
@@ -109,16 +109,16 @@ export default function DashboardPage() {
           <div className="flex items-center gap-3">
             <NotificationsBell />
             {isInstructor ? (
-               <Link href="/courses/create" className="flex items-center gap-2 bg-blue-800 text-white px-6 py-3 rounded-2xl shadow-lg shadow-blue-800/20 hover:bg-blue-900 transition-all">
-                  <Plus className="w-5 h-5" />
-                  <span className="font-bold">Create Course</span>
+               <Link href="/courses/create" className="flex items-center gap-2 bg-blue-600 text-white px-4 sm:px-5 py-2.5 rounded-xl hover:bg-blue-700 transition-colors">
+                  <Plus className="w-4 h-4" />
+                  <span className="font-medium">Create Course</span>
                </Link>
             ) : (
-              <div className="flex items-center gap-4 bg-blue-800 text-white px-6 py-3 rounded-2xl shadow-lg shadow-blue-800/20">
-                <Trophy className="w-5 h-5 text-amber-400" />
+              <div className="flex items-center gap-3 bg-blue-50 border border-blue-100 px-4 py-2.5 rounded-xl">
+                <Trophy className="w-5 h-5 text-blue-600" />
                 <div className="text-sm">
-                  <p className="font-black">{enrolledCourses?.length || 0} Enrolled</p>
-                  <p className="text-[10px] text-blue-200 uppercase font-black tracking-widest">
+                  <p className="font-semibold text-slate-900">{enrolledCourses?.length || 0} Enrolled</p>
+                  <p className="text-[10px] text-slate-500 uppercase tracking-wide">
                     {enrolledCourses?.filter((e) => e.progress?.percentage === 100).length || 0} Completed
                   </p>
                 </div>
@@ -142,7 +142,7 @@ function ThumbnailImage({ thumbnailUrl, title, className }: { thumbnailUrl: stri
   const resolvedUrl = useQuery(api.files.getImageUrl, isStorageId ? { storageId: thumbnailUrl } : "skip");
   const displayImage = isStorageId ? resolvedUrl : thumbnailUrl;
 
-  if (!displayImage) return <div className="absolute inset-0 bg-gradient-to-br from-blue-800/40 to-cyan-500/40" />;
+  if (!displayImage) return <div className="absolute inset-0 bg-gradient-to-br from-blue-600/40 to-blue-500/40" />;
 
   return (
     <Image 
@@ -166,19 +166,17 @@ function LearnerDashboard({ enrolledCourses, allCourses }: {
       <div className="lg:col-span-2 space-y-8">
         {/* Continue Learning Card */}
         {featuredEnrollment ? (
-          <div className="bg-white dark:bg-slate-900 rounded-[32px] p-8 border border-slate-100 dark:border-slate-800 shadow-xl shadow-blue-800/5 overflow-hidden relative group">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-blue-800/5 rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-700" />
-            
-            <div className="relative z-10">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-cyan-400 rounded-xl flex items-center justify-center">
+          <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm">
+            <div>
+              <div className="flex items-center gap-3 mb-5">
+                <div className="w-10 h-10 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center">
                   <Zap className="w-5 h-5 fill-current" />
                 </div>
-                <h2 className="text-xl font-black">Continue Learning</h2>
+                <h2 className="text-xl font-semibold">Continue Learning</h2>
               </div>
 
-              <div className="flex flex-col md:flex-row gap-8 items-start">
-                <div className="w-full md:w-56 aspect-video bg-slate-900 rounded-2xl overflow-hidden relative shadow-2xl">
+              <div className="flex flex-col md:flex-row gap-6 items-start">
+                <div className="w-full md:w-56 aspect-video bg-slate-900 rounded-lg overflow-hidden relative">
                   <ThumbnailImage 
                     thumbnailUrl={featuredEnrollment.course.thumbnailUrl} 
                     title={featuredEnrollment.course.title}
@@ -189,7 +187,7 @@ function LearnerDashboard({ enrolledCourses, allCourses }: {
                   </div>
                   <div className="absolute bottom-0 left-0 right-0 h-1.5 bg-white/10 text-xs">
                     <div 
-                      className="h-full bg-cyan-400 transition-all duration-1000" 
+                      className="h-full bg-blue-500 transition-all duration-1000" 
                       style={{ width: `${featuredEnrollment.progress?.percentage || 0}%` }} 
                     />
                   </div>
@@ -197,10 +195,10 @@ function LearnerDashboard({ enrolledCourses, allCourses }: {
                 
                 <div className="flex-grow space-y-4">
                   <div>
-                    <h3 className="font-black text-xl mb-1">{featuredEnrollment.course.title}</h3>
-                    <div className="flex items-center gap-4 text-sm text-muted-foreground font-bold">
+                    <h3 className="font-semibold text-xl mb-1">{featuredEnrollment.course.title}</h3>
+                    <div className="flex items-center gap-4 text-sm text-slate-500">
                       <div className="flex items-center gap-1.5">
-                        <Clock className="w-4 h-4 text-blue-800 dark:text-cyan-400" />
+                        <Clock className="w-4 h-4 text-blue-600" />
                         <span>{featuredEnrollment.progress?.completedCount || 0} of {featuredEnrollment.progress?.totalCount || 0} lessons</span>
                       </div>
                       <div className="flex items-center gap-1.5 text-emerald-500">
@@ -211,7 +209,7 @@ function LearnerDashboard({ enrolledCourses, allCourses }: {
                   </div>
                   <Link 
                     href={`/courses/${featuredEnrollment.courseId}/lessons/${featuredEnrollment.lastLessonId || "start"}`}
-                    className="px-8 py-4 bg-blue-800 text-white font-black rounded-2xl hover:bg-blue-900 transition-all flex items-center gap-2 w-fit shadow-xl shadow-blue-800/20 active:scale-95"
+                    className="px-5 py-2.5 bg-blue-600 text-white font-medium rounded-xl hover:bg-blue-700 transition-colors flex items-center gap-2 w-fit"
                   >
                       Continue Lesson
                       <ArrowRight className="w-4 h-4" />
@@ -221,15 +219,15 @@ function LearnerDashboard({ enrolledCourses, allCourses }: {
             </div>
           </div>
         ) : (
-          <div className="bg-slate-900 text-white rounded-[32px] p-12 text-center space-y-6">
-             <div className="w-16 h-16 bg-blue-800/30 rounded-2xl flex items-center justify-center mx-auto">
-                <LayoutGrid className="w-8 h-8 text-cyan-400" />
+          <div className="bg-white rounded-xl border border-slate-200 p-10 text-center space-y-5">
+             <div className="w-14 h-14 bg-blue-50 rounded-xl flex items-center justify-center mx-auto">
+                <LayoutGrid className="w-7 h-7 text-blue-600" />
              </div>
              <div className="space-y-2">
-                <h2 className="text-2xl font-black">Start your journey today</h2>
-                <p className="text-slate-400 text-sm max-w-xs mx-auto">Enroll in your first course to begin tracking your learning progress.</p>
+                <h2 className="text-xl font-semibold">Start your journey today</h2>
+                <p className="text-slate-500 text-sm max-w-xs mx-auto">Enroll in your first course to begin tracking your learning progress.</p>
              </div>
-             <Link href="/courses" className="inline-flex items-center gap-2 px-8 py-3 bg-white text-slate-900 font-black rounded-xl hover:bg-slate-100 transition-all">
+             <Link href="/courses" className="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white font-medium rounded-xl hover:bg-blue-700 transition-colors">
                 Browse Courses
                 <ArrowRight className="w-4 h-4" />
              </Link>
@@ -240,12 +238,12 @@ function LearnerDashboard({ enrolledCourses, allCourses }: {
         <div>
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-cyan-100 dark:bg-cyan-900/30 text-cyan-600 dark:text-cyan-400 rounded-xl flex items-center justify-center">
+              <div className="w-10 h-10 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center">
                 <LayoutGrid className="w-5 h-5" />
               </div>
-              <h2 className="text-2xl font-black">Recommended for You</h2>
+              <h2 className="text-2xl font-semibold">Recommended for You</h2>
             </div>
-            <Link href="/courses" className="text-blue-800 dark:text-cyan-400 font-bold hover:underline flex items-center gap-1 text-sm">
+            <Link href="/courses" className="text-blue-600 font-bold hover:underline flex items-center gap-1 text-sm">
               View all <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
@@ -265,45 +263,42 @@ function LearnerDashboard({ enrolledCourses, allCourses }: {
       {/* Sidebar Area */}
       <div className="space-y-8">
         {/* Stats / Quick Links */}
-        <div className="bg-blue-800 rounded-[32px] p-8 text-white shadow-2xl shadow-blue-800/40 relative overflow-hidden group">
-          <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-white/5 rounded-full blur-3xl group-hover:scale-125 transition-transform duration-1000" />
-          <h3 className="font-black text-xl mb-6 relative z-10">Your Stats</h3>
-          <div className="space-y-6 relative z-10">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="p-4 bg-white/10 rounded-2xl border border-white/10">
-                <p className="text-[9px] text-blue-200 uppercase font-black tracking-widest mb-1">Enrolled</p>
-                <p className="text-2xl font-black">{enrolledCourses?.length || 0}</p>
-              </div>
-              <div className="p-4 bg-white/10 rounded-2xl border border-white/10">
-                <p className="text-[9px] text-blue-200 uppercase font-black tracking-widest mb-1">Completed</p>
-                <p className="text-2xl font-black">
-                  {enrolledCourses?.filter((e) => e.progress?.percentage === 100).length || 0}
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
+        <div className="bg-blue-50 rounded-xl p-6 border border-blue-100">
+           <h3 className="font-semibold text-lg mb-4 text-slate-900">Your Stats</h3>
+           <div className="grid grid-cols-2 gap-3">
+             <div className="p-4 bg-white rounded-lg border border-blue-100">
+               <p className="text-xs text-slate-500 uppercase tracking-wide mb-1">Enrolled</p>
+               <p className="text-2xl font-bold text-blue-600">{enrolledCourses?.length || 0}</p>
+             </div>
+             <div className="p-4 bg-white rounded-lg border border-blue-100">
+               <p className="text-xs text-slate-500 uppercase tracking-wide mb-1">Completed</p>
+               <p className="text-2xl font-bold text-blue-600">
+                 {enrolledCourses?.filter((e) => e.progress?.percentage === 100).length || 0}
+               </p>
+             </div>
+           </div>
+         </div>
 
         {/* Tips Section */}
-        <div className="bg-white dark:bg-slate-900 rounded-[32px] p-8 border border-slate-100 dark:border-slate-800 shadow-xl shadow-blue-800/5">
-          <h3 className="font-black text-xl mb-6">Quick Links</h3>
-          <div className="space-y-4">
-            <Link 
-              href="/courses" 
-              className="block p-4 rounded-2xl bg-slate-50 dark:bg-slate-800 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors group"
-            >
-              <h4 className="font-black text-sm group-hover:text-blue-800 transition-colors">Browse Courses</h4>
-              <p className="text-xs text-muted-foreground mt-1 font-medium">Discover new courses to expand your skills.</p>
-            </Link>
-            <Link 
-              href="/mentorship" 
-              className="block p-4 rounded-2xl bg-slate-50 dark:bg-slate-800 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors group"
-            >
-              <h4 className="font-black text-sm group-hover:text-blue-800 transition-colors">Find a Mentor</h4>
-              <p className="text-xs text-muted-foreground mt-1 font-medium">Get 1-on-1 guidance from industry experts.</p>
-            </Link>
-          </div>
-        </div>
+        <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm">
+           <h3 className="font-semibold text-lg mb-4">Quick Links</h3>
+           <div className="space-y-3">
+             <Link
+               href="/courses"
+               className="block p-4 rounded-lg bg-slate-50 hover:bg-blue-50 transition-colors group"
+             >
+               <h4 className="font-semibold text-sm group-hover:text-blue-600 transition-colors">Browse Courses</h4>
+               <p className="text-xs text-slate-500 mt-1">Discover new courses to expand your skills.</p>
+             </Link>
+             <Link
+               href="/mentorship"
+               className="block p-4 rounded-lg bg-slate-50 hover:bg-blue-50 transition-colors group"
+             >
+               <h4 className="font-semibold text-sm group-hover:text-blue-600 transition-colors">Find a Mentor</h4>
+               <p className="text-xs text-slate-500 mt-1">Get 1-on-1 guidance from industry experts.</p>
+             </Link>
+           </div>
+         </div>
       </div>
     </div>
   );
@@ -323,32 +318,32 @@ function InstructorDashboard({ courses, stats }: {
     <div className="grid lg:grid-cols-4 gap-4 sm:gap-6">
       {/* Stats Overview */}
       {[
-        { label: "Total Students", value: stats?.totalStudents || 0, icon: Users, color: "text-blue-600", bg: "bg-blue-100 dark:bg-blue-900/30" },
-        { label: "Your Earnings", value: formatPrice(stats?.totalRevenue || 0), icon: DollarSign, color: "text-emerald-600", bg: "bg-emerald-100 dark:bg-emerald-900/30" },
-        { label: "Course Rating", value: stats?.averageRating?.toFixed(1) || "0.0", icon: Trophy, color: "text-amber-600", bg: "bg-amber-100 dark:bg-amber-900/30" },
-        { label: "My Courses", value: stats?.totalCourses || 0, icon: Video, color: "text-purple-600", bg: "bg-purple-100 dark:bg-purple-900/30" },
+        { label: "Total Students", value: stats?.totalStudents || 0, icon: Users, color: "text-blue-600", bg: "bg-blue-50" },
+        { label: "Your Earnings", value: formatPrice(stats?.totalRevenue || 0), icon: DollarSign, color: "text-emerald-600", bg: "bg-emerald-50" },
+        { label: "Course Rating", value: stats?.averageRating?.toFixed(1) || "0.0", icon: Trophy, color: "text-amber-600", bg: "bg-amber-50" },
+        { label: "My Courses", value: stats?.totalCourses || 0, icon: Video, color: "text-blue-600", bg: "bg-blue-50" },
       ].map((stat, i) => (
-        <div key={i} className="bg-white dark:bg-slate-900 p-4 sm:p-6 rounded-[20px] sm:rounded-[24px] border border-slate-100 dark:border-slate-800 shadow-sm">
-          <div className="flex items-center gap-3 sm:gap-4">
-            <div className={`w-10 h-10 sm:w-12 sm:h-12 ${stat.bg} ${stat.color} rounded-xl flex items-center justify-center shrink-0`}>
-              <stat.icon className="w-5 h-5 sm:w-6 sm:h-6" />
-            </div>
-            <div className="min-w-0">
-              <p className="text-[9px] sm:text-[10px] text-muted-foreground font-black uppercase tracking-widest truncate">{stat.label}</p>
-              <p className="text-lg sm:text-2xl font-black truncate">{stat.value}</p>
-            </div>
-          </div>
-        </div>
+        <div key={i} className="bg-white p-4 sm:p-5 rounded-xl border border-slate-200 shadow-sm">
+           <div className="flex items-center gap-3 sm:gap-4">
+             <div className={`w-10 h-10 sm:w-11 sm:h-11 ${stat.bg} ${stat.color} rounded-lg flex items-center justify-center shrink-0`}>
+               <stat.icon className="w-5 h-5" />
+             </div>
+             <div className="min-w-0">
+               <p className="text-xs text-slate-500 truncate">{stat.label}</p>
+               <p className="text-lg sm:text-xl font-bold truncate">{stat.value}</p>
+             </div>
+           </div>
+         </div>
       ))}
 
       {/* Main Instructor Area */}
       <div className="lg:col-span-3 space-y-8 mt-4">
-        <div className="flex bg-slate-100 dark:bg-slate-800 p-1.5 rounded-2xl w-fit">
+        <div className="flex bg-slate-100 p-1 rounded-lg w-fit">
           <button
             onClick={() => setActiveInstructorTab("courses")}
             className={cn(
-              "px-6 py-2 rounded-xl text-sm font-bold transition-all",
-              activeInstructorTab === "courses" ? "bg-white dark:bg-slate-900 shadow-sm text-blue-800 dark:text-cyan-400" : "text-slate-500 hover:text-slate-700"
+              "px-4 sm:px-5 py-1.5 rounded-md text-sm font-medium transition-all",
+              activeInstructorTab === "courses" ? "bg-white shadow-sm text-blue-600" : "text-slate-500 hover:text-slate-700"
             )}
           >
             My Courses
@@ -356,8 +351,8 @@ function InstructorDashboard({ courses, stats }: {
           <button
             onClick={() => setActiveInstructorTab("earnings")}
             className={cn(
-              "px-6 py-2 rounded-xl text-sm font-bold transition-all",
-              activeInstructorTab === "earnings" ? "bg-white dark:bg-slate-900 shadow-sm text-blue-800 dark:text-cyan-400" : "text-slate-500 hover:text-slate-700"
+              "px-4 sm:px-5 py-1.5 rounded-md text-sm font-medium transition-all",
+              activeInstructorTab === "earnings" ? "bg-white shadow-sm text-blue-600" : "text-slate-500 hover:text-slate-700"
             )}
           >
             Earnings & Payouts
@@ -365,8 +360,8 @@ function InstructorDashboard({ courses, stats }: {
           <button
             onClick={() => setActiveInstructorTab("mentorship")}
             className={cn(
-              "px-6 py-2 rounded-xl text-sm font-bold transition-all",
-              activeInstructorTab === "mentorship" ? "bg-white dark:bg-slate-900 shadow-sm text-blue-800 dark:text-cyan-400" : "text-slate-500 hover:text-slate-700"
+              "px-4 sm:px-5 py-1.5 rounded-md text-sm font-medium transition-all",
+              activeInstructorTab === "mentorship" ? "bg-white shadow-sm text-blue-600" : "text-slate-500 hover:text-slate-700"
             )}
           >
             Mentorship
@@ -378,11 +373,11 @@ function InstructorDashboard({ courses, stats }: {
         ) : activeInstructorTab === "courses" ? (
           <>
             <EarningsAnalytics chartData={stats?.recentEarnings} />
-            <div className="bg-white dark:bg-slate-900 rounded-[32px] p-8 border border-slate-100 dark:border-slate-800 shadow-xl shadow-blue-800/5">
-              <div className="flex items-center justify-between mb-8">
-                <h2 className="text-2xl font-black">Your Courses</h2>
+            <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-semibold">Your Courses</h2>
                 <Link href="/courses/create">
-                  <button className="bg-blue-800 hover:bg-black text-white px-6 py-3 rounded-2xl font-black text-sm transition-all shadow-lg flex items-center gap-2">
+                  <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 sm:px-5 py-2.5 rounded-xl font-medium text-sm transition-colors flex items-center gap-2">
                     <PlusIcon className="w-4 h-4" /> Create Course
                   </button>
                 </Link>
@@ -390,13 +385,13 @@ function InstructorDashboard({ courses, stats }: {
 
               <div className="space-y-4">
                 {courses?.length === 0 && (
-                  <div className="text-center py-12 border-2 border-dashed border-slate-100 dark:border-slate-800 rounded-[32px]">
+                  <div className="text-center py-12 border-2 border-dashed border-slate-100 rounded-2xl">
                     <p className="text-muted-foreground font-bold italic">You haven&apos;t created any courses yet.</p>
                   </div>
                 )}
                 {courses?.map((course) => (
-                  <div key={course._id} className="flex flex-col md:flex-row items-center gap-6 p-5 border border-slate-50 dark:border-slate-800 rounded-3xl hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-all group">
-                    <div className="w-full md:w-40 aspect-video bg-slate-900 rounded-2xl overflow-hidden relative shadow-lg">
+                  <div key={course._id} className="flex flex-col md:flex-row items-center gap-5 p-4 border border-slate-100 rounded-xl hover:bg-slate-50 transition-colors group">
+                    <div className="w-full md:w-40 aspect-video bg-slate-900 rounded-lg overflow-hidden relative">
                        <ThumbnailImage 
                           thumbnailUrl={course.thumbnailUrl} 
                           title={course.title}
@@ -404,25 +399,25 @@ function InstructorDashboard({ courses, stats }: {
                        />
                     </div>
                     <div className="flex-grow">
-                      <h4 className="font-black text-xl">{course.title}</h4>
-                      <div className="flex items-center gap-4 mt-2">
+                      <h4 className="font-semibold text-lg">{course.title}</h4>
+                      <div className="flex items-center gap-3 mt-1.5">
                         <span className={cn(
-                          "text-[10px] font-black underline decoration-2 uppercase tracking-widest",
-                          course.isPublished ? "text-emerald-500 decoration-emerald-200" : "text-amber-500 decoration-amber-200"
+                          "text-[10px] font-semibold uppercase tracking-wide",
+                          course.isPublished ? "text-emerald-600" : "text-amber-600"
                         )}>
                           {course.isPublished ? "Published" : "Draft"}
                         </span>
-                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{course.category}</span>
+                        <span className="text-xs text-slate-400">{course.category}</span>
                       </div>
                     </div>
-                    <div className="flex items-center gap-8 px-4">
+                    <div className="flex items-center gap-6 px-4">
                        <div className="text-center">
-                         <p className="text-[9px] text-muted-foreground uppercase font-black tracking-widest mb-1">Students</p>
-                         <p className="font-black text-lg">{course.studentsEnrolled || 0}</p>
+                         <p className="text-xs text-slate-500 mb-1">Students</p>
+                         <p className="font-semibold text-lg">{course.studentsEnrolled || 0}</p>
                        </div>
                        <Link 
                         href={`/courses/manage/${course._id}`} 
-                        className="p-3 bg-slate-100 dark:bg-slate-800 rounded-2xl hover:bg-blue-800 hover:text-white transition-all shadow-sm"
+                        className="p-2.5 bg-slate-100 rounded-lg hover:bg-blue-600 hover:text-white transition-colors"
                        >
                           <Edit2 className="w-5 h-5" />
                        </Link>
@@ -437,7 +432,7 @@ function InstructorDashboard({ courses, stats }: {
             <MentorRegister userId={convexUser._id} />
           ) : (
             <div className="flex items-center justify-center py-12">
-              <Loader2 className="w-8 h-8 text-blue-800 animate-spin" />
+              <Loader2 className="w-8 h-8 text-blue-600 animate-spin" />
             </div>
           )
         )}
@@ -445,10 +440,9 @@ function InstructorDashboard({ courses, stats }: {
 
       {/* Instructor Sidebar */}
       <div className="space-y-6 mt-4">
-        <div className="bg-slate-900 text-white rounded-[32px] p-8 relative overflow-hidden group shadow-2xl">
-          <div className="absolute top-0 right-0 w-24 h-24 bg-blue-800/20 rounded-full blur-2xl group-hover:scale-150 transition-transform" />
-          <h3 className="font-black text-xl mb-4 relative z-10">Pro Instructor Tip</h3>
-          <p className="text-slate-400 text-sm leading-relaxed font-medium relative z-10">
+        <div className="bg-blue-50 rounded-xl p-6 border border-blue-100">
+          <h3 className="font-semibold text-lg mb-3 text-slate-900">Pro Instructor Tip</h3>
+          <p className="text-slate-600 text-sm leading-relaxed">
             Keep your lesson titles clear and descriptive. Courses with structured curriculum have 40% higher completion rates.
           </p>
         </div>

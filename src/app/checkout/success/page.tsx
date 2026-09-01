@@ -21,8 +21,8 @@ export default function CheckoutSuccessPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen flex flex-col items-center justify-center px-6 bg-slate-50 dark:bg-slate-950">
-          <Loader2 className="w-16 h-16 text-blue-800 animate-spin mb-8" />
+        <div className="min-h-screen flex flex-col items-center justify-center px-4 sm:px-6 bg-slate-50">
+          <Loader2 className="w-16 h-16 text-blue-600 animate-spin mb-8" />
           <p className="text-muted-foreground font-medium">Loading checkout…</p>
         </div>
       }
@@ -86,15 +86,15 @@ function CheckoutSuccessContent() {
 
   if (!txRef) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center px-6 bg-slate-50 dark:bg-slate-950">
+      <div className="min-h-screen flex flex-col items-center justify-center px-4 sm:px-6 bg-slate-50">
         <XCircle className="w-16 h-16 text-red-500 mb-6" />
-        <h1 className="text-3xl font-black mb-4">Invalid Checkout Session</h1>
+        <h1 className="text-3xl font-semibold mb-4">Invalid Checkout Session</h1>
         <p className="text-muted-foreground text-center max-w-md mb-8 font-medium">
           No payment reference was found. Please start your checkout again.
         </p>
         <Link
           href="/courses"
-          className="px-8 py-4 bg-blue-800 text-white font-black rounded-2xl hover:bg-blue-900 transition-all"
+          className="px-5 py-2.5 bg-blue-600 text-white font-semibold rounded-2xl hover:bg-blue-700 transition-all"
         >
           Browse Courses
         </Link>
@@ -108,11 +108,11 @@ function CheckoutSuccessContent() {
     const itemCount = payment?.items?.length ?? 0;
 
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center px-6 bg-slate-50 dark:bg-slate-950">
-        <div className="w-24 h-24 bg-emerald-500 rounded-full flex items-center justify-center mb-8 shadow-2xl shadow-emerald-500/20 animate-in zoom-in duration-500">
+      <div className="min-h-screen flex flex-col items-center justify-center px-4 sm:px-6 bg-slate-50">
+        <div className="w-24 h-24 bg-emerald-500 rounded-full flex items-center justify-center mb-8 shadow-sm shadow-emerald-500/20 animate-in zoom-in duration-500">
           <CheckCircle2 className="w-12 h-12 text-white" />
         </div>
-        <h1 className="text-4xl font-black mb-4 animate-in fade-in slide-in-from-bottom-2 duration-700">
+        <h1 className="text-4xl font-semibold mb-4 animate-in fade-in slide-in-from-bottom-2 duration-700">
           Payment Successful!
         </h1>
         <p className="text-muted-foreground text-center max-w-md mb-6 font-medium animate-in fade-in duration-1000">
@@ -125,14 +125,14 @@ function CheckoutSuccessContent() {
           Your courses have been added to your dashboard.
         </p>
 
-        <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-3xl px-8 py-6 mb-8 shadow-xl shadow-blue-800/5 space-y-3">
-          <div className="flex items-center justify-between gap-12 text-sm font-bold">
+        <div className="bg-white border border-slate-100 rounded-2xl px-8 py-6 mb-8 shadow-md shadow-blue-600/5 space-y-3">
+          <div className="flex items-center justify-between gap-8 text-sm font-bold">
             <span className="text-muted-foreground">Amount Paid</span>
-            <span className="text-blue-800 dark:text-cyan-400 font-black">
+            <span className="text-blue-600 font-semibold">
               {formatPrice(amount)}
             </span>
           </div>
-          <div className="flex items-center justify-between gap-12 text-sm font-bold">
+          <div className="flex items-center justify-between gap-8 text-sm font-bold">
             <span className="text-muted-foreground">Reference</span>
             <span className="font-mono text-xs">{txRef}</span>
           </div>
@@ -140,7 +140,7 @@ function CheckoutSuccessContent() {
 
         <button
           onClick={() => router.push("/dashboard")}
-          className="px-10 py-5 bg-blue-800 text-white font-black rounded-2xl hover:bg-blue-900 shadow-2xl shadow-blue-800/30 transition-all active:scale-95 flex items-center gap-3 text-lg"
+          className="px-6 py-3 bg-blue-600 text-white font-semibold rounded-2xl hover:bg-blue-700 shadow-sm shadow-blue-600/30 transition-all active:scale-95 flex items-center gap-3 text-lg"
         >
           Go to Dashboard
           <ArrowRight className="w-5 h-5" />
@@ -157,24 +157,24 @@ function CheckoutSuccessContent() {
   // ── Failed / Cancelled ─────────────────────────────────────────────────
   if (status === "failed" || status === "cancelled") {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center px-6 bg-slate-50 dark:bg-slate-950">
-        <div className="w-24 h-24 bg-red-500 rounded-full flex items-center justify-center mb-8 shadow-2xl shadow-red-500/20">
+      <div className="min-h-screen flex flex-col items-center justify-center px-4 sm:px-6 bg-slate-50">
+        <div className="w-24 h-24 bg-red-500 rounded-full flex items-center justify-center mb-8 shadow-sm shadow-red-500/20">
           <XCircle className="w-12 h-12 text-white" />
         </div>
-        <h1 className="text-4xl font-black mb-4">Payment Not Completed</h1>
+        <h1 className="text-4xl font-semibold mb-4">Payment Not Completed</h1>
         <p className="text-muted-foreground text-center max-w-md mb-8 font-medium">
           Your payment could not be completed. No charges were made — you can try again.
         </p>
         <div className="flex flex-col sm:flex-row gap-4">
           <Link
             href="/cart"
-            className="px-8 py-4 bg-blue-800 text-white font-black rounded-2xl hover:bg-blue-900 transition-all text-center"
+            className="px-5 py-2.5 bg-blue-600 text-white font-semibold rounded-2xl hover:bg-blue-700 transition-all text-center"
           >
             Try Again
           </Link>
           <Link
             href="/courses"
-            className="px-8 py-4 bg-slate-100 dark:bg-slate-800 font-black rounded-2xl hover:bg-slate-200 dark:hover:bg-slate-700 transition-all text-center"
+            className="px-5 py-2.5 bg-slate-100 font-semibold rounded-2xl hover:bg-slate-200 transition-all text-center"
           >
             Browse Courses
           </Link>
@@ -186,11 +186,11 @@ function CheckoutSuccessContent() {
   // ── Timeout (still unconfirmed after several attempts) ─────────────────
   if (isTimedOut) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center px-6 bg-slate-50 dark:bg-slate-950">
-        <div className="w-24 h-24 bg-amber-500 rounded-full flex items-center justify-center mb-8 shadow-2xl shadow-amber-500/20">
+      <div className="min-h-screen flex flex-col items-center justify-center px-4 sm:px-6 bg-slate-50">
+        <div className="w-24 h-24 bg-amber-500 rounded-full flex items-center justify-center mb-8 shadow-sm shadow-amber-500/20">
           <AlertCircle className="w-12 h-12 text-white" />
         </div>
-        <h1 className="text-3xl font-black mb-4">Still Confirming Your Payment</h1>
+        <h1 className="text-3xl font-semibold mb-4">Still Confirming Your Payment</h1>
         <p className="text-muted-foreground text-center max-w-md mb-4 font-medium">
           We&apos;re taking longer than usual to confirm your payment. If you were debited, your
           enrollment will appear in your dashboard within a few minutes.
@@ -205,13 +205,13 @@ function CheckoutSuccessContent() {
               setAttempts(0);
               void verify();
             }}
-            className="px-8 py-4 bg-blue-800 text-white font-black rounded-2xl hover:bg-blue-900 transition-all"
+            className="px-5 py-2.5 bg-blue-600 text-white font-semibold rounded-2xl hover:bg-blue-700 transition-all"
           >
             Check Again
           </button>
           <Link
             href="/dashboard"
-            className="px-8 py-4 bg-slate-100 dark:bg-slate-800 font-black rounded-2xl hover:bg-slate-200 dark:hover:bg-slate-700 transition-all text-center"
+            className="px-5 py-2.5 bg-slate-100 font-semibold rounded-2xl hover:bg-slate-200 transition-all text-center"
           >
             Go to Dashboard
           </Link>
@@ -222,9 +222,9 @@ function CheckoutSuccessContent() {
 
   // ── Pending / Verifying ────────────────────────────────────────────────
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center px-6 bg-slate-50 dark:bg-slate-950">
-      <Loader2 className="w-16 h-16 text-blue-800 animate-spin mb-8" />
-      <h1 className="text-3xl font-black mb-4">Confirming Your Payment…</h1>
+    <div className="min-h-screen flex flex-col items-center justify-center px-4 sm:px-6 bg-slate-50">
+      <Loader2 className="w-16 h-16 text-blue-600 animate-spin mb-8" />
+      <h1 className="text-3xl font-semibold mb-4">Confirming Your Payment…</h1>
       <p className="text-muted-foreground text-center max-w-md font-medium">
         We&apos;re verifying your payment with Flutterwave. This usually takes a few seconds —
         please don&apos;t close this page.
@@ -236,7 +236,7 @@ function CheckoutSuccessContent() {
       <button
         onClick={() => void verify()}
         disabled={verifying}
-        className="mt-8 px-6 py-3 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold rounded-xl hover:bg-slate-200 dark:hover:bg-slate-700 transition-all text-sm disabled:opacity-60"
+        className="mt-8 px-4 sm:px-6 py-3 bg-slate-100 text-slate-600 font-bold rounded-xl hover:bg-slate-200 transition-all text-sm disabled:opacity-60"
       >
         {verifying ? "Checking…" : "Check Status"}
       </button>

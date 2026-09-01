@@ -111,7 +111,7 @@ export default function CertificateButton({
 
   if (!isCompleted) {
     return (
-      <div className="flex items-center gap-3 px-6 py-4 bg-slate-100 dark:bg-slate-800/50 rounded-2xl text-slate-400 cursor-not-allowed">
+      <div className="flex items-center gap-3 px-4 sm:px-6 py-3 bg-slate-100 rounded-2xl text-slate-400 cursor-not-allowed">
         <Award className="w-5 h-5" />
         <span className="text-sm font-bold">Complete course to unlock certificate</span>
       </div>
@@ -122,7 +122,7 @@ export default function CertificateButton({
     <button
       onClick={generatePDF}
       disabled={isGenerating}
-      className="w-full flex items-center justify-between p-6 bg-gradient-to-r from-blue-800 to-indigo-900 text-white rounded-[24px] shadow-xl shadow-blue-800/20 hover:scale-[1.02] transition-all group"
+      className="w-full flex items-center justify-between p-6 bg-gradient-to-r from-blue-600 to-indigo-900 text-white rounded-xl shadow-md shadow-blue-600/20 hover:scale-[1.02] transition-all group"
     >
       <div className="flex items-center gap-4">
         <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">

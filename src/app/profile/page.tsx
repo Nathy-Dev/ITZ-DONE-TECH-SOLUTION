@@ -176,15 +176,15 @@ export default function ProfilePage() {
 
   if (!session || convexUser === undefined) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950">
-        <Loader2 className="w-10 h-10 text-blue-800 animate-spin" />
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+        <Loader2 className="w-10 h-10 text-blue-600 animate-spin" />
       </div>
     );
   }
 
   if (convexUser === null) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950 font-bold text-slate-500">
+      <div className="min-h-screen flex items-center justify-center bg-slate-50 font-bold text-slate-500">
         User profile not found.
       </div>
     );
@@ -192,17 +192,17 @@ export default function ProfilePage() {
 
   const displayImage = avatarPreview ?? convexUser.profileImage;
 
-  const inputClass = "w-full pl-12 pr-4 py-4 bg-slate-50 dark:bg-slate-950 border-2 border-slate-100 dark:border-slate-800 rounded-2xl font-bold focus:border-blue-800 dark:focus:border-cyan-400 focus:outline-none transition-colors";
+  const inputClass = "w-full pl-12 pr-4 py-3 bg-slate-50  border-2 border-slate-100  rounded-2xl font-bold focus:border-blue-600  focus:outline-none transition-colors";
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pt-24 md:pt-32 pb-20">
+    <div className="min-h-screen bg-slate-50 pt-20 md:pt-20 pb-10">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 md:px-12">
-        <div className="mb-8 md:mb-12">
-          <h1 className="text-3xl md:text-4xl font-black tracking-tight mb-2">Profile Settings</h1>
+        <div className="mb-8 md:mb-8">
+          <h1 className="text-3xl md:text-4xl font-semibold tracking-tight mb-2">Profile Settings</h1>
           <p className="text-muted-foreground font-medium">Manage your personal information and preferences.</p>
         </div>
 
-        <div className="grid md:grid-cols-[250px_1fr] gap-8 md:gap-12">
+        <div className="grid md:grid-cols-[250px_1fr] gap-8 md:gap-8">
           {/* Sidebar Navigation */}
           <div className="flex md:flex-col gap-2 overflow-x-auto pb-1 md:pb-0">
             <button 
@@ -210,8 +210,8 @@ export default function ProfilePage() {
               className={cn(
                 "flex items-center gap-3 px-4 py-3 font-bold rounded-2xl transition-all whitespace-nowrap shrink-0",
                 activeTab === "general"
-                  ? "bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-cyan-400"
-                  : "text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-900"
+                  ? "bg-blue-100  text-blue-600 "
+                  : "text-slate-500 hover:bg-slate-100 "
               )}
             >
               <User className="w-5 h-5" />
@@ -222,8 +222,8 @@ export default function ProfilePage() {
               className={cn(
                 "flex items-center gap-3 px-4 py-3 font-bold rounded-2xl transition-all whitespace-nowrap shrink-0",
                 activeTab === "security"
-                  ? "bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-cyan-400"
-                  : "text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-900"
+                  ? "bg-blue-100  text-blue-600 "
+                  : "text-slate-500 hover:bg-slate-100 "
               )}
             >
               <Shield className="w-5 h-5" />
@@ -235,10 +235,10 @@ export default function ProfilePage() {
           <div className="space-y-8">
             {activeTab === "general" ? (
               <>
-            <div className="bg-white dark:bg-slate-900 rounded-[24px] md:rounded-[32px] p-5 sm:p-8 border border-slate-100 dark:border-slate-800 shadow-xl shadow-blue-800/5">
-              <div className="flex flex-col sm:flex-row items-center gap-6 sm:gap-8 mb-10 pb-10 border-b border-slate-100 dark:border-slate-800">
+            <div className="bg-white rounded-xl md:rounded-2xl p-5 sm:p-8 border border-slate-100 shadow-md shadow-blue-600/5">
+              <div className="flex flex-col sm:flex-row items-center gap-6 sm:gap-8 mb-6 pb-10 border-b border-slate-100">
                 <div className="relative group">
-                  <div className="w-24 h-24 bg-blue-100 dark:bg-blue-900/30 rounded-3xl flex items-center justify-center overflow-hidden">
+                  <div className="w-24 h-24 bg-blue-100 rounded-2xl flex items-center justify-center overflow-hidden">
                     {displayImage ? (
                       <Image 
                         src={displayImage} 
@@ -247,7 +247,7 @@ export default function ProfilePage() {
                         className="object-cover" 
                       />
                     ) : (
-                      <span className="text-3xl font-black text-blue-800 dark:text-cyan-400">
+                      <span className="text-3xl font-semibold text-blue-600">
                         {convexUser.name?.substring(0, 2).toUpperCase() || "US"}
                       </span>
                     )}
@@ -262,7 +262,7 @@ export default function ProfilePage() {
                   <button 
                     onClick={handleAvatarClick}
                     disabled={isUploadingAvatar}
-                    className="absolute -bottom-3 -right-3 w-10 h-10 bg-white dark:bg-slate-800 rounded-2xl shadow-lg border border-slate-100 dark:border-slate-700 flex items-center justify-center text-slate-500 hover:text-blue-800 dark:hover:text-cyan-400 transition-colors group-hover:scale-110 disabled:opacity-60"
+                    className="absolute -bottom-3 -right-3 w-10 h-10 bg-white rounded-2xl shadow-sm border border-slate-100 flex items-center justify-center text-slate-500 hover:text-blue-600 transition-colors group-hover:scale-110 disabled:opacity-60"
                     aria-label="Change profile photo"
                   >
                     {isUploadingAvatar ? (
@@ -273,7 +273,7 @@ export default function ProfilePage() {
                   </button>
                 </div>
                 <div className="text-center sm:text-left">
-                  <h3 className="font-black text-xl">{convexUser.name}</h3>
+                  <h3 className="font-semibold text-xl">{convexUser.name}</h3>
                   <p className="text-sm text-muted-foreground font-medium capitalize">{convexUser.role || "Learner"}</p>
                   <p className="text-xs text-slate-400 font-medium mt-1">Tap the camera to change your photo</p>
                 </div>
@@ -281,7 +281,7 @@ export default function ProfilePage() {
 
               <form onSubmit={handleSave} className="space-y-6">
                 <div className="grid gap-2">
-                  <label htmlFor="name" className="text-xs font-black uppercase tracking-widest text-slate-500">Full Name</label>
+                  <label htmlFor="name" className="text-xs font-semibold uppercase tracking-widest text-slate-500">Full Name</label>
                   <div className="relative">
                     <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
                     <input 
@@ -296,7 +296,7 @@ export default function ProfilePage() {
                 </div>
 
                 <div className="grid gap-2">
-                  <label htmlFor="email" className="text-xs font-black uppercase tracking-widest text-slate-500">Email Address</label>
+                  <label htmlFor="email" className="text-xs font-semibold uppercase tracking-widest text-slate-500">Email Address</label>
                   <div className="relative">
                     <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
                     <input 
@@ -304,26 +304,26 @@ export default function ProfilePage() {
                       type="email" 
                       value={convexUser.email}
                       disabled
-                      className="w-full pl-12 pr-4 py-4 bg-slate-50 dark:bg-slate-950 border-2 border-slate-100 dark:border-slate-800 rounded-2xl font-bold text-slate-400 cursor-not-allowed"
+                      className="w-full pl-12 pr-4 py-3 bg-slate-50 border-2 border-slate-100 rounded-2xl font-bold text-slate-400 cursor-not-allowed"
                     />
                   </div>
                   <p className="text-[10px] text-muted-foreground font-bold mt-1">Email cannot be changed directly.</p>
                 </div>
 
                 <div className="grid gap-2">
-                  <label htmlFor="bio" className="text-xs font-black uppercase tracking-widest text-slate-500">Bio</label>
+                  <label htmlFor="bio" className="text-xs font-semibold uppercase tracking-widest text-slate-500">Bio</label>
                   <textarea 
                     id="bio"
                     value={bio}
                     onChange={(e) => setBio(e.target.value)}
                     rows={4}
-                    className="w-full p-4 bg-slate-50 dark:bg-slate-950 border-2 border-slate-100 dark:border-slate-800 rounded-2xl font-bold focus:border-blue-800 dark:focus:border-cyan-400 focus:outline-none transition-colors resize-none"
+                    className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl font-bold focus:border-blue-600 focus:outline-none transition-colors resize-none"
                     placeholder="Tell us a bit about yourself..."
                   />
                 </div>
 
                 {profileError && (
-                  <div className="flex items-start gap-3 p-4 bg-red-500/10 border border-red-500/20 rounded-2xl text-red-600 dark:text-red-400 text-xs font-bold">
+                  <div className="flex items-start gap-3 p-4 bg-red-500/10 border border-red-500/20 rounded-2xl text-red-600 text-xs font-bold">
                     <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
                     {profileError}
                   </div>
@@ -331,7 +331,7 @@ export default function ProfilePage() {
 
                 <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-4">
                   {saved && (
-                    <span className="flex items-center gap-2 text-emerald-500 text-xs font-black uppercase tracking-widest animate-in slide-in-from-right-4">
+                    <span className="flex items-center gap-2 text-emerald-500 text-xs font-semibold uppercase tracking-widest animate-in slide-in-from-right-4">
                       <CheckCircle2 className="w-4 h-4" />
                       Saved
                     </span>
@@ -339,7 +339,7 @@ export default function ProfilePage() {
                   <button 
                     type="submit"
                     disabled={isSaving}
-                    className="flex items-center justify-center gap-2 px-8 py-4 bg-blue-800 text-white font-black rounded-2xl hover:bg-blue-900 transition-all shadow-xl shadow-blue-800/20 active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed"
+                    className="flex items-center justify-center gap-2 px-5 py-2.5 bg-blue-600 text-white font-semibold rounded-2xl hover:bg-blue-700 transition-all shadow-md shadow-blue-600/20 active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed"
                   >
                     {isSaving ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />}
                     Save Changes
@@ -355,13 +355,13 @@ export default function ProfilePage() {
               </>
             ) : (
               /* ─── Security Tab ─────────────────────────────────────── */
-              <div className="bg-white dark:bg-slate-900 rounded-[24px] md:rounded-[32px] p-5 sm:p-8 border border-slate-100 dark:border-slate-800 shadow-xl shadow-blue-800/5">
+              <div className="bg-white rounded-xl md:rounded-2xl p-5 sm:p-8 border border-slate-100 shadow-md shadow-blue-600/5">
                 <div className="flex items-center gap-4 mb-8">
-                  <div className="w-12 h-12 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 rounded-2xl flex items-center justify-center">
+                  <div className="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center">
                     <Lock className="w-6 h-6" />
                   </div>
                   <div>
-                    <h3 className="font-black text-lg">Change Password</h3>
+                    <h3 className="font-semibold text-lg">Change Password</h3>
                     <p className="text-xs text-muted-foreground font-bold uppercase tracking-widest">
                       Keep your account secure
                     </p>
@@ -369,13 +369,13 @@ export default function ProfilePage() {
                 </div>
 
                 {isSocialAccount ? (
-                  <div className="p-6 bg-blue-50 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-900/30 rounded-2xl text-sm font-medium text-blue-900/70 dark:text-blue-200/70">
+                  <div className="p-6 bg-blue-50 border border-blue-100 rounded-2xl text-sm font-medium text-blue-700/70">
                     You signed up with a social account (Google/GitHub), so there&#39;s no password to change. Your account is secured by your provider.
                   </div>
                 ) : (
                   <form onSubmit={handleChangePassword} className="space-y-6">
                     <div className="grid gap-2">
-                      <label htmlFor="currentPassword" className="text-xs font-black uppercase tracking-widest text-slate-500">Current Password</label>
+                      <label htmlFor="currentPassword" className="text-xs font-semibold uppercase tracking-widest text-slate-500">Current Password</label>
                       <div className="relative">
                         <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
                         <input 
@@ -391,7 +391,7 @@ export default function ProfilePage() {
                     </div>
 
                     <div className="grid gap-2">
-                      <label htmlFor="newPassword" className="text-xs font-black uppercase tracking-widest text-slate-500">New Password</label>
+                      <label htmlFor="newPassword" className="text-xs font-semibold uppercase tracking-widest text-slate-500">New Password</label>
                       <div className="relative">
                         <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
                         <input 
@@ -408,7 +408,7 @@ export default function ProfilePage() {
                     </div>
 
                     <div className="grid gap-2">
-                      <label htmlFor="confirmPassword" className="text-xs font-black uppercase tracking-widest text-slate-500">Confirm New Password</label>
+                      <label htmlFor="confirmPassword" className="text-xs font-semibold uppercase tracking-widest text-slate-500">Confirm New Password</label>
                       <div className="relative">
                         <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
                         <input 
@@ -433,14 +433,14 @@ export default function ProfilePage() {
                     </div>
 
                     {passwordError && (
-                      <div className="flex items-start gap-3 p-4 bg-red-500/10 border border-red-500/20 rounded-2xl text-red-600 dark:text-red-400 text-xs font-bold">
+                      <div className="flex items-start gap-3 p-4 bg-red-500/10 border border-red-500/20 rounded-2xl text-red-600 text-xs font-bold">
                         <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
                         {passwordError}
                       </div>
                     )}
 
                     {passwordChanged && (
-                      <div className="flex items-start gap-3 p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl text-emerald-600 dark:text-emerald-400 text-xs font-bold">
+                      <div className="flex items-start gap-3 p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl text-emerald-600 text-xs font-bold">
                         <CheckCircle2 className="w-4 h-4 shrink-0 mt-0.5" />
                         Password changed successfully!
                       </div>
@@ -450,7 +450,7 @@ export default function ProfilePage() {
                       <button 
                         type="submit"
                         disabled={isChangingPassword}
-                        className="flex items-center justify-center gap-2 px-8 py-4 bg-blue-800 text-white font-black rounded-2xl hover:bg-blue-900 transition-all shadow-xl shadow-blue-800/20 active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed"
+                        className="flex items-center justify-center gap-2 px-5 py-2.5 bg-blue-600 text-white font-semibold rounded-2xl hover:bg-blue-700 transition-all shadow-md shadow-blue-600/20 active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed"
                       >
                         {isChangingPassword ? <Loader2 className="w-5 h-5 animate-spin" /> : <Shield className="w-5 h-5" />}
                         Update Password

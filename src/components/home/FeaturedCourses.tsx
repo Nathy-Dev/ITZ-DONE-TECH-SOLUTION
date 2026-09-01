@@ -11,29 +11,29 @@ const FeaturedCourses = () => {
   const courses = useQuery(api.courses.listFeatured, { limit: 4 });
 
   return (
-    <section className="py-24 bg-slate-50/50 dark:bg-slate-900/10">
-      <div className="max-w-7xl mx-auto px-6 md:px-12">
-        <div className="flex flex-col md:flex-row justify-between items-end gap-6 mb-16">
-          <div className="max-w-xl space-y-4">
-            <h2 className="text-4xl font-bold tracking-tight">Most <span className="text-cyan-500">Popular</span> Courses</h2>
-            <p className="text-muted-foreground">Expertly crafted lessons to help you master the most in-demand tech skills in today&apos;s market.</p>
+    <section className="py-12 bg-slate-50/60">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex flex-col md:flex-row justify-between md:items-end gap-4 mb-8">
+          <div className="max-w-xl space-y-2">
+            <h2 className="text-2xl md:text-3xl font-bold tracking-tight">Popular Courses</h2>
+            <p className="text-slate-500">Expertly crafted lessons to help you master the most in-demand tech skills.</p>
           </div>
-          <Link href="/courses" className="px-6 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl font-semibold shadow-sm hover:shadow-md transition-all flex items-center gap-2">
-            View All Courses
+          <Link href="/courses" className="text-blue-600 font-medium hover:text-blue-700 transition-colors flex items-center gap-1.5">
+            View all courses
             <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
 
         {courses === undefined ? (
-          <div className="flex items-center justify-center py-20">
-            <Loader2 className="w-8 h-8 animate-spin text-blue-800" />
+          <div className="flex items-center justify-center py-16">
+            <Loader2 className="w-6 h-6 animate-spin text-blue-600" />
           </div>
         ) : courses.length === 0 ? (
-          <div className="text-center py-20 border-2 border-dashed border-slate-100 dark:border-slate-800 rounded-[32px]">
-            <p className="text-muted-foreground font-bold">No courses published yet. Check back soon!</p>
+          <div className="text-center py-16 border border-dashed border-slate-200 rounded-xl">
+            <p className="text-slate-500">No courses published yet. Check back soon!</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
             {courses.map((course) => (
               <CourseCard
                 key={course._id}

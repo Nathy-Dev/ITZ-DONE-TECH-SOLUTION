@@ -105,9 +105,9 @@ export default function UploadCenter({ courseId }: UploadCenterProps) {
   };
 
   return (
-    <div className="bg-white dark:bg-slate-900 rounded-[32px] p-8 border border-slate-100 dark:border-slate-800 shadow-xl shadow-blue-800/5">
+    <div className="bg-white rounded-2xl p-8 border border-slate-100 shadow-md shadow-blue-600/5">
       <h3 className="font-bold text-lg mb-6 flex items-center gap-2">
-        <Upload className="w-5 h-5 text-blue-800 dark:text-cyan-400" />
+        <Upload className="w-5 h-5 text-blue-600" />
         Content Upload Center
       </h3>
 
@@ -115,10 +115,10 @@ export default function UploadCenter({ courseId }: UploadCenterProps) {
       <div 
         onClick={() => !isUploading && fileInputRef.current?.click()}
         className={cn(
-          "w-full p-8 border-2 border-dashed rounded-[24px] flex flex-col items-center justify-center text-center transition-all cursor-pointer relative overflow-hidden",
+          "w-full p-8 border-2 border-dashed rounded-xl flex flex-col items-center justify-center text-center transition-all cursor-pointer relative overflow-hidden",
           isUploading 
-            ? "border-blue-400 bg-blue-50/50 dark:bg-blue-900/10 pointer-events-none" 
-            : "border-slate-200 dark:border-slate-700 hover:border-blue-800 hover:bg-slate-50 dark:hover:bg-slate-800"
+            ? "border-blue-400 bg-blue-50/50  pointer-events-none" 
+            : "border-slate-200  hover:border-blue-600 hover:bg-slate-50 "
         )}
       >
         <input 
@@ -131,12 +131,12 @@ export default function UploadCenter({ courseId }: UploadCenterProps) {
         
         {isUploading ? (
           <div className="space-y-4 z-10">
-            <Loader2 className="w-8 h-8 text-blue-800 animate-spin mx-auto" />
+            <Loader2 className="w-8 h-8 text-blue-600 animate-spin mx-auto" />
             <div className="space-y-1">
               <p className="font-bold text-sm">Uploading file...</p>
-              <div className="w-48 h-2 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
+              <div className="w-48 h-2 bg-slate-200 rounded-full overflow-hidden">
                 <div 
-                  className="h-full bg-blue-800 transition-all duration-300" 
+                  className="h-full bg-blue-600 transition-all duration-300" 
                   style={{ width: `${uploadProgress}%` }}
                 />
               </div>
@@ -144,7 +144,7 @@ export default function UploadCenter({ courseId }: UploadCenterProps) {
           </div>
         ) : (
           <div className="space-y-2 z-10">
-            <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-cyan-400 rounded-full flex items-center justify-center mx-auto mb-4">
+            <div className="w-12 h-12 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
               <Upload className="w-6 h-6" />
             </div>
             <p className="font-bold">Click to upload media</p>
@@ -156,20 +156,20 @@ export default function UploadCenter({ courseId }: UploadCenterProps) {
       {/* Uploaded Files List */}
       <div className="mt-8 space-y-4">
         {media === undefined ? (
-          <div className="flex justify-center py-4">
+          <div className="flex justify-center py-3">
             <Loader2 className="w-5 h-5 text-slate-400 animate-spin" />
           </div>
         ) : media.length === 0 ? (
-          <p className="text-sm text-center text-slate-400 font-medium py-4">No files uploaded yet.</p>
+          <p className="text-sm text-center text-slate-400 font-medium py-3">No files uploaded yet.</p>
         ) : (
           <div className="space-y-2 max-h-[300px] overflow-y-auto pr-2">
             {media.map((item) => (
               <div 
                 key={item._id} 
-                className="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700/50 group"
+                className="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-100 group"
               >
                 <div className="flex items-center gap-3 overflow-hidden">
-                  <div className="p-2 bg-white dark:bg-slate-800 rounded-lg shadow-sm">
+                  <div className="p-2 bg-white rounded-lg shadow-sm">
                     {getIcon(item.type)}
                   </div>
                   <div className="flex flex-col min-w-0">
@@ -183,7 +183,7 @@ export default function UploadCenter({ courseId }: UploadCenterProps) {
                 <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity pl-2">
                   <button 
                     onClick={() => copyToClipboard(item.resolvedUrl, item._id)}
-                    className="p-2 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg text-slate-500 transition-colors"
+                    className="p-2 hover:bg-slate-200 rounded-lg text-slate-500 transition-colors"
                     title="Copy Link"
                   >
                     {copiedId === item._id ? (
@@ -194,7 +194,7 @@ export default function UploadCenter({ courseId }: UploadCenterProps) {
                   </button>
                   <button 
                     onClick={() => deleteMedia({ id: item._id, storageId: item.storageId })}
-                    className="p-2 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg text-red-500 transition-colors"
+                    className="p-2 hover:bg-red-50 rounded-lg text-red-500 transition-colors"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>

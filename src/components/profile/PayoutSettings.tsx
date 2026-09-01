@@ -152,13 +152,13 @@ export default function PayoutSettings() {
   };
 
   return (
-    <div className="bg-white dark:bg-slate-900 rounded-[32px] p-8 border border-slate-100 dark:border-slate-800 shadow-xl shadow-blue-800/5">
+    <div className="bg-white rounded-2xl p-8 border border-slate-100 shadow-md shadow-blue-600/5">
       <div className="flex items-center gap-4 mb-8">
-        <div className="w-12 h-12 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 rounded-2xl flex items-center justify-center">
+        <div className="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center">
           <Landmark className="w-6 h-6" />
         </div>
         <div>
-          <h3 className="font-black text-lg">Payout Account</h3>
+          <h3 className="font-semibold text-lg">Payout Account</h3>
           <p className="text-xs text-muted-foreground font-bold uppercase tracking-widest">
             Receive your 60% course earnings
           </p>
@@ -167,19 +167,19 @@ export default function PayoutSettings() {
 
       {savedAccount ? (
         <div className="space-y-6">
-          <div className="p-6 rounded-3xl bg-emerald-50 dark:bg-emerald-900/10 border border-emerald-100 dark:border-emerald-800/50 space-y-4">
+          <div className="p-6 rounded-2xl bg-emerald-50 border border-emerald-100 space-y-4">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-emerald-500 rounded-xl flex items-center justify-center">
                 <CheckCircle2 className="w-5 h-5 text-white" />
               </div>
               <div>
-                <p className="font-black text-sm">{savedAccount.accountName}</p>
+                <p className="font-semibold text-sm">{savedAccount.accountName}</p>
                 <p className="text-xs text-muted-foreground font-bold">
                   {savedAccount.bankName} • {savedAccount.accountNumber}
                 </p>
               </div>
             </div>
-            <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400">
+            <div className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-widest text-emerald-600">
               <ShieldCheck className="w-4 h-4" />
               Verified — payouts will be sent to this account
             </div>
@@ -188,7 +188,7 @@ export default function PayoutSettings() {
           <button
             onClick={handleDelete}
             disabled={deleting}
-            className="flex items-center gap-2 px-5 py-3 text-sm font-bold text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/10 rounded-2xl hover:bg-red-100 dark:hover:bg-red-900/20 transition-all disabled:opacity-60"
+            className="flex items-center gap-2 px-5 py-3 text-sm font-bold text-red-600 bg-red-50 rounded-2xl hover:bg-red-100 transition-all disabled:opacity-60"
           >
             {deleting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
             Remove Account
@@ -198,7 +198,7 @@ export default function PayoutSettings() {
         <form onSubmit={handleSave} className="space-y-6">
           {/* Bank selector */}
           <div className="grid gap-2">
-            <label htmlFor="bank" className="text-xs font-black uppercase tracking-widest text-slate-500">
+            <label htmlFor="bank" className="text-xs font-semibold uppercase tracking-widest text-slate-500">
               Bank
             </label>
             <div className="relative">
@@ -209,7 +209,7 @@ export default function PayoutSettings() {
                 onChange={(e) => setBankCode(e.target.value)}
                 required
                 disabled={banksLoading}
-                className="w-full pl-12 pr-4 py-4 bg-slate-50 dark:bg-slate-950 border-2 border-slate-100 dark:border-slate-800 rounded-2xl font-bold focus:border-blue-800 dark:focus:border-cyan-400 focus:outline-none transition-colors appearance-none disabled:opacity-60"
+                className="w-full pl-12 pr-4 py-3 bg-slate-50 border-2 border-slate-100 rounded-2xl font-bold focus:border-blue-600 focus:outline-none transition-colors appearance-none disabled:opacity-60"
               >
                 <option value="">
                   {banksLoading ? "Loading banks…" : "Select your bank"}
@@ -225,7 +225,7 @@ export default function PayoutSettings() {
 
           {/* Account number */}
           <div className="grid gap-2">
-            <label htmlFor="accountNumber" className="text-xs font-black uppercase tracking-widest text-slate-500">
+            <label htmlFor="accountNumber" className="text-xs font-semibold uppercase tracking-widest text-slate-500">
               Account Number (10 digits)
             </label>
             <div className="relative">
@@ -239,7 +239,7 @@ export default function PayoutSettings() {
                 value={accountNumber}
                 onChange={(e) => setAccountNumber(e.target.value.replace(/\D/g, ""))}
                 required
-                className="w-full pl-12 pr-4 py-4 bg-slate-50 dark:bg-slate-950 border-2 border-slate-100 dark:border-slate-800 rounded-2xl font-bold focus:border-blue-800 dark:focus:border-cyan-400 focus:outline-none transition-colors"
+                className="w-full pl-12 pr-4 py-3 bg-slate-50 border-2 border-slate-100 rounded-2xl font-bold focus:border-blue-600 focus:outline-none transition-colors"
                 placeholder="0123456789"
               />
             </div>
@@ -247,32 +247,32 @@ export default function PayoutSettings() {
 
           {/* Resolved account name */}
           {resolving && (
-            <div className="flex items-center gap-3 p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl text-sm font-bold text-muted-foreground">
+            <div className="flex items-center gap-3 p-4 bg-slate-50 rounded-2xl text-sm font-bold text-muted-foreground">
               <Loader2 className="w-4 h-4 animate-spin" />
               Verifying account…
             </div>
           )}
           {resolvedName && !resolving && (
-            <div className="flex items-center gap-3 p-4 bg-emerald-50 dark:bg-emerald-900/10 border border-emerald-100 dark:border-emerald-800/50 rounded-2xl">
+            <div className="flex items-center gap-3 p-4 bg-emerald-50 border border-emerald-100 rounded-2xl">
               <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0" />
               <div>
-                <p className="text-[10px] font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400">
+                <p className="text-[10px] font-semibold uppercase tracking-widest text-emerald-600">
                   Verified Account Name
                 </p>
-                <p className="font-black text-sm">{resolvedName}</p>
+                <p className="font-semibold text-sm">{resolvedName}</p>
               </div>
             </div>
           )}
 
           {error && (
-            <div className="flex items-start gap-3 p-4 bg-red-500/10 border border-red-500/20 rounded-2xl text-red-600 dark:text-red-400 text-xs font-bold">
+            <div className="flex items-start gap-3 p-4 bg-red-500/10 border border-red-500/20 rounded-2xl text-red-600 text-xs font-bold">
               <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
               {error}
             </div>
           )}
 
           {saved && (
-            <div className="flex items-center gap-3 p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl text-emerald-600 dark:text-emerald-400 text-xs font-bold">
+            <div className="flex items-center gap-3 p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl text-emerald-600 text-xs font-bold">
               <CheckCircle2 className="w-4 h-4 shrink-0" />
               Bank account saved and verified!
             </div>
@@ -282,10 +282,10 @@ export default function PayoutSettings() {
             type="submit"
             disabled={saving || !resolvedName || !bankCode}
             className={cn(
-              "w-full py-4 rounded-2xl font-black flex items-center justify-center gap-2 transition-all",
+              "w-full py-3 rounded-2xl font-semibold flex items-center justify-center gap-2 transition-all",
               saving || !resolvedName || !bankCode
                 ? "bg-slate-200 text-slate-400 cursor-not-allowed"
-                : "bg-blue-800 text-white hover:bg-blue-900 shadow-lg shadow-blue-800/20 active:scale-95"
+                : "bg-blue-600 text-white hover:bg-blue-700 shadow-sm shadow-blue-600/20 active:scale-95"
             )}
           >
             {saving ? (

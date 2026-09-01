@@ -18,11 +18,11 @@ export function StatCard({
   icon: Icon, 
   trend, 
   trendUp = true,
-  colorClass = "text-blue-600 dark:text-cyan-400",
-  bgClass = "bg-blue-100 dark:bg-blue-900/30"
+  colorClass = "text-blue-600 ",
+  bgClass = "bg-blue-100 "
 }: StatCardProps) {
   return (
-    <div className="bg-white dark:bg-slate-900 rounded-[32px] p-8 border border-slate-100 dark:border-slate-800 shadow-xl shadow-blue-800/5 hover:shadow-2xl hover:shadow-blue-800/10 transition-all duration-500 group relative overflow-hidden">
+    <div className="bg-white rounded-2xl p-8 border border-slate-100 shadow-md shadow-blue-600/5 hover:shadow-sm hover:shadow-blue-600/10 transition-all duration-500 group relative overflow-hidden">
       {/* Decorative background element */}
       <div className={cn(
         "absolute -right-12 -top-12 w-40 h-40 rounded-full blur-3xl opacity-20 group-hover:scale-150 transition-transform duration-700",
@@ -40,7 +40,7 @@ export function StatCard({
           {trend && (
             <div className={cn(
               "px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1",
-              trendUp ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400" : "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
+              trendUp ? "bg-emerald-100 text-emerald-700  " : "bg-red-100 text-red-700  "
             )}>
               {trendUp ? "↑" : "↓"} {trend}
             </div>
@@ -48,10 +48,10 @@ export function StatCard({
         </div>
         
         <div>
-          <p className="text-sm font-black text-muted-foreground uppercase tracking-widest mb-2">
+          <p className="text-sm font-semibold text-muted-foreground uppercase tracking-widest mb-2">
             {title}
           </p>
-          <h3 className="text-4xl font-black text-slate-900 dark:text-white">
+          <h3 className="text-4xl font-semibold text-slate-900">
             {value}
           </h3>
         </div>

@@ -34,29 +34,29 @@ export default function MentorshipPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pt-32 pb-20">
-      <div className="max-w-7xl mx-auto px-6 md:px-12">
+    <div className="min-h-screen bg-slate-50 pt-20 pb-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Hero Section */}
-        <div className="text-center max-w-3xl mx-auto mb-20">
-          <div className="w-16 h-16 bg-cyan-100 dark:bg-cyan-900/30 text-cyan-600 dark:text-cyan-400 rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-xl shadow-cyan-900/10">
+        <div className="text-center max-w-3xl mx-auto mb-6">
+          <div className="w-16 h-16 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-8 shadow-md shadow-cyan-900/10">
             <Users className="w-8 h-8" />
           </div>
-          <h1 className="text-5xl md:text-6xl font-black tracking-tight mb-6 leading-tight">
-            Accelerate your career with <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-500 to-blue-600">1-on-1 Mentorship</span>
+          <h1 className="text-5xl md:text-6xl font-semibold tracking-tight mb-6 leading-tight">
+            Accelerate your career with <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-blue-600">1-on-1 Mentorship</span>
           </h1>
-          <p className="text-xl text-slate-500 dark:text-slate-400 mb-10 font-medium leading-relaxed">
+          <p className="text-xl text-slate-500 mb-6 font-medium leading-relaxed">
             Connect directly with senior engineers and industry leaders to guide your technical journey and career growth.
           </p>
 
           {/* Mentors or Waitlist */}
           {mentors && mentors.length > 0 ? (
             <div className="mt-16 text-left">
-              <div className="flex items-center justify-between mb-12">
+              <div className="flex items-center justify-between mb-8">
                 <div>
-                   <h2 className="text-3xl font-black mb-2">Available Mentors</h2>
+                   <h2 className="text-3xl font-semibold mb-2">Available Mentors</h2>
                    <p className="text-muted-foreground font-medium">Book a session with one of our top industry experts.</p>
                 </div>
-                <div className="flex items-center gap-2 px-6 py-2 bg-emerald-500/10 text-emerald-600 rounded-full text-xs font-black uppercase tracking-widest">
+                <div className="flex items-center gap-2 px-4 sm:px-6 py-2 bg-emerald-500/10 text-emerald-600 rounded-full text-xs font-semibold uppercase tracking-widest">
                    <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
                    {mentors.length} Mentors Online
                 </div>
@@ -77,19 +77,19 @@ export default function MentorshipPage() {
             </div>
           ) : (
             /* Waitlist Form */
-            <div className="max-w-md mx-auto bg-white dark:bg-slate-900 rounded-[2rem] p-2 border border-slate-100 dark:border-slate-800 shadow-2xl relative">
+            <div className="max-w-md mx-auto bg-white rounded-2xl p-2 border border-slate-100 shadow-sm relative">
               {isSuccess ? (
                 <div className="p-8 text-center animate-in fade-in zoom-in duration-500">
-                  <div className="w-16 h-16 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <div className="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4">
                     <CheckCircle2 className="w-8 h-8" />
                   </div>
-                  <h3 className="text-xl font-black mb-2">You&apos;re on the list!</h3>
+                  <h3 className="text-xl font-semibold mb-2">You&apos;re on the list!</h3>
                   <p className="text-sm font-medium text-slate-500">We&apos;ll be in touch soon when spots open up.</p>
                 </div>
               ) : (
                 <form onSubmit={handleSubmit} className="flex flex-col gap-4 p-4">
                   <div className="text-left mb-2">
-                    <h3 className="font-black">Join the Mentorship Waitlist</h3>
+                    <h3 className="font-semibold">Join the Mentorship Waitlist</h3>
                     <p className="text-xs font-bold text-slate-500 mt-1 uppercase tracking-widest">Spots are extremely limited</p>
                   </div>
                   
@@ -99,7 +99,7 @@ export default function MentorshipPage() {
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full px-6 py-4 bg-slate-50 dark:bg-slate-950 border-2 border-slate-100 dark:border-slate-800 rounded-2xl font-bold focus:border-cyan-500 dark:focus:border-cyan-400 focus:outline-none transition-colors"
+                    className="w-full px-4 sm:px-6 py-3 bg-slate-50 border-2 border-slate-100 rounded-2xl font-bold focus:border-blue-500 focus:outline-none transition-colors"
                   />
                   
                   {error && <p className="text-xs font-bold text-red-500 px-2 text-left">{error}</p>}
@@ -107,7 +107,7 @@ export default function MentorshipPage() {
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full py-4 bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-black rounded-2xl hover:bg-slate-800 dark:hover:bg-slate-100 shadow-xl shadow-slate-900/10 transition-all flex items-center justify-center gap-2 disabled:opacity-70 group"
+                    className="w-full py-3 bg-blue-600 text-white font-medium rounded-xl hover:bg-blue-700 transition-colors flex items-center justify-center gap-2 disabled:opacity-70"
                   >
                     {isSubmitting ? (
                       <Loader2 className="w-5 h-5 animate-spin" />
@@ -143,11 +143,11 @@ export default function MentorshipPage() {
               desc: "Receive deeply technical feedback on your personal projects or open source contributions."
             }
           ].map((feature, i) => (
-            <div key={i} className="bg-white dark:bg-slate-900 p-8 rounded-[32px] border border-slate-100 dark:border-slate-800 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300">
-              <div className="w-12 h-12 bg-slate-50 dark:bg-slate-800 text-cyan-600 dark:text-cyan-400 rounded-2xl flex items-center justify-center mb-6 shadow-sm">
+            <div key={i} className="bg-white p-8 rounded-2xl border border-slate-100 hover:shadow-sm hover:-translate-y-2 transition-all duration-300">
+              <div className="w-12 h-12 bg-slate-50 text-blue-600 rounded-2xl flex items-center justify-center mb-6 shadow-sm">
                 <feature.icon className="w-6 h-6" />
               </div>
-              <h3 className="text-xl font-black mb-3">{feature.title}</h3>
+              <h3 className="text-xl font-semibold mb-3">{feature.title}</h3>
               <p className="text-slate-500 font-medium leading-relaxed">{feature.desc}</p>
             </div>
           ))}

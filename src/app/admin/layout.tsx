@@ -25,8 +25,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   if (status === "loading" || (session && convexUser === undefined)) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950">
-        <div className="w-12 h-12 border-4 border-blue-800 border-t-transparent rounded-full animate-spin"></div>
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+        <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
       </div>
     );
   }
@@ -37,7 +37,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   }
 
   return (
-    <div className="flex h-[100dvh] bg-slate-50 dark:bg-slate-950 overflow-hidden relative">
+    <div className="flex h-[100dvh] bg-slate-50 overflow-hidden relative">
       {/* Mobile backdrop */}
       {sidebarOpen && (
         <div 
@@ -59,7 +59,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         {/* Mobile menu toggle */}
         <button
           onClick={() => setSidebarOpen(true)}
-          className="lg:hidden mb-6 p-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm"
+          className="lg:hidden mb-6 p-3 bg-white border border-slate-200 rounded-2xl shadow-sm"
           aria-label="Open admin menu"
         >
           <Menu className="w-5 h-5" />

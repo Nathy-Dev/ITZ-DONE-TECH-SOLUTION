@@ -82,18 +82,18 @@ export default function CreateCoursePage() {
   // Only instructors (or admins) can create courses
   if (convexUser && convexUser.role !== "instructor" && convexUser.role !== "admin") {
     return (
-      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pt-32 pb-20 px-6">
+      <div className="min-h-screen bg-slate-50 pt-20 pb-10 px-4 sm:px-6">
         <div className="max-w-md mx-auto text-center space-y-6">
-          <div className="w-20 h-20 bg-amber-100 dark:bg-amber-900/30 text-amber-600 rounded-3xl flex items-center justify-center mx-auto">
+          <div className="w-20 h-20 bg-amber-100 text-amber-600 rounded-2xl flex items-center justify-center mx-auto">
             <AlertCircle className="w-10 h-10" />
           </div>
-          <h1 className="text-3xl font-black">Instructors Only</h1>
+          <h1 className="text-3xl font-semibold">Instructors Only</h1>
           <p className="text-muted-foreground font-medium">
             Course creation is available for instructor accounts. Switch to an instructor account from the profile menu to get started.
           </p>
           <Link 
             href="/dashboard"
-            className="inline-flex items-center gap-2 px-8 py-4 bg-blue-800 text-white font-black rounded-2xl hover:bg-blue-900 transition-all"
+            className="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white font-semibold rounded-2xl hover:bg-blue-700 transition-all"
           >
             <ArrowLeft className="w-4 h-4" />
             Back to Dashboard
@@ -201,23 +201,23 @@ export default function CreateCoursePage() {
     }
   };
 
-  const inputClass = "w-full px-5 py-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-800/20 focus:border-blue-800 transition-all text-base";
-  const labelClass = "text-xs font-black uppercase tracking-widest text-slate-500 mb-2 block";
+  const inputClass = "w-full px-5 py-3 bg-slate-50  border border-slate-200  rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition-all text-base";
+  const labelClass = "text-xs font-semibold uppercase tracking-widest text-slate-500 mb-2 block";
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pt-24 pb-24 md:pb-20">
+    <div className="min-h-screen bg-slate-50 pt-20 pb-12 md:pb-10">
       <div className="max-w-4xl mx-auto px-4 sm:px-6">
         <Link 
           href="/dashboard" 
-          className="inline-flex items-center gap-2 text-muted-foreground hover:text-blue-800 dark:hover:text-cyan-400 transition-colors mb-6 md:mb-8"
+          className="inline-flex items-center gap-2 text-muted-foreground hover:text-blue-600 transition-colors mb-6 md:mb-8"
         >
           <ArrowLeft className="w-4 h-4" />
           Back to Dashboard
         </Link>
 
         {/* Step indicator */}
-        <div className="mb-8 md:mb-10">
-          <h1 className="text-2xl sm:text-3xl font-black tracking-tight mb-2">Create New Course</h1>
+        <div className="mb-8 md:mb-6">
+          <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight mb-2">Create New Course</h1>
           <p className="text-muted-foreground text-sm md:text-base">Fill in the details below to start building your curriculum.</p>
           
           <div className="flex items-center gap-2 mt-6 overflow-x-auto pb-1 -mx-1 px-1">
@@ -229,24 +229,24 @@ export default function CreateCoursePage() {
                   className={cn(
                     "flex items-center gap-3 px-4 py-3 rounded-2xl shrink-0 transition-all text-left",
                     currentStep === step.id
-                      ? "bg-blue-800 text-white shadow-lg shadow-blue-800/20"
+                      ? "bg-blue-600 text-white shadow-sm shadow-blue-600/20"
                       : currentStep > step.id
-                        ? "bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400"
-                        : "bg-white dark:bg-slate-900 text-slate-400 border border-slate-100 dark:border-slate-800"
+                        ? "bg-emerald-50  text-emerald-700 "
+                        : "bg-white  text-slate-400 border border-slate-100 "
                   )}
                 >
                   {currentStep > step.id ? (
                     <CheckCircle2 className="w-5 h-5 shrink-0" />
                   ) : (
                     <span className={cn(
-                      "w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black shrink-0",
-                      currentStep === step.id ? "bg-white/20" : "bg-slate-100 dark:bg-slate-800"
+                      "w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-semibold shrink-0",
+                      currentStep === step.id ? "bg-white/20" : "bg-slate-100 "
                     )}>
                       {step.id}
                     </span>
                   )}
                   <span className="hidden sm:block">
-                    <span className="block text-xs font-black">{step.title}</span>
+                    <span className="block text-xs font-semibold">{step.title}</span>
                     <span className={cn(
                       "block text-[10px] font-medium",
                       currentStep === step.id ? "text-blue-200" : "text-slate-400"
@@ -258,7 +258,7 @@ export default function CreateCoursePage() {
                 {idx < STEPS.length - 1 && (
                   <div className={cn(
                     "w-6 h-0.5 shrink-0 rounded-full",
-                    currentStep > step.id ? "bg-emerald-400" : "bg-slate-200 dark:bg-slate-800"
+                    currentStep > step.id ? "bg-emerald-400" : "bg-slate-200 "
                   )} />
                 )}
               </React.Fragment>
@@ -266,7 +266,7 @@ export default function CreateCoursePage() {
           </div>
         </div>
 
-        <div className="bg-white dark:bg-slate-900 rounded-[24px] md:rounded-[32px] p-5 sm:p-8 md:p-12 border border-slate-100 dark:border-slate-800 shadow-xl shadow-blue-800/5">
+        <div className="bg-white rounded-xl md:rounded-2xl p-5 sm:p-8 md:p-12 border border-slate-100 shadow-md shadow-blue-600/5">
           <form onSubmit={(e) => { e.preventDefault(); handleSubmit(); }} className="space-y-8">
             {/* Step 1: Basics */}
             {currentStep === 1 && (
@@ -305,7 +305,7 @@ export default function CreateCoursePage() {
                 <div className="space-y-2">
                   <label htmlFor="price" className={labelClass}>Price in Naira — 0 for free</label>
                   <div className="relative">
-                    <span className="absolute left-4 top-1/2 -translate-y-1/2 font-black text-slate-400 pointer-events-none">₦</span>
+                    <span className="absolute left-4 top-1/2 -translate-y-1/2 font-semibold text-slate-400 pointer-events-none">₦</span>
                     <input
                       id="price"
                       required
@@ -320,8 +320,8 @@ export default function CreateCoursePage() {
                     />
                   </div>
                   {formData.price !== "" && !isNaN(parseFloat(formData.price)) && parseFloat(formData.price) > 0 && (
-                    <div className="p-3 bg-blue-50 dark:bg-blue-900/10 rounded-xl space-y-1">
-                      <p className="text-xs font-bold text-blue-800 dark:text-cyan-400">
+                    <div className="p-3 bg-blue-50 rounded-xl space-y-1">
+                      <p className="text-xs font-bold text-blue-600">
                         ≈ {formatPrice(ngnToUsd(parseFloat(formData.price), fxRate), "USD")} for international students
                       </p>
                       <p className="text-xs text-muted-foreground font-medium">
@@ -399,7 +399,7 @@ export default function CreateCoursePage() {
                 
                 <div 
                   onClick={handleThumbnailClick}
-                  className="aspect-video bg-slate-50 dark:bg-slate-800/50 border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-[24px] md:rounded-[32px] flex flex-col items-center justify-center text-center p-6 md:p-8 group hover:border-blue-800 transition-all cursor-pointer overflow-hidden relative"
+                  className="aspect-video bg-slate-50 border-2 border-dashed border-slate-200 rounded-xl md:rounded-2xl flex flex-col items-center justify-center text-center p-6 md:p-8 group hover:border-blue-600 transition-all cursor-pointer overflow-hidden relative"
                 >
                   {previewUrl ? (
                     <>
@@ -418,7 +418,7 @@ export default function CreateCoursePage() {
                     </>
                   ) : (
                     <>
-                      <div className="w-14 h-14 md:w-16 md:h-16 bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-cyan-400 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                      <div className="w-14 h-14 md:w-16 md:h-16 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                          {isUploading ? <Loader2 className="w-7 h-7 animate-spin" /> : <Upload className="w-7 h-7" />}
                       </div>
                       <h4 className="font-bold mb-1 text-sm md:text-base">Tap to upload thumbnail</h4>
@@ -427,10 +427,10 @@ export default function CreateCoursePage() {
                   )}
                   
                   {isUploading && (
-                     <div className="absolute inset-0 bg-white/50 dark:bg-slate-950/50 backdrop-blur-sm flex items-center justify-center">
+                     <div className="absolute inset-0 bg-white/50 backdrop-blur-sm flex items-center justify-center">
                         <div className="flex flex-col items-center gap-2">
-                           <Loader2 className="w-8 h-8 animate-spin text-blue-800" />
-                           <p className="text-xs font-black uppercase tracking-widest text-blue-800">Uploading...</p>
+                           <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+                           <p className="text-xs font-semibold uppercase tracking-widest text-blue-600">Uploading...</p>
                         </div>
                      </div>
                   )}
@@ -439,23 +439,23 @@ export default function CreateCoursePage() {
             )}
 
             {error && (
-              <div className="flex items-start gap-3 p-4 bg-red-500/10 border border-red-500/20 rounded-2xl text-red-600 dark:text-red-400 text-sm font-bold">
+              <div className="flex items-start gap-3 p-4 bg-red-500/10 border border-red-500/20 rounded-2xl text-red-600 text-sm font-bold">
                 <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
                 {error}
               </div>
             )}
 
             {/* Step navigation */}
-            <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-4 pt-4 border-t border-slate-100 dark:border-slate-800">
+            <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-4 pt-4 border-t border-slate-100">
               <button
                 type="button"
                 onClick={() => currentStep > 1 && setCurrentStep(currentStep - 1)}
                 disabled={currentStep === 1}
                 className={cn(
-                  "flex items-center justify-center gap-2 px-6 py-4 rounded-2xl font-bold transition-all",
+                  "flex items-center justify-center gap-2 px-4 sm:px-6 py-3 rounded-2xl font-bold transition-all",
                   currentStep === 1
-                    ? "text-slate-300 dark:text-slate-600 cursor-not-allowed"
-                    : "text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
+                    ? "text-slate-300  cursor-not-allowed"
+                    : "text-slate-600  hover:bg-slate-100 "
                 )}
               >
                 <ChevronLeft className="w-5 h-5" />
@@ -466,7 +466,7 @@ export default function CreateCoursePage() {
                 <button
                   type="button"
                   onClick={() => goToStep(currentStep + 1)}
-                  className="flex items-center justify-center gap-2 px-8 py-4 bg-blue-800 text-white rounded-2xl font-black hover:bg-blue-900 shadow-lg shadow-blue-800/20 transition-all active:scale-95"
+                  className="flex items-center justify-center gap-2 px-5 py-2.5 bg-blue-600 text-white rounded-2xl font-semibold hover:bg-blue-700 shadow-sm shadow-blue-600/20 transition-all active:scale-95"
                 >
                   Continue
                   <ChevronRight className="w-5 h-5" />
@@ -475,7 +475,7 @@ export default function CreateCoursePage() {
                 <button 
                   disabled={isSubmitting || isUploading}
                   type="submit"
-                  className="flex items-center justify-center gap-3 px-8 py-4 bg-blue-800 text-white rounded-2xl font-black text-base md:text-lg shadow-xl shadow-blue-800/20 hover:bg-blue-900 transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed group"
+                  className="flex items-center justify-center gap-3 px-5 py-2.5 bg-blue-600 text-white rounded-2xl font-semibold text-base md:text-lg shadow-md shadow-blue-600/20 hover:bg-blue-700 transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed group"
                 >
                   {isSubmitting ? (
                     <Loader2 className="w-6 h-6 animate-spin" />

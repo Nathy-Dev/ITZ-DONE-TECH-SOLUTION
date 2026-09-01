@@ -17,10 +17,10 @@ export default function VideoPlayer({ url, onEnded, title }: VideoPlayerProps) {
   const [progress, setProgress] = useState(0);
 
   return (
-    <div className="relative aspect-video w-full bg-black rounded-[2rem] overflow-hidden group shadow-2xl">
+    <div className="relative aspect-video w-full bg-black rounded-2xl overflow-hidden group shadow-sm">
       {loading && (
         <div className="absolute inset-0 z-20 flex items-center justify-center bg-slate-900/50 backdrop-blur-sm">
-          <Loader2 className="w-10 h-10 text-cyan-400 animate-spin" />
+          <Loader2 className="w-10 h-10 text-blue-600 animate-spin" />
         </div>
       )}
 
@@ -61,7 +61,7 @@ export default function VideoPlayer({ url, onEnded, title }: VideoPlayerProps) {
              </div>
              
              <div className="flex items-center gap-4">
-                <span className="text-[10px] font-black uppercase tracking-widest text-white/50">{title || "Lesson Video"}</span>
+                <span className="text-[10px] font-semibold uppercase tracking-widest text-white/50">{title || "Lesson Video"}</span>
                 <button className="p-2 text-white/70 hover:text-white transition-colors">
                   <Maximize className="w-4 h-4" />
                 </button>
@@ -71,7 +71,7 @@ export default function VideoPlayer({ url, onEnded, title }: VideoPlayerProps) {
           {/* Progress Bar */}
           <div className="relative h-1.5 w-full bg-white/10 rounded-full overflow-hidden">
              <div 
-              className="absolute left-0 top-0 h-full bg-cyan-400 transition-all duration-300"
+              className="absolute left-0 top-0 h-full bg-blue-500 transition-all duration-300"
               style={{ width: `${progress}%` }}
              />
           </div>
@@ -84,7 +84,7 @@ export default function VideoPlayer({ url, onEnded, title }: VideoPlayerProps) {
           onClick={() => setPlaying(true)}
           className="absolute inset-0 z-10 flex items-center justify-center group/play"
         >
-          <div className="w-24 h-24 bg-blue-800/80 text-white rounded-full flex items-center justify-center shadow-2xl backdrop-blur-sm group-hover/play:scale-110 group-hover/play:bg-blue-800 transition-all">
+          <div className="w-24 h-24 bg-blue-600/80 text-white rounded-full flex items-center justify-center shadow-sm backdrop-blur-sm group-hover/play:scale-110 group-hover/play:bg-blue-600 transition-all">
             <Play className="w-10 h-10 fill-current ml-2" />
           </div>
         </button>

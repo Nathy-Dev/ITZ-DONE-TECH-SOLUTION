@@ -6,22 +6,22 @@ import { Code2, Cpu, Database, Layout, Smartphone, Shield, Cloud, Terminal } fro
 import { useQuery } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 
-// Map category names to icons and colors
-const categoryMeta: Record<string, { icon: any; color: string; bg: string }> = {
-  "Web Development": { icon: Code2, color: "text-blue-500", bg: "bg-blue-500/10" },
-  "Data Science": { icon: Database, color: "text-purple-500", bg: "bg-purple-500/10" },
-  "Mobile Dev": { icon: Smartphone, color: "text-pink-500", bg: "bg-pink-500/10" },
-  "Mobile App Dev": { icon: Smartphone, color: "text-pink-500", bg: "bg-pink-500/10" },
-  "Cloud Computing": { icon: Cloud, color: "text-cyan-500", bg: "bg-cyan-500/10" },
-  "Cloud": { icon: Cloud, color: "text-cyan-500", bg: "bg-cyan-500/10" },
-  "Cybersecurity": { icon: Shield, color: "text-emerald-500", bg: "bg-emerald-500/10" },
-  "UI/UX Design": { icon: Layout, color: "text-orange-500", bg: "bg-orange-500/10" },
-  "Design": { icon: Layout, color: "text-orange-500", bg: "bg-orange-500/10" },
-  "DevOps": { icon: Terminal, color: "text-blue-800", bg: "bg-blue-800/10" },
-  "AI & ML": { icon: Cpu, color: "text-rose-500", bg: "bg-rose-500/10" },
+// Map category names to icons (single blue accent for brand consistency)
+const categoryMeta: Record<string, { icon: React.ComponentType<{ className?: string }> }> = {
+  "Web Development": { icon: Code2 },
+  "Data Science": { icon: Database },
+  "Mobile Dev": { icon: Smartphone },
+  "Mobile App Dev": { icon: Smartphone },
+  "Cloud Computing": { icon: Cloud },
+  "Cloud": { icon: Cloud },
+  "Cybersecurity": { icon: Shield },
+  "UI/UX Design": { icon: Layout },
+  "Design": { icon: Layout },
+  "DevOps": { icon: Terminal },
+  "AI & ML": { icon: Cpu },
 };
 
-const defaultMeta = { icon: Code2, color: "text-slate-500", bg: "bg-slate-500/10" };
+const defaultMeta = { icon: Code2 };
 
 /**
  * FeaturedCategories component to showcase different tech domains.
@@ -31,53 +31,50 @@ const FeaturedCategories = () => {
   const categoriesData = useQuery(api.courses.getCategoriesWithCounts);
 
   return (
-    <section className="py-24 bg-white dark:bg-slate-950">
-      <div className="max-w-7xl mx-auto px-6 md:px-12">
-        <div className="flex flex-col md:flex-row justify-between items-end gap-6 mb-16">
-          <div className="max-w-xl space-y-4">
-            <h2 className="text-4xl font-bold tracking-tight">Top <span className="text-cyan-500">Categories</span></h2>
-            <p className="text-muted-foreground">Dive into specialized paths designed to take you from beginner to job-ready professional.</p>
+    <section className="py-12 bg-white">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex flex-col md:flex-row justify-between md:items-end gap-4 mb-8">
+          <div className="max-w-xl space-y-2">
+            <h2 className="text-2xl md:text-3xl font-bold tracking-tight">Top Categories</h2>
+            <p className="text-slate-500">Specialized paths designed to take you from beginner to job-ready professional.</p>
           </div>
-          <Link href="/courses" className="text-cyan-500 font-semibold hover:underline flex items-center gap-2">
+          <Link href="/courses" className="text-blue-600 font-medium hover:text-blue-700 transition-colors">
             View all courses
           </Link>
         </div>
 
         {categoriesData && categoriesData.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {categoriesData.slice(0, 8).map((cat, idx) => {
               const meta = categoryMeta[cat.name] || defaultMeta;
               const IconComponent = meta.icon;
               return (
-                <Link 
-                  key={idx} 
+                <Link
+                  key={idx}
                   href={`/courses?category=${encodeURIComponent(cat.name)}`}
-                  className="p-8 rounded-3xl border border-slate-100 dark:border-slate-800 hover:border-blue-800/30 hover:shadow-xl hover:shadow-blue-800/5 transition-all group relative overflow-hidden shrink-0"
+                  className="p-5 rounded-xl border border-slate-200 hover:border-blue-600/40 hover:shadow-sm transition-all group"
                 >
-                  <div className={`w-14 h-14 ${meta.bg} rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform`}>
-                    <IconComponent className={`w-7 h-7 ${meta.color}`} />
+                  <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center mb-4 group-hover:bg-blue-100 transition-colors">
+                    <IconComponent className="w-5 h-5 text-blue-600" />
                   </div>
-                  <h3 className="text-lg font-bold mb-2">{cat.name}</h3>
-                  <p className="text-sm text-muted-foreground">{cat.count} {cat.count === 1 ? "Course" : "Courses"} available</p>
-                  
-                  {/* Subtle background flair */}
-                  <div className="absolute -bottom-2 -right-2 w-16 h-16 bg-slate-100 dark:bg-slate-800/50 rounded-full scale-0 group-hover:scale-100 transition-transform -z-10 blur-xl opacity-20" />
+                  <h3 className="text-base font-semibold mb-1">{cat.name}</h3>
+                  <p className="text-sm text-slate-500">{cat.count} {cat.count === 1 ? "Course" : "Courses"} available</p>
                 </Link>
               );
             })}
           </div>
         ) : categoriesData && categoriesData.length === 0 ? (
-          <div className="text-center py-16 border-2 border-dashed border-slate-100 dark:border-slate-800 rounded-[32px]">
-            <p className="text-muted-foreground font-bold">No categories available yet.</p>
+          <div className="text-center py-12 border border-dashed border-slate-200 rounded-xl">
+            <p className="text-slate-500">No categories available yet.</p>
           </div>
         ) : (
           // Loading skeleton
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="p-8 rounded-3xl border border-slate-100 dark:border-slate-800 animate-pulse">
-                <div className="w-14 h-14 bg-slate-100 dark:bg-slate-800 rounded-2xl mb-6" />
-                <div className="h-5 w-32 bg-slate-100 dark:bg-slate-800 rounded mb-2" />
-                <div className="h-4 w-24 bg-slate-100 dark:bg-slate-800 rounded" />
+              <div key={i} className="p-5 rounded-xl border border-slate-200 animate-pulse">
+                <div className="w-10 h-10 bg-slate-100 rounded-lg mb-4" />
+                <div className="h-4 w-32 bg-slate-100 rounded mb-2" />
+                <div className="h-3 w-24 bg-slate-100 rounded" />
               </div>
             ))}
           </div>

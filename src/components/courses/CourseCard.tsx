@@ -30,6 +30,7 @@ interface CourseCardProps {
 
 /**
  * Reusable Course Card component.
+ * Clean white card with subtle border and hover elevation.
  */
 const CourseCard = ({
   id, _id, title, instructor, rating, reviews = 0, price,
@@ -38,7 +39,7 @@ const CourseCard = ({
   const courseId = (_id || id) as string;
   const displayInstructor = instructor || "ITS-DONE Instructor";
   const rawImage = thumbnailUrl || image;
-  
+
   const { data: session } = useSession();
   const convexUser = useQuery(api.users.getUserByProviderId,
     session?.user?.id ? {
@@ -51,11 +52,11 @@ const CourseCard = ({
 
   const { addItem, isInCart } = useCart();
   const inCart = isInCart(courseId);
-  
+
   // Check if rawImage is a external URL or a Convex storage ID
   const isStorageId = rawImage && !rawImage.startsWith("http") && !rawImage.startsWith("/");
-  
-  const resolvedUrl = useQuery(api.files.getImageUrl, 
+
+  const resolvedUrl = useQuery(api.files.getImageUrl,
     isStorageId ? { storageId: rawImage as string } : "skip"
   );
 
@@ -76,83 +77,84 @@ const CourseCard = ({
   };
 
   return (
-    <div className="group block bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl overflow-hidden hover:shadow-xl transition-all h-full flex flex-col relative">
+    <div className="group block bg-white border border-slate-200 rounded-xl overflow-hidden hover:shadow-md hover:border-slate-300 transition-all h-full flex flex-col relative">
       <Link href={`/courses/${courseId}`} className="flex-grow flex flex-col">
         {/* Course Image */}
-        <div className="relative aspect-video overflow-hidden bg-slate-100 dark:bg-slate-800">
+        <div className="relative aspect-video overflow-hidden bg-slate-100">
           {displayImage ? (
-             <Image 
-               src={displayImage} 
-               alt={title} 
+             <Image
+               src={displayImage}
+               alt={title}
                fill
-               className="object-cover group-hover:scale-110 transition-transform duration-500" 
+               className="object-cover group-hover:scale-105 transition-transform duration-300"
              />
           ) : (
-            <div className="absolute inset-0 bg-gradient-to-br from-blue-800/20 to-cyan-500/20 group-hover:scale-110 transition-transform duration-500 flex items-center justify-center">
-              <span className="text-4xl font-bold text-blue-800/10 dark:text-blue-400/5 select-none">ITS-DONE</span>
+            <div className="absolute inset-0 bg-blue-50 flex items-center justify-center">
+              <span className="text-lg font-semibold text-blue-600/30 select-none">ITS-DONE</span>
             </div>
           )}
-          
+
           {badge && (
-            <div className="absolute top-3 left-3 px-2 py-1 bg-white/90 dark:bg-slate-950/90 backdrop-blur-sm rounded-lg text-[10px] font-bold uppercase tracking-wider text-blue-800 shadow-sm">
+            <div className="absolute top-2.5 left-2.5 px-2 py-0.5 bg-white/95 backdrop-blur-sm rounded-md text-[10px] font-semibold uppercase tracking-wide text-blue-600 shadow-sm">
               {badge}
             </div>
           )}
         </div>
 
         {/* Content */}
-        <div className="p-5 flex flex-col flex-grow space-y-3">
-          <h3 className="font-bold text-lg leading-tight group-hover:text-blue-800 transition-colors line-clamp-2">
+        <div className="p-4 flex flex-col flex-grow space-y-2.5">
+          <h3 className="font-semibold text-base leading-snug group-hover:text-blue-600 transition-colors line-clamp-2">
             {title}
           </h3>
-          
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <User className="w-4 h-4" />
-            <span>{displayInstructor}</span>
+
+          <div className="flex items-center gap-2 text-sm text-slate-500">
+            <User className="w-3.5 h-3.5" aria-hidden="true" />
+            <span className="truncate">{displayInstructor}</span>
           </div>
 
-          <div className="flex items-center gap-1.5 py-1">
+          <div className="flex items-center gap-1.5">
             <div className="flex items-center gap-0.5 text-amber-500">
-              <Star className="w-3.5 h-3.5 fill-current" />
-              <span className="text-sm font-bold ml-1">{rating.toFixed(1)}</span>
+              <Star className="w-3.5 h-3.5 fill-current" aria-hidden="true" />
+              <span className="text-sm font-semibold text-slate-900 ml-0.5">{rating.toFixed(1)}</span>
             </div>
-            <span className="text-xs text-muted-foreground">({reviews.toLocaleString()})</span>
+            <span className="text-xs text-slate-400">({reviews.toLocaleString()})</span>
           </div>
 
-          <div className="flex items-center gap-4 text-xs text-muted-foreground">
+          <div className="flex items-center gap-3 text-xs text-slate-500">
             <div className="flex items-center gap-1">
-              <Clock className="w-3.5 h-3.5" />
+              <Clock className="w-3.5 h-3.5" aria-hidden="true" />
               <span>{duration}</span>
             </div>
             <div className="flex items-center gap-1">
-              <BarChart className="w-3.5 h-3.5" />
+              <BarChart className="w-3.5 h-3.5" aria-hidden="true" />
               <span>{level}</span>
             </div>
           </div>
 
-          <div className="pt-3 mt-auto flex items-center justify-between gap-2">
-            <div className="flex items-center gap-2">
-              <span className="text-xl font-extrabold">{formatPrice(price)}</span>
+          <div className="pt-2.5 mt-auto border-t border-slate-100 flex items-center justify-between gap-2">
+            <div className="flex items-baseline gap-2">
+              <span className="text-lg font-bold text-slate-900">{formatPrice(price)}</span>
               {originalPrice && (
-                <span className="text-sm text-muted-foreground line-through">{formatPrice(originalPrice)}</span>
+                <span className="text-sm text-slate-400 line-through">{formatPrice(originalPrice)}</span>
               )}
             </div>
-            
+
             {isLearner && (
               <button
                 onClick={handleAddToCart}
                 disabled={inCart}
+                aria-label={inCart ? "Already in cart" : `Add ${title} to cart`}
                 className={cn(
-                  "p-2.5 rounded-xl transition-all active:scale-95 shadow-lg",
+                  "p-2 rounded-lg transition-colors",
                   inCart
-                    ? "bg-emerald-500 text-white shadow-emerald-500/20"
-                    : "bg-blue-800 text-white hover:bg-blue-900 shadow-blue-800/20"
+                    ? "bg-emerald-50 text-emerald-600"
+                    : "bg-blue-600 text-white hover:bg-blue-700"
                 )}
               >
                 {inCart ? (
-                  <CheckCircle2 className="w-5 h-5" />
+                  <CheckCircle2 className="w-4 h-4" />
                 ) : (
-                  <ShoppingCart className="w-5 h-5" />
+                  <ShoppingCart className="w-4 h-4" />
                 )}
               </button>
             )}

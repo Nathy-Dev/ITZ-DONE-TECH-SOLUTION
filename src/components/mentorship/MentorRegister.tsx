@@ -67,19 +67,19 @@ export default function MentorRegister({ userId }: MentorRegisterProps) {
   };
 
   return (
-    <div className="bg-white dark:bg-slate-900 rounded-[32px] p-8 border border-slate-100 dark:border-slate-800 shadow-xl max-w-2xl">
+    <div className="bg-white rounded-2xl p-8 border border-slate-100 shadow-md max-w-2xl">
       <div className="mb-8">
-        <h2 className="text-2xl font-black">Become a Mentor</h2>
+        <h2 className="text-2xl font-semibold">Become a Mentor</h2>
         <p className="text-sm text-muted-foreground font-medium mt-1">Share your expertise and guide others in their tech journey.</p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="space-y-2">
-          <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mx-4">Biography</label>
+          <label className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mx-4">Biography</label>
           <textarea
             required
             placeholder="Tell us about your experience and how you can help..."
-            className="w-full h-32 px-6 py-4 bg-slate-50 dark:bg-slate-950 border-2 border-slate-100 dark:border-slate-800 rounded-2xl font-medium focus:border-blue-800 transition-colors outline-none text-sm resize-none"
+            className="w-full h-32 px-4 sm:px-6 py-3 bg-slate-50 border-2 border-slate-100 rounded-2xl font-medium focus:border-blue-600 transition-colors outline-none text-sm resize-none"
             value={formData.bio}
             onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
           />
@@ -87,35 +87,35 @@ export default function MentorRegister({ userId }: MentorRegisterProps) {
 
         <div className="grid md:grid-cols-2 gap-6">
           <div className="space-y-2">
-            <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mx-4">Expertise (comma separated)</label>
+            <label className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mx-4">Expertise (comma separated)</label>
             <input
               type="text"
               required
               placeholder="React, Node.js, Architecture..."
-              className="w-full px-6 py-4 bg-slate-50 dark:bg-slate-950 border-2 border-slate-100 dark:border-slate-800 rounded-2xl font-bold focus:border-blue-800 transition-colors outline-none text-sm"
+              className="w-full px-4 sm:px-6 py-3 bg-slate-50 border-2 border-slate-100 rounded-2xl font-bold focus:border-blue-600 transition-colors outline-none text-sm"
               value={formData.expertise}
               onChange={(e) => setFormData({ ...formData, expertise: e.target.value })}
             />
           </div>
 
           <div className="space-y-2">
-            <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mx-4">Hourly Rate (₦)</label>
+            <label className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mx-4">Hourly Rate (₦)</label>
             <input
               type="number"
               required
               min="0"
-              className="w-full px-6 py-4 bg-slate-50 dark:bg-slate-950 border-2 border-slate-100 dark:border-slate-800 rounded-2xl font-bold focus:border-blue-800 transition-colors outline-none text-sm"
+              className="w-full px-4 sm:px-6 py-3 bg-slate-50 border-2 border-slate-100 rounded-2xl font-bold focus:border-blue-600 transition-colors outline-none text-sm"
               value={formData.hourlyRate}
               onChange={(e) => setFormData({ ...formData, hourlyRate: parseInt(e.target.value) })}
             />
           </div>
         </div>
 
-        <div className="flex items-center gap-4 p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl">
+        <div className="flex items-center gap-4 p-4 bg-slate-50 rounded-2xl">
             <input 
                 type="checkbox"
                 id="isAvailable"
-                className="w-5 h-5 rounded border-slate-300 text-blue-800 focus:ring-blue-800"
+                className="w-5 h-5 rounded border-slate-300 text-blue-600 focus:ring-blue-600"
                 checked={formData.isAvailable}
                 onChange={(e) => setFormData({ ...formData, isAvailable: e.target.checked })}
             />
@@ -133,8 +133,8 @@ export default function MentorRegister({ userId }: MentorRegisterProps) {
           type="submit"
           disabled={isSaving}
           className={cn(
-            "w-full py-4 rounded-2xl font-black text-sm flex items-center justify-center gap-2 transition-all shadow-lg",
-            success ? "bg-emerald-500 text-white" : "bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:bg-black dark:hover:bg-slate-100"
+            "w-full py-3 rounded-xl font-medium text-sm flex items-center justify-center gap-2 transition-colors",
+            success ? "bg-emerald-500 text-white" : "bg-blue-600 text-white hover:bg-blue-700"
           )}
         >
           {isSaving ? (

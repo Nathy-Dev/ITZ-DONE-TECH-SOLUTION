@@ -32,34 +32,34 @@ export default function BusinessPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white dark:bg-slate-950 pt-32 pb-20">
-      <div className="max-w-7xl mx-auto px-6 md:px-12">
+    <div className="min-h-screen bg-white pt-20 pb-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Hero Section */}
-        <div className="text-center max-w-3xl mx-auto mb-20">
-          <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-cyan-400 rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-xl shadow-blue-800/10">
+        <div className="text-center max-w-3xl mx-auto mb-6">
+          <div className="w-16 h-16 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-8 shadow-md shadow-blue-600/10">
             <Briefcase className="w-8 h-8" />
           </div>
-          <h1 className="text-5xl md:text-6xl font-black tracking-tight mb-6 leading-tight">
-            Upskill your entire <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-800 to-cyan-500">engineering team</span>
+          <h1 className="text-5xl md:text-6xl font-semibold tracking-tight mb-6 leading-tight">
+            Upskill your entire <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-blue-500">engineering team</span>
           </h1>
-          <p className="text-xl text-slate-500 dark:text-slate-400 mb-10 font-medium leading-relaxed">
+          <p className="text-xl text-slate-500 mb-6 font-medium leading-relaxed">
             Get unlimited access to our premium course library, custom learning paths, and dedicated analytics for your organization.
           </p>
 
           {/* Waitlist Form */}
-          <div className="max-w-md mx-auto bg-slate-50 dark:bg-slate-900 rounded-[2rem] p-2 border border-slate-100 dark:border-slate-800 shadow-2xl relative">
+          <div className="max-w-md mx-auto bg-slate-50 rounded-2xl p-2 border border-slate-100 shadow-sm relative">
             {isSuccess ? (
               <div className="p-8 text-center animate-in fade-in zoom-in duration-500">
-                <div className="w-16 h-16 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 rounded-full flex items-center justify-center mx-auto mb-4">
+                <div className="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4">
                   <CheckCircle2 className="w-8 h-8" />
                 </div>
-                <h3 className="text-xl font-black mb-2">You&apos;re on the list!</h3>
+                <h3 className="text-xl font-semibold mb-2">You&apos;re on the list!</h3>
                 <p className="text-sm font-medium text-slate-500">We&apos;ll be in touch soon with priority access.</p>
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="flex flex-col gap-4 p-4">
                 <div className="text-left mb-2">
-                  <h3 className="font-black">Join the Business Waitlist</h3>
+                  <h3 className="font-semibold">Join the Business Waitlist</h3>
                   <p className="text-xs font-bold text-slate-500 mt-1 uppercase tracking-widest">Early access opening soon</p>
                 </div>
                 
@@ -69,7 +69,7 @@ export default function BusinessPage() {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-6 py-4 bg-white dark:bg-slate-950 border-2 border-slate-200 dark:border-slate-800 rounded-2xl font-bold focus:border-blue-800 dark:focus:border-cyan-400 focus:outline-none transition-colors"
+                  className="w-full px-4 sm:px-6 py-3 bg-white border-2 border-slate-200 rounded-2xl font-bold focus:border-blue-600 focus:outline-none transition-colors"
                 />
                 
                 {error && <p className="text-xs font-bold text-red-500 px-2 text-left">{error}</p>}
@@ -77,7 +77,7 @@ export default function BusinessPage() {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full py-4 bg-blue-800 text-white font-black rounded-2xl hover:bg-blue-900 shadow-xl shadow-blue-800/20 transition-all flex items-center justify-center gap-2 disabled:opacity-70 group"
+                  className="w-full py-3 bg-blue-600 text-white font-semibold rounded-2xl hover:bg-blue-700 shadow-md shadow-blue-600/20 transition-all flex items-center justify-center gap-2 disabled:opacity-70 group"
                 >
                   {isSubmitting ? (
                     <Loader2 className="w-5 h-5 animate-spin" />
@@ -112,11 +112,11 @@ export default function BusinessPage() {
               desc: "Enterprise-grade security with SAML SSO integration and admin controls."
             }
           ].map((feature, i) => (
-            <div key={i} className="bg-slate-50 dark:bg-slate-900 p-8 rounded-[32px] border border-slate-100 dark:border-slate-800 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300">
-              <div className="w-12 h-12 bg-white dark:bg-slate-800 text-blue-800 dark:text-cyan-400 rounded-2xl flex items-center justify-center mb-6 shadow-sm">
+            <div key={i} className="bg-slate-50 p-8 rounded-2xl border border-slate-100 hover:shadow-sm hover:-translate-y-2 transition-all duration-300">
+              <div className="w-12 h-12 bg-white text-blue-600 rounded-2xl flex items-center justify-center mb-6 shadow-sm">
                 <feature.icon className="w-6 h-6" />
               </div>
-              <h3 className="text-xl font-black mb-3">{feature.title}</h3>
+              <h3 className="text-xl font-semibold mb-3">{feature.title}</h3>
               <p className="text-slate-500 font-medium leading-relaxed">{feature.desc}</p>
             </div>
           ))}

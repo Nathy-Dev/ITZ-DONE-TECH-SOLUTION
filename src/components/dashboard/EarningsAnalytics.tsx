@@ -21,15 +21,15 @@ export default function EarningsAnalytics({ chartData }: EarningsAnalyticsProps)
   const hasData = data.some(d => d.amount > 0);
 
   return (
-    <div className="bg-white dark:bg-slate-900 rounded-[24px] md:rounded-[32px] p-5 sm:p-8 border border-slate-100 dark:border-slate-800 shadow-xl shadow-blue-800/5 mt-8 mb-8">
+    <div className="bg-white rounded-xl md:rounded-2xl p-5 sm:p-8 border border-slate-100 shadow-md shadow-blue-600/5 mt-8 mb-8">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
         <div>
-          <h2 className="text-xl sm:text-2xl font-black">Revenue Analytics</h2>
+          <h2 className="text-xl sm:text-2xl font-semibold">Revenue Analytics</h2>
           <p className="text-sm text-muted-foreground font-medium mt-1">
             Your 60% earnings share from course sales, by month.
           </p>
         </div>
-        <div className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-blue-800 dark:text-cyan-400 bg-blue-50 dark:bg-blue-900/20 px-4 py-2 rounded-xl w-fit">
+        <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-blue-600 bg-blue-50 px-4 py-2 rounded-xl w-fit">
           <TrendingUp className="w-4 h-4" />
           Last 6 Months
         </div>
@@ -58,8 +58,8 @@ export default function EarningsAnalytics({ chartData }: EarningsAnalyticsProps)
             </AreaChart>
           </ResponsiveContainer>
         ) : (
-          <div className="h-full flex flex-col items-center justify-center text-center border-2 border-dashed border-slate-100 dark:border-slate-800 rounded-3xl p-8">
-            <TrendingUp className="w-10 h-10 text-slate-200 dark:text-slate-700 mb-4" />
+          <div className="h-full flex flex-col items-center justify-center text-center border-2 border-dashed border-slate-100 rounded-2xl p-8">
+            <TrendingUp className="w-10 h-10 text-slate-200 mb-4" />
             <p className="font-bold text-muted-foreground">No earnings data yet</p>
             <p className="text-xs text-slate-400 mt-1 max-w-xs">
               Publish a course and your monthly revenue will appear here once students start enrolling.

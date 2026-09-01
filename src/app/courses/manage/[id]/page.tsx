@@ -106,7 +106,7 @@ export default function ManageCoursePage({ params }: PageProps) {
   if (!course || !isMounted || !convexUser) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-800 border-t-transparent"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-600 border-t-transparent"></div>
       </div>
     );
   }
@@ -116,18 +116,18 @@ export default function ManageCoursePage({ params }: PageProps) {
   const isAdmin = convexUser.role === "admin";
   if (!isOwner && !isAdmin) {
     return (
-      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pt-32 pb-20 px-6">
+      <div className="min-h-screen bg-slate-50 pt-20 pb-10 px-4 sm:px-6">
         <div className="max-w-md mx-auto text-center space-y-6">
-          <div className="w-20 h-20 bg-amber-100 dark:bg-amber-900/30 text-amber-600 rounded-3xl flex items-center justify-center mx-auto">
+          <div className="w-20 h-20 bg-amber-100 text-amber-600 rounded-2xl flex items-center justify-center mx-auto">
             <AlertCircle className="w-10 h-10" />
           </div>
-          <h1 className="text-3xl font-black">Not Your Course</h1>
+          <h1 className="text-3xl font-semibold">Not Your Course</h1>
           <p className="text-muted-foreground font-medium">
             You don&#39;t have permission to manage this course.
           </p>
           <Link 
             href="/dashboard"
-            className="inline-flex items-center gap-2 px-8 py-4 bg-blue-800 text-white font-black rounded-2xl hover:bg-blue-900 transition-all"
+            className="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white font-semibold rounded-2xl hover:bg-blue-700 transition-all"
           >
             <ArrowLeft className="w-4 h-4" />
             Back to Dashboard
@@ -256,18 +256,18 @@ export default function ManageCoursePage({ params }: PageProps) {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pt-24 pb-20">
+    <div className="min-h-screen bg-slate-50 pt-20 pb-10">
       <div className="max-w-5xl mx-auto px-4 sm:px-6">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8 md:mb-12">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8 md:mb-8">
           <div>
-            <Link href="/dashboard" className="inline-flex items-center gap-2 text-muted-foreground hover:text-blue-800 transition-colors mb-4">
+            <Link href="/dashboard" className="inline-flex items-center gap-2 text-muted-foreground hover:text-blue-600 transition-colors mb-4">
               <ArrowLeft className="w-4 h-4" />
               Back to Dashboard
             </Link>
             <div className="flex flex-wrap items-center gap-3">
               <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">{course.title}</h1>
               <span className={cn(
-                "px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest",
+                "px-3 py-1 rounded-full text-[10px] font-semibold uppercase tracking-widest",
                 course.status === "published" ? "bg-emerald-100 text-emerald-700" : 
                 course.status === "in_review" ? "bg-blue-100 text-blue-700" :
                 course.status === "rejected" ? "bg-red-100 text-red-700" :
@@ -284,7 +284,7 @@ export default function ManageCoursePage({ params }: PageProps) {
           <div className="flex flex-wrap items-center gap-3">
              <button 
                onClick={() => setIsSettingsOpen(true)}
-               className="flex items-center gap-2 px-5 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl font-bold hover:bg-slate-50 transition-all text-sm active:scale-95"
+               className="flex items-center gap-2 px-5 py-3 bg-white border border-slate-200 rounded-2xl font-bold hover:bg-slate-50 transition-all text-sm active:scale-95"
              >
                <Settings className="w-4 h-4" />
                Settings
@@ -295,7 +295,7 @@ export default function ManageCoursePage({ params }: PageProps) {
                   onClick={handleSubmitForReview}
                   className={cn(
                     "flex items-center gap-2 px-5 py-3 rounded-2xl font-bold transition-all text-sm active:scale-95",
-                    "bg-blue-800 text-white hover:bg-blue-900 shadow-lg shadow-blue-800/20"
+                    "bg-blue-600 text-white hover:bg-blue-700 shadow-sm shadow-blue-600/20"
                   )}
                 >
                   {isPublishing ? "Submitting..." : (
@@ -307,7 +307,7 @@ export default function ManageCoursePage({ params }: PageProps) {
                 </button>
               )}
               {course.status === "in_review" && (
-                <div className="px-5 py-3 bg-blue-50 text-blue-800 font-bold rounded-2xl text-sm border border-blue-100">
+                <div className="px-5 py-3 bg-blue-50 text-blue-600 font-bold rounded-2xl text-sm border border-blue-100">
                   Under Review
                 </div>
               )}
@@ -315,27 +315,27 @@ export default function ManageCoursePage({ params }: PageProps) {
         </div>
 
         {actionError && (
-          <div className="mb-8 p-4 bg-red-500/10 border border-red-500/20 rounded-2xl flex items-start gap-3 text-red-600 dark:text-red-400 text-sm font-bold">
+          <div className="mb-8 p-4 bg-red-500/10 border border-red-500/20 rounded-2xl flex items-start gap-3 text-red-600 text-sm font-bold">
             <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
             {actionError}
           </div>
         )}
 
         {course.status === "rejected" && course.rejectionReason && (
-          <div className="mb-8 p-6 bg-red-50 dark:bg-red-900/10 border border-red-200 dark:border-red-900/30 rounded-[24px] md:rounded-[32px]">
-            <h3 className="text-red-800 dark:text-red-400 font-bold text-lg mb-2">Changes Requested</h3>
-            <p className="text-red-900/70 dark:text-red-200/70">{course.rejectionReason}</p>
+          <div className="mb-8 p-6 bg-red-50 border border-red-200 rounded-xl md:rounded-2xl">
+            <h3 className="text-red-800 font-bold text-lg mb-2">Changes Requested</h3>
+            <p className="text-red-900/70">{course.rejectionReason}</p>
           </div>
         )}
 
         <div className="grid lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-6">
-            <div className="bg-white dark:bg-slate-900 rounded-[24px] md:rounded-[32px] p-5 sm:p-8 border border-slate-100 dark:border-slate-800 shadow-xl shadow-blue-800/5">
+            <div className="bg-white rounded-xl md:rounded-2xl p-5 sm:p-8 border border-slate-100 shadow-md shadow-blue-600/5">
               <div className="flex items-center justify-between mb-8">
                 <h2 className="text-lg sm:text-xl font-bold">Course Curriculum</h2>
                 <button 
                   onClick={() => setIsAddingSection(true)}
-                  className="flex items-center gap-2 text-blue-800 dark:text-cyan-400 font-bold hover:underline text-sm"
+                  className="flex items-center gap-2 text-blue-600 font-bold hover:underline text-sm"
                 >
                   <PlusCircle className="w-5 h-5" />
                   Add Section
@@ -383,7 +383,7 @@ export default function ManageCoursePage({ params }: PageProps) {
                 </DragDropContext>
 
                 {isAddingSection && (
-                  <div className="p-5 sm:p-6 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-blue-800/30 animate-in fade-in slide-in-from-top-4 mt-4">
+                  <div className="p-5 sm:p-6 bg-slate-50 rounded-2xl border border-blue-600/30 animate-in fade-in slide-in-from-top-4 mt-4">
                     <input 
                       autoFocus
                       type="text" 
@@ -395,13 +395,13 @@ export default function ManageCoursePage({ params }: PageProps) {
                     />
                     <div className="flex justify-end gap-3">
                       <button onClick={() => setIsAddingSection(false)} className="px-4 py-2.5 text-slate-500 font-bold hover:text-slate-700 transition-colors">Cancel</button>
-                      <button onClick={handleCreateSection} className="px-6 py-2.5 bg-blue-800 text-white rounded-xl font-bold hover:bg-blue-900 transition-all active:scale-95">Save Section</button>
+                      <button onClick={handleCreateSection} className="px-4 sm:px-6 py-2.5 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 transition-all active:scale-95">Save Section</button>
                     </div>
                   </div>
                 )}
 
                 {sections.length === 0 && !isAddingSection && (
-                  <div className="text-center py-12 border-2 border-dashed border-slate-100 dark:border-slate-800 rounded-[24px] md:rounded-[32px] mt-4 px-4">
+                  <div className="text-center py-12 border-2 border-dashed border-slate-100 rounded-xl md:rounded-2xl mt-4 px-4">
                     <p className="text-muted-foreground">No sections yet. Start by adding your first section.</p>
                   </div>
                 )}
@@ -410,7 +410,7 @@ export default function ManageCoursePage({ params }: PageProps) {
           </div>
 
           <div className="space-y-6">
-            <div className="bg-slate-900 text-white rounded-[24px] md:rounded-[32px] p-6 sm:p-8">
+            <div className="bg-blue-600 text-white rounded-xl p-6">
               <h3 className="font-bold text-lg mb-4">Course Progress</h3>
               <div className="space-y-4">
                 <div className="flex justify-between text-sm">
@@ -424,9 +424,9 @@ export default function ManageCoursePage({ params }: PageProps) {
               </div>
             </div>
 
-            <div className="bg-blue-50 dark:bg-blue-900/10 rounded-[24px] md:rounded-[32px] p-6 sm:p-8 border border-blue-100 dark:border-blue-900/30">
-              <h3 className="font-bold text-lg text-blue-800 dark:text-cyan-400 mb-2">Pro Tip</h3>
-              <p className="text-sm text-blue-900/70 dark:text-blue-200/70 leading-relaxed">
+            <div className="bg-blue-50 rounded-xl md:rounded-2xl p-6 sm:p-8 border border-blue-100">
+              <h3 className="font-bold text-lg text-blue-600 mb-2">Pro Tip</h3>
+              <p className="text-sm text-blue-700/70 leading-relaxed">
                 Break your course into small, manageable lessons (5-10 minutes) to keep students engaged. On desktop, drag the grip handle to reorder — on mobile, use the ▲▼ buttons.
               </p>
             </div>
@@ -526,18 +526,18 @@ function CourseSettingsModal({ course, onClose, providerId }: {
     }
   };
 
-  const inputClass = "w-full px-4 py-3 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-800/20 text-sm";
+  const inputClass = "w-full px-4 py-3 bg-slate-50  border border-slate-200  rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600/20 text-sm";
   const labelClass = "text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1.5 block";
 
   return (
     <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center bg-slate-950/40 backdrop-blur-sm p-0 sm:p-6">
-      <div className="bg-white dark:bg-slate-900 w-full sm:max-w-2xl rounded-t-[32px] sm:rounded-[32px] shadow-2xl overflow-hidden animate-in slide-in-from-bottom-4 sm:zoom-in-95 duration-200 max-h-[92vh] sm:max-h-[90vh] flex flex-col">
-        <div className="p-5 sm:p-8 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50/50 dark:bg-slate-800/50 shrink-0">
+      <div className="bg-white w-full sm:max-w-2xl rounded-t-[32px] sm:rounded-2xl shadow-sm overflow-hidden animate-in slide-in-from-bottom-4 sm:zoom-in-95 duration-200 max-h-[92vh] sm:max-h-[90vh] flex flex-col">
+        <div className="p-5 sm:p-8 border-b border-slate-100 flex items-center justify-between bg-slate-50/50 shrink-0">
           <div>
             <h2 className="text-xl sm:text-2xl font-bold">Course Settings</h2>
             <p className="text-xs sm:text-sm text-muted-foreground truncate max-w-[200px] sm:max-w-md">{course.title}</p>
           </div>
-          <button onClick={onClose} className="p-2 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-full transition-colors shrink-0">
+          <button onClick={onClose} className="p-2 hover:bg-slate-200 rounded-full transition-colors shrink-0">
             <X className="w-6 h-6" />
           </button>
         </div>
@@ -567,7 +567,7 @@ function CourseSettingsModal({ course, onClose, providerId }: {
             <div className="space-y-2">
               <label className={labelClass}>Price (₦ — 0 for free)</label>
               <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 font-black text-slate-400 text-sm">₦</span>
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 font-semibold text-slate-400 text-sm">₦</span>
                 <input 
                   type="number"
                   min="0"
@@ -642,7 +642,7 @@ function CourseSettingsModal({ course, onClose, providerId }: {
               type="button"
               onClick={() => fileInputRef.current?.click()}
               disabled={isUploading}
-              className="w-full p-4 border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-xl text-sm font-bold text-slate-500 hover:border-blue-800 hover:text-blue-800 transition-all flex items-center justify-center gap-2 disabled:opacity-60"
+              className="w-full p-4 border-2 border-dashed border-slate-200 rounded-xl text-sm font-bold text-slate-500 hover:border-blue-600 hover:text-blue-600 transition-all flex items-center justify-center gap-2 disabled:opacity-60"
             >
               {isUploading ? (
                 <><Loader2 className="w-4 h-4 animate-spin" /> Uploading…</>
@@ -653,24 +653,24 @@ function CourseSettingsModal({ course, onClose, providerId }: {
           </div>
 
           {error && (
-            <div className="flex items-start gap-3 p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-600 dark:text-red-400 text-xs font-bold">
+            <div className="flex items-start gap-3 p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-600 text-xs font-bold">
               <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
               {error}
             </div>
           )}
         </div>
 
-        <div className="p-5 sm:p-8 border-t border-slate-100 dark:border-slate-800 flex flex-col-reverse sm:flex-row justify-end gap-3 bg-slate-50/50 dark:bg-slate-800/50 shrink-0">
+        <div className="p-5 sm:p-8 border-t border-slate-100 flex flex-col-reverse sm:flex-row justify-end gap-3 bg-slate-50/50 shrink-0">
           <button 
             onClick={onClose}
-            className="px-6 py-3 font-bold text-slate-500 hover:text-slate-700 transition-colors"
+            className="px-4 sm:px-6 py-3 font-bold text-slate-500 hover:text-slate-700 transition-colors"
           >
             Cancel
           </button>
           <button 
             disabled={isSaving || isUploading}
             onClick={handleSave}
-            className="px-8 py-3 bg-blue-800 text-white rounded-2xl font-bold shadow-lg shadow-blue-800/20 hover:bg-blue-900 transition-all flex items-center justify-center gap-2 disabled:opacity-60 active:scale-95"
+            className="px-8 py-3 bg-blue-600 text-white rounded-2xl font-bold shadow-sm shadow-blue-600/20 hover:bg-blue-700 transition-all flex items-center justify-center gap-2 disabled:opacity-60 active:scale-95"
           >
             {isSaving ? (
               <><Loader2 className="w-4 h-4 animate-spin" /> Saving…</>
@@ -780,8 +780,8 @@ function SectionItem({
   };
 
   return (
-    <div className="border border-slate-100 dark:border-slate-800 rounded-2xl overflow-hidden bg-white dark:bg-slate-900">
-      <div className="bg-slate-50 dark:bg-slate-800/30 p-4 sm:p-5 flex items-center justify-between gap-3 group">
+    <div className="border border-slate-100 rounded-2xl overflow-hidden bg-white">
+      <div className="bg-slate-50 p-4 sm:p-5 flex items-center justify-between gap-3 group">
         <div className="flex items-center gap-2 sm:gap-3 font-bold min-w-0">
           <div {...dragHandleProps} className="hidden md:block shrink-0">
             <GripVertical className="w-5 h-5 text-slate-300 cursor-grab active:cursor-grabbing hover:text-slate-500 transition-colors" />
@@ -794,7 +794,7 @@ function SectionItem({
             <button 
               onClick={onMoveUp} 
               disabled={!onMoveUp}
-              className="p-1 text-slate-400 hover:text-blue-800 disabled:opacity-30 transition-colors"
+              className="p-1 text-slate-400 hover:text-blue-600 disabled:opacity-30 transition-colors"
               aria-label="Move section up"
             >
               <ChevronUp className="w-4 h-4" />
@@ -802,16 +802,16 @@ function SectionItem({
             <button 
               onClick={onMoveDown} 
               disabled={!onMoveDown}
-              className="p-1 text-slate-400 hover:text-blue-800 disabled:opacity-30 transition-colors"
+              className="p-1 text-slate-400 hover:text-blue-600 disabled:opacity-30 transition-colors"
               aria-label="Move section down"
             >
               <ChevronDown className="w-4 h-4" />
             </button>
           </div>
-          <button onClick={onAddLesson} className="p-2 hover:bg-white dark:hover:bg-slate-700 rounded-lg text-blue-800 dark:text-cyan-400 transition-colors" aria-label="Add lesson">
+          <button onClick={onAddLesson} className="p-2 hover:bg-white rounded-lg text-blue-600 transition-colors" aria-label="Add lesson">
             <Plus className="w-5 h-5" />
           </button>
-          <button onClick={onDelete} className="p-2 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg text-red-500 transition-colors" aria-label="Delete section">
+          <button onClick={onDelete} className="p-2 hover:bg-red-50 rounded-lg text-red-500 transition-colors" aria-label="Delete section">
             <Trash2 className="w-4 h-4" />
           </button>
         </div>
@@ -828,13 +828,13 @@ function SectionItem({
                       <div
                         ref={provided.innerRef}
                         {...provided.draggableProps}
-                        className="flex items-center justify-between p-3 sm:p-4 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/50 group transition-colors bg-white dark:bg-slate-900 gap-2"
+                        className="flex items-center justify-between p-3 sm:p-4 rounded-xl hover:bg-slate-50 group transition-colors bg-white gap-2"
                       >
                         <div className="flex items-center gap-2 sm:gap-3 min-w-0">
                            <div {...provided.dragHandleProps} className="hidden sm:block text-slate-300 hover:text-slate-500 cursor-grab active:cursor-grabbing shrink-0">
                              <GripVertical className="w-4 h-4" />
                            </div>
-                           <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-cyan-400 rounded-lg flex items-center justify-center shrink-0">
+                           <div className="w-8 h-8 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center shrink-0">
                              <PlayCircle className="w-4 h-4" />
                            </div>
                            <span className="text-sm font-medium truncate">{lesson.title}</span>
@@ -845,7 +845,7 @@ function SectionItem({
                              <button 
                                onClick={() => moveLesson(index, -1)} 
                                disabled={index === 0}
-                               className="p-1 text-slate-400 hover:text-blue-800 disabled:opacity-30 transition-colors"
+                               className="p-1 text-slate-400 hover:text-blue-600 disabled:opacity-30 transition-colors"
                                aria-label="Move lesson up"
                              >
                                <ChevronUp className="w-3.5 h-3.5" />
@@ -853,7 +853,7 @@ function SectionItem({
                              <button 
                                onClick={() => moveLesson(index, 1)} 
                                disabled={index === lessons.length - 1}
-                               className="p-1 text-slate-400 hover:text-blue-800 disabled:opacity-30 transition-colors"
+                               className="p-1 text-slate-400 hover:text-blue-600 disabled:opacity-30 transition-colors"
                                aria-label="Move lesson down"
                              >
                                <ChevronDown className="w-3.5 h-3.5" />
@@ -861,12 +861,12 @@ function SectionItem({
                            </div>
                            <button 
                             onClick={() => onEditLesson(lesson._id)}
-                            className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg text-slate-500 transition-colors"
+                            className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-500 transition-colors"
                             aria-label="Edit lesson"
                            >
                              <Pencil className="w-3.5 h-3.5" />
                            </button>
-                           <button onClick={() => deleteLesson(lesson._id)} className="p-1.5 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg text-red-500 transition-colors" aria-label="Delete lesson">
+                           <button onClick={() => deleteLesson(lesson._id)} className="p-1.5 hover:bg-red-50 rounded-lg text-red-500 transition-colors" aria-label="Delete lesson">
                              <Trash2 className="w-3.5 h-3.5" />
                            </button>
                         </div>
@@ -881,7 +881,7 @@ function SectionItem({
         </DragDropContext>
 
         {isAddingLesson && (
-          <div className="p-4 bg-blue-50/50 dark:bg-blue-900/5 rounded-xl border border-blue-200 dark:border-blue-900/30 mt-2">
+          <div className="p-4 bg-blue-50/50 rounded-xl border border-blue-200 mt-2">
             <input 
                autoFocus
                type="text" 
@@ -893,7 +893,7 @@ function SectionItem({
             />
             <div className="flex justify-end gap-2">
               <button onClick={onCancelLesson} className="text-xs font-bold text-slate-500 hover:text-slate-700">Cancel</button>
-              <button onClick={onSubmitLesson} className="bg-blue-800 text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-blue-900 transition-all active:scale-95">
+              <button onClick={onSubmitLesson} className="bg-blue-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-blue-700 transition-all active:scale-95">
                 Add Lesson
               </button>
             </div>
@@ -914,7 +914,7 @@ function LessonEditor({ lessonId, onClose, updateLesson, providerId }: {
 }) {
   return (
     <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center bg-slate-950/40 backdrop-blur-sm p-0 sm:p-6">
-      <div className="bg-white dark:bg-slate-900 w-full sm:max-w-2xl rounded-t-[32px] sm:rounded-[32px] shadow-2xl overflow-hidden animate-in slide-in-from-bottom-4 sm:zoom-in-95 duration-200">
+      <div className="bg-white w-full sm:max-w-2xl rounded-t-[32px] sm:rounded-2xl shadow-sm overflow-hidden animate-in slide-in-from-bottom-4 sm:zoom-in-95 duration-200">
         <LessonEditorForm lessonId={lessonId} onClose={onClose} updateLesson={updateLesson} providerId={providerId} />
       </div>
     </div>
@@ -952,7 +952,7 @@ function LessonEditorForm({ lessonId, onClose, updateLesson, providerId }: {
 
   if (!lesson || !formData) return (
     <div className="p-12 flex items-center justify-center">
-      <div className="animate-spin rounded-full h-8 w-8 border-4 border-blue-800 border-t-transparent"></div>
+      <div className="animate-spin rounded-full h-8 w-8 border-4 border-blue-600 border-t-transparent"></div>
     </div>
   );
 
@@ -973,17 +973,17 @@ function LessonEditorForm({ lessonId, onClose, updateLesson, providerId }: {
     }
   };
 
-  const inputClass = "w-full px-4 py-3 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-800/20 text-sm";
+  const inputClass = "w-full px-4 py-3 bg-slate-50  border border-slate-200  rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600/20 text-sm";
   const labelClass = "text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1.5 block";
 
   return (
     <div className="flex flex-col h-full max-h-[92vh] sm:max-h-[90vh]">
-      <div className="p-5 sm:p-8 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50/50 dark:bg-slate-800/50 shrink-0">
+      <div className="p-5 sm:p-8 border-b border-slate-100 flex items-center justify-between bg-slate-50/50 shrink-0">
         <div className="min-w-0">
           <h2 className="text-xl sm:text-2xl font-bold">Edit Lesson</h2>
           <p className="text-xs sm:text-sm text-muted-foreground truncate">{formData.title}</p>
         </div>
-        <button onClick={onClose} className="p-2 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-full transition-colors shrink-0">
+        <button onClick={onClose} className="p-2 hover:bg-slate-200 rounded-full transition-colors shrink-0">
           <X className="w-6 h-6" />
         </button>
       </div>
@@ -1039,7 +1039,7 @@ function LessonEditorForm({ lessonId, onClose, updateLesson, providerId }: {
           />
         </div>
 
-        <div className="flex items-center gap-3 p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl">
+        <div className="flex items-center gap-3 p-4 bg-slate-50 rounded-2xl">
            <input 
              type="checkbox" 
              id="isFree"
@@ -1051,24 +1051,24 @@ function LessonEditorForm({ lessonId, onClose, updateLesson, providerId }: {
         </div>
 
         {error && (
-          <div className="flex items-start gap-3 p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-600 dark:text-red-400 text-xs font-bold">
+          <div className="flex items-start gap-3 p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-600 text-xs font-bold">
             <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
             {error}
           </div>
         )}
       </div>
 
-      <div className="p-5 sm:p-8 border-t border-slate-100 dark:border-slate-800 flex flex-col-reverse sm:flex-row justify-end gap-3 bg-slate-50/50 dark:bg-slate-800/50 shrink-0">
+      <div className="p-5 sm:p-8 border-t border-slate-100 flex flex-col-reverse sm:flex-row justify-end gap-3 bg-slate-50/50 shrink-0">
         <button 
           onClick={onClose}
-          className="px-6 py-3 font-bold text-slate-500 hover:text-slate-700 transition-colors"
+          className="px-4 sm:px-6 py-3 font-bold text-slate-500 hover:text-slate-700 transition-colors"
         >
           Cancel
         </button>
         <button 
           disabled={isSaving}
           onClick={handleSave}
-          className="px-8 py-3 bg-blue-800 text-white rounded-2xl font-bold shadow-lg shadow-blue-800/20 hover:bg-blue-900 transition-all flex items-center justify-center gap-2 disabled:opacity-60 active:scale-95"
+          className="px-8 py-3 bg-blue-600 text-white rounded-2xl font-bold shadow-sm shadow-blue-600/20 hover:bg-blue-700 transition-all flex items-center justify-center gap-2 disabled:opacity-60 active:scale-95"
         >
           {isSaving ? "Saving..." : <><Save className="w-4 h-4" /> Save Changes</>}
         </button>

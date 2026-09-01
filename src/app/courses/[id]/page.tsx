@@ -76,8 +76,8 @@ export default function CourseDetailPage({ params }: PageProps) {
 
   if (!course) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950">
-        <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-800 border-t-transparent"></div>
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+        <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-600 border-t-transparent"></div>
       </div>
     );
   }
@@ -166,54 +166,53 @@ export default function CourseDetailPage({ params }: PageProps) {
   const isEnrolled = !!enrollment;
 
   return (
-    <div className="pt-24 pb-20 bg-white dark:bg-slate-950">
-      {/* Course Header Banner (Dark) */}
-      <section className="bg-slate-900 text-white py-20 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-900/20 to-transparent" />
-        <div className="max-w-7xl mx-auto px-6 md:px-12 grid lg:grid-cols-3 gap-12 relative z-10">
-          <div className="lg:col-span-2 space-y-6">
-            <nav className="text-xs font-black uppercase tracking-widest text-slate-400 flex gap-2">
-              <Link href="/courses" className="hover:text-cyan-400 transition-colors">Courses</Link>
+    <div className="pt-20 pb-10 bg-white">
+      {/* Course Header Banner */}
+      <section className="bg-blue-50 border-b border-blue-100 py-8 md:py-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid lg:grid-cols-3 gap-8">
+          <div className="lg:col-span-2 space-y-4">
+            <nav aria-label="Breadcrumb" className="text-xs font-medium text-slate-500 flex gap-2">
+              <Link href="/courses" className="hover:text-blue-600 transition-colors">Courses</Link>
               <span>/</span>
-              <span className="text-cyan-400">{course.category}</span>
+              <span className="text-blue-600">{course.category}</span>
               <span>/</span>
               <span>{course.level}</span>
             </nav>
             
-            <h1 className="text-4xl md:text-5xl font-black tracking-tight leading-tight">
+            <h1 className="text-3xl md:text-4xl font-bold tracking-tight leading-tight text-slate-900">
               {course.title}
             </h1>
             
-            <p className="text-xl text-slate-300 leading-relaxed max-w-3xl">
+            <p className="text-base md:text-lg text-slate-600 leading-relaxed max-w-3xl">
               {course.description}
             </p>
 
-            <div className="flex flex-wrap items-center gap-8 text-sm">
-              <div className="flex items-center gap-2 text-amber-400">
-                <span className="font-black text-2xl">{course.rating.toFixed(1)}</span>
+            <div className="flex flex-wrap items-center gap-6 text-sm">
+              <div className="flex items-center gap-2 text-amber-500">
+                <span className="font-bold text-xl text-slate-900">{course.rating.toFixed(1)}</span>
                 <div className="flex">
                   {[1, 2, 3, 4, 5].map((i: number) => (
                     <Star key={i} className={cn("w-4 h-4 fill-current", i > Math.floor(course.rating) && "opacity-30")} />
                   ))}
                 </div>
-                <span className="text-slate-400 ml-1">({course.totalReviews} reviews)</span>
+                <span className="text-slate-500 ml-1">({course.totalReviews} reviews)</span>
               </div>
-              <div className="flex items-center gap-2 text-slate-300">
-                <Users className="w-5 h-5 text-cyan-400" />
-                <span className="font-bold">{course.studentsEnrolled.toLocaleString()} students</span>
+              <div className="flex items-center gap-2 text-slate-600">
+                <Users className="w-4 h-4 text-blue-600" />
+                <span className="font-medium">{course.studentsEnrolled.toLocaleString()} students</span>
               </div>
             </div>
 
-            <div className="flex flex-wrap items-center gap-8 text-sm text-slate-300 pt-4">
+            <div className="flex flex-wrap items-center gap-6 text-sm text-slate-600">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-full bg-blue-800 flex items-center justify-center font-bold text-[10px] overflow-hidden">
+                <div className="w-7 h-7 rounded-full bg-blue-600 flex items-center justify-center font-semibold text-[10px] text-white overflow-hidden">
                   {course.instructor?.profileImage ? (
-                    <Image src={course.instructor.profileImage} alt={course.instructor.name} width={32} height={32} className="object-cover" />
+                    <Image src={course.instructor.profileImage} alt={course.instructor.name} width={28} height={28} className="object-cover" />
                   ) : (
                     course.instructor?.name.substring(0, 2).toUpperCase() || "IN"
                   )}
                 </div>
-                <span>Created by <span className="text-cyan-400 font-bold">{course.instructor?.name || "Instructor"}</span></span>
+                <span>Created by <span className="text-blue-600 font-medium">{course.instructor?.name || "Instructor"}</span></span>
               </div>
               <div className="flex items-center gap-2">
                 <Calendar className="w-4 h-4 text-slate-400" />
@@ -228,19 +227,19 @@ export default function CourseDetailPage({ params }: PageProps) {
         </div>
       </section>
 
-      <div className="max-w-7xl mx-auto px-6 md:px-12 mt-12 grid lg:grid-cols-3 gap-16">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8 grid lg:grid-cols-3 gap-8">
         {/* Main Content (Left) */}
-        <div className="lg:col-span-2 space-y-16">
+        <div className="lg:col-span-2 space-y-8">
           {/* What you'll learn */}
-          <section className="p-10 bg-slate-50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-800 rounded-[32px]">
-            <h2 className="text-2xl font-black mb-8">What you&apos;ll learn</h2>
-            <div className="grid sm:grid-cols-2 gap-8">
+          <section className="p-6 md:p-8 bg-slate-50 border border-slate-200 rounded-xl">
+            <h2 className="text-xl font-bold mb-6">What you&apos;ll learn</h2>
+            <div className="grid sm:grid-cols-2 gap-5">
               {whatYouWillLearn.map((item: string, idx: number) => (
                 <div key={idx} className="flex gap-4">
-                  <div className="w-6 h-6 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center shrink-0">
-                    <CheckCircle2 className="w-4 h-4 text-blue-800 dark:text-cyan-400" />
+                  <div className="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center shrink-0">
+                    <CheckCircle2 className="w-4 h-4 text-blue-600" />
                   </div>
-                  <p className="text-sm dark:text-slate-300 leading-relaxed font-medium">{item}</p>
+                  <p className="text-sm leading-relaxed font-medium">{item}</p>
                 </div>
               ))}
             </div>
@@ -248,9 +247,9 @@ export default function CourseDetailPage({ params }: PageProps) {
 
           {/* Curriculum */}
           <section>
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
-              <h2 className="text-2xl font-black">Course Curriculum</h2>
-              <div className="flex gap-4 text-sm font-bold text-slate-500">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+              <h2 className="text-xl font-bold">Course Curriculum</h2>
+              <div className="flex gap-4 text-sm text-slate-500">
                 <span>{sections?.length || 0} sections</span>
                 <span>•</span>
                 <span>{course.duration} total length</span>
@@ -267,8 +266,8 @@ export default function CourseDetailPage({ params }: PageProps) {
                ))}
                
                {sections?.length === 0 && (
-                 <div className="text-center py-12 border-2 border-dashed border-slate-100 dark:border-slate-800 rounded-[32px]">
-                   <p className="text-muted-foreground uppercase font-black text-xs tracking-widest">No content available yet</p>
+                 <div className="text-center py-12 border border-dashed border-slate-200 rounded-xl">
+                   <p className="text-slate-500 text-sm">No content available yet</p>
                  </div>
                )}
             </div>
@@ -280,10 +279,10 @@ export default function CourseDetailPage({ params }: PageProps) {
           </section>
 
           {/* Instructor Placeholder */}
-          <section className="p-10 border border-slate-100 dark:border-slate-800 rounded-[32px]">
-            <h2 className="text-2xl font-black mb-8 text-blue-800 dark:text-cyan-400">Your Instructor</h2>
-            <div className="flex flex-col md:flex-row gap-8 items-start">
-              <div className="w-24 h-24 bg-slate-900 rounded-3xl flex items-center justify-center text-white font-black text-3xl shadow-2xl overflow-hidden">
+          <section className="p-6 md:p-8 border border-slate-200 rounded-xl">
+            <h2 className="text-xl font-bold mb-6 text-blue-600">Your Instructor</h2>
+            <div className="flex flex-col md:flex-row gap-6 items-start">
+              <div className="w-20 h-20 bg-blue-600 rounded-xl flex items-center justify-center text-white font-semibold text-2xl overflow-hidden">
                 {course.instructor?.profileImage ? (
                   <Image src={course.instructor.profileImage} alt={course.instructor.name} width={96} height={96} className="object-cover" />
                 ) : (
@@ -292,10 +291,10 @@ export default function CourseDetailPage({ params }: PageProps) {
               </div>
               <div className="flex-grow space-y-4">
                 <div>
-                  <h3 className="text-2xl font-black">{course.instructor?.name || "Lead Instructor"}</h3>
-                  <p className="text-blue-800 dark:text-cyan-400 font-bold">Expert Educator</p>
+                  <h3 className="text-xl font-semibold">{course.instructor?.name || "Lead Instructor"}</h3>
+                  <p className="text-blue-600 font-medium text-sm">Expert Educator</p>
                 </div>
-                <div className="flex gap-8 text-xs font-black uppercase tracking-widest text-slate-500">
+                <div className="flex gap-6 text-xs text-slate-500">
                   <div className="flex items-center gap-2">
                     <Star className="w-4 h-4 text-amber-500 fill-current" />
                     <span>4.9 Rating</span>
@@ -305,7 +304,7 @@ export default function CourseDetailPage({ params }: PageProps) {
                     <span>{course.studentsEnrolled.toLocaleString()} Students</span>
                   </div>
                 </div>
-                <p className="text-slate-600 dark:text-slate-400 leading-relaxed font-medium">
+                <p className="text-slate-600 leading-relaxed font-medium">
                   {course.instructor?.bio || "Leading expert in the field with years of practical experience and a passion for teaching modern technologies."}
                 </p>
               </div>
@@ -315,9 +314,9 @@ export default function CourseDetailPage({ params }: PageProps) {
 
         {/* Sidebar (Right) */}
         <div className="relative">
-          <div className="sticky top-32 p-1 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-[3rem] shadow-2xl overflow-hidden">
+          <div className="sticky top-20 bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
             {/* Preview Section */}
-            <div className="relative aspect-video bg-slate-900 rounded-[2.75rem] flex items-center justify-center group overflow-hidden m-2">
+            <div className="relative aspect-video bg-slate-900 flex items-center justify-center group overflow-hidden">
               {displayImage ? (
                 <Image 
                   src={displayImage} 
@@ -326,21 +325,21 @@ export default function CourseDetailPage({ params }: PageProps) {
                   className="object-cover opacity-60 group-hover:scale-105 transition-transform duration-700"
                 />
               ) : (
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-800/40 to-cyan-500/40" />
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-600/40 to-blue-500/40" />
               )}
               <div className="absolute inset-0 bg-slate-950/20 group-hover:bg-slate-950/40 transition-colors" />
-              <PlayCircle className="w-20 h-20 text-white fill-white/10 relative z-10 group-hover:scale-110 transition-transform cursor-pointer drop-shadow-2xl" />
-              <p className="absolute bottom-6 text-white text-[10px] font-black uppercase tracking-[0.2em] z-10 opacity-80">Preview Course</p>
+              <PlayCircle className="w-16 h-16 text-white fill-white/10 relative z-10 group-hover:scale-105 transition-transform cursor-pointer" />
+              <p className="absolute bottom-4 text-white text-[10px] font-medium uppercase tracking-widest z-10 opacity-80">Preview Course</p>
             </div>
 
-            <div className="p-10 space-y-8">
-              <div className="flex items-center gap-4 flex-wrap">
-                <span className="text-4xl sm:text-5xl font-black tracking-tighter">{formatPrice(course.price)}</span>
+            <div className="p-6 space-y-6">
+              <div className="flex items-center gap-3 flex-wrap">
+                <span className="text-3xl font-bold text-slate-900">{formatPrice(course.price)}</span>
                 <div className="flex flex-col">
                   {course.price > 0 && (
                     <>
-                      <span className="text-sm sm:text-lg text-slate-400 line-through font-bold">{formatPrice(Math.round(course.price * 2.5))}</span>
-                      <span className="text-blue-800 dark:text-cyan-400 font-black text-xs uppercase tracking-widest">60% OFF</span>
+                      <span className="text-sm text-slate-400 line-through">{formatPrice(Math.round(course.price * 2.5))}</span>
+                      <span className="text-blue-600 font-semibold text-xs uppercase tracking-wide">60% OFF</span>
                     </>
                   )}
                 </div>
@@ -351,21 +350,21 @@ export default function CourseDetailPage({ params }: PageProps) {
                 </p>
               )}
 
-              <div className="space-y-4">
+              <div className="space-y-3">
                 {isEnrolled ? (
-                  <Link 
+                  <Link
                     href={`/courses/${courseId}/lessons/start`} // We'll handle 'start' redirect in the viewer or helper
-                    className="w-full py-5 bg-emerald-600 text-white font-black rounded-2xl hover:bg-emerald-700 shadow-2xl shadow-emerald-800/30 transition-all active:scale-[0.98] text-lg flex items-center justify-center gap-2"
+                    className="w-full py-3 bg-emerald-600 text-white font-semibold rounded-xl hover:bg-emerald-700 transition-colors flex items-center justify-center gap-2"
                   >
                     Go to Course
                   </Link>
                 ) : (
-                  <button 
+                  <button
                     onClick={handleEnroll}
                     disabled={isEnrolling}
-                    className="w-full py-5 bg-blue-800 text-white font-black rounded-2xl hover:bg-blue-900 shadow-2xl shadow-blue-800/30 transition-all active:scale-[0.98] text-lg flex items-center justify-center gap-2 disabled:opacity-70"
+                    className="w-full py-3 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition-colors flex items-center justify-center gap-2 disabled:opacity-70"
                   >
-                    {isEnrolling ? <Loader2 className="w-6 h-6 animate-spin" /> : "Enroll Now"}
+                    {isEnrolling ? <Loader2 className="w-5 h-5 animate-spin" /> : "Enroll Now"}
                   </button>
                 )}
                 
@@ -385,10 +384,10 @@ export default function CourseDetailPage({ params }: PageProps) {
                     }}
                     disabled={inCart}
                     className={cn(
-                      "w-full py-5 border-2 border-slate-100 dark:border-slate-800 font-black rounded-2xl transition-all text-lg flex items-center justify-center gap-2",
-                      inCart 
-                        ? "bg-emerald-50 text-emerald-600 border-emerald-100 dark:bg-emerald-900/10 dark:text-emerald-400 dark:border-emerald-800" 
-                        : "hover:bg-slate-50 dark:hover:bg-slate-900"
+                      "w-full py-3 border border-slate-200 font-semibold rounded-xl transition-colors flex items-center justify-center gap-2",
+                      inCart
+                        ? "bg-emerald-50 text-emerald-600 border-emerald-100"
+                        : "hover:bg-slate-50"
                     )}
                   >
                     {inCart ? (
@@ -406,33 +405,25 @@ export default function CourseDetailPage({ params }: PageProps) {
                 )}
               </div>
 
-              <p className="text-[10px] text-center text-slate-400 font-black uppercase tracking-[0.1em]">30-Day Money-Back Guarantee</p>
+              <p className="text-xs text-center text-slate-400">30-Day Money-Back Guarantee</p>
 
-              <div className="space-y-5 pt-8 border-t border-slate-100 dark:border-slate-900">
-                <h5 className="font-black text-xs uppercase tracking-widest text-slate-900 dark:text-white">This course includes:</h5>
-                <ul className="space-y-4 text-sm text-slate-600 dark:text-slate-400 font-medium">
-                  <li className="flex items-center gap-4">
-                    <div className="w-6 h-6 rounded-lg bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center">
-                      <PlayCircle className="w-4 h-4 text-blue-800 dark:text-cyan-400" />
-                    </div>
+              <div className="space-y-4 pt-5 border-t border-slate-100">
+                <h5 className="font-semibold text-xs uppercase tracking-wide text-slate-900">This course includes:</h5>
+                <ul className="space-y-3 text-sm text-slate-600">
+                  <li className="flex items-center gap-3">
+                    <PlayCircle className="w-4 h-4 text-blue-600 shrink-0" />
                     <span>{course.duration} on-demand video</span>
                   </li>
-                  <li className="flex items-center gap-4">
-                    <div className="w-6 h-6 rounded-lg bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center">
-                      <Clock className="w-4 h-4 text-blue-800 dark:text-cyan-400" />
-                    </div>
+                  <li className="flex items-center gap-3">
+                    <Clock className="w-4 h-4 text-blue-600 shrink-0" />
                     <span>Full lifetime access</span>
                   </li>
-                  <li className="flex items-center gap-4">
-                    <div className="w-6 h-6 rounded-lg bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center">
-                      <BarChart className="w-4 h-4 text-blue-800 dark:text-cyan-400" />
-                    </div>
+                  <li className="flex items-center gap-3">
+                    <BarChart className="w-4 h-4 text-blue-600 shrink-0" />
                     <span>Assignments & Projects</span>
                   </li>
-                  <li className="flex items-center gap-4">
-                    <div className="w-6 h-6 rounded-lg bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center">
-                      <ShieldCheck className="w-4 h-4 text-blue-800 dark:text-cyan-400" />
-                    </div>
+                  <li className="flex items-center gap-3">
+                    <ShieldCheck className="w-4 h-4 text-blue-600 shrink-0" />
                     <span>Certificate of completion</span>
                   </li>
                 </ul>
@@ -441,14 +432,14 @@ export default function CourseDetailPage({ params }: PageProps) {
               <div className="flex justify-between items-center pt-6">
                 <button
                   onClick={handleShare}
-                  className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-slate-400 hover:text-blue-800 transition-all"
+                  className="flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-slate-400 hover:text-blue-600 transition-all"
                 >
                   <Share2 className="w-4 h-4" /> {shareCopied ? "Link Copied!" : "Share"}
                 </button>
                 <button
                   onClick={handleSave}
                   className={cn(
-                    "flex items-center gap-2 text-xs font-black uppercase tracking-widest transition-all",
+                    "flex items-center gap-2 text-xs font-semibold uppercase tracking-widest transition-all",
                     isSaved ? "text-red-500" : "text-slate-400 hover:text-red-500"
                   )}
                 >
@@ -468,24 +459,25 @@ function SectionAccordion({ section, isEnrolled }: { section: Doc<"sections">; i
   const lessons = useQuery(api.content.listLessons, { sectionId: section._id });
 
   return (
-    <div className="border border-slate-100 dark:border-slate-800 rounded-3xl overflow-hidden bg-white dark:bg-slate-900 group transition-all">
-      <button 
+    <div className="border border-slate-200 rounded-xl overflow-hidden bg-white transition-all">
+      <button
         onClick={() => setIsOpen(!isOpen)}
+        aria-expanded={isOpen}
         className={cn(
-          "w-full p-6 flex justify-between items-center transition-all",
-          isOpen ? "bg-slate-50 dark:bg-slate-800/50" : "hover:bg-slate-50/50 dark:hover:bg-slate-800/30"
+          "w-full p-4 flex justify-between items-center transition-colors",
+          isOpen ? "bg-slate-50" : "hover:bg-slate-50/50"
         )}
       >
-        <div className="flex items-center gap-5">
+        <div className="flex items-center gap-4">
           <div className={cn(
-            "w-10 h-10 rounded-2xl flex items-center justify-center transition-all",
-            isOpen ? "bg-blue-800 text-white rotate-180" : "bg-slate-100 dark:bg-slate-800 text-slate-500"
+            "w-8 h-8 rounded-lg flex items-center justify-center transition-all",
+            isOpen ? "bg-blue-600 text-white rotate-180" : "bg-slate-100 text-slate-500"
           )}>
-            <ChevronDown className="w-5 h-5" />
+            <ChevronDown className="w-4 h-4" />
           </div>
           <div className="text-left">
-            <h4 className="font-black text-lg">{section.title}</h4>
-            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">{lessons?.length || 0} lessons</p>
+            <h4 className="font-semibold text-base">{section.title}</h4>
+            <p className="text-xs text-slate-400 mt-0.5">{lessons?.length || 0} lessons</p>
           </div>
         </div>
       </button>
@@ -499,31 +491,31 @@ function SectionAccordion({ section, isEnrolled }: { section: Doc<"sections">; i
               <div 
                 key={lesson._id} 
                 className={cn(
-                  "flex items-center justify-between p-4 px-6 rounded-2xl transition-colors group/lesson",
-                  isLocked ? "bg-slate-50/50 dark:bg-slate-900/50 opacity-60 cursor-not-allowed" : "hover:bg-slate-50 dark:hover:bg-slate-800/50"
+                  "flex items-center justify-between p-3 px-4 sm:px-5 rounded-lg transition-colors group/lesson",
+                  isLocked ? "bg-slate-50/50 opacity-60 cursor-not-allowed" : "hover:bg-slate-50"
                 )}
               >
                 <div className="flex items-center gap-4">
                    <div className={cn(
                      "w-8 h-8 rounded-lg flex items-center justify-center",
-                     isLocked ? "bg-slate-200 dark:bg-slate-800 text-slate-400" : "bg-blue-50 dark:bg-blue-900/20 text-blue-800 dark:text-cyan-400"
+                     isLocked ? "bg-slate-200 text-slate-400" : "bg-blue-50 text-blue-600"
                    )}>
                      {isLocked ? <Clock className="w-4 h-4" /> : <PlayCircle className="w-4 h-4" />}
                    </div>
                    {isLocked ? (
-                     <span className="font-bold text-sm tracking-tight">{lesson.title}</span>
+                     <span className="font-medium text-sm">{lesson.title}</span>
                    ) : (
                     <Link 
                       href={`/courses/${section.courseId}/lessons/${lesson._id}`}
-                      className="font-bold text-sm tracking-tight hover:text-blue-800 dark:hover:text-cyan-400 transition-colors"
+                      className="font-medium text-sm hover:text-blue-600 transition-colors"
                     >
                       {lesson.title}
                     </Link>
                    )}
                 </div>
-                <div className="flex items-center gap-4 text-xs font-black text-slate-400">
-                  {lesson.isFree && <span className="text-emerald-500 uppercase tracking-widest text-[10px]">Preview</span>}
-                  {isLocked && <span className="uppercase tracking-widest text-[10px]">Locked</span>}
+                <div className="flex items-center gap-4 text-xs text-slate-400">
+                  {lesson.isFree && <span className="text-emerald-600 text-[10px] font-medium">Preview</span>}
+                  {isLocked && <span className="text-slate-400 text-[10px] font-medium">Locked</span>}
                   <span>{lesson.duration || "5m"}</span>
                 </div>
               </div>
@@ -532,7 +524,7 @@ function SectionAccordion({ section, isEnrolled }: { section: Doc<"sections">; i
           
           {lessons?.length === 0 && (
             <div className="p-8 text-center">
-              <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">No lessons in this section</p>
+              <p className="text-xs text-slate-400">No lessons in this section</p>
             </div>
           )}
         </div>

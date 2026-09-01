@@ -8,23 +8,22 @@ import { cn } from "@/lib/utils";
 import { signOut, useSession } from "next-auth/react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../../convex/_generated/api";
-import { GraduationCap, BookOpen, UserCircle, Sun, Moon, LogOut, ArrowRightLeft, User, ShieldCheck } from "lucide-react";
+import { GraduationCap, BookOpen, UserCircle, LogOut, ArrowRightLeft, User, ShieldCheck } from "lucide-react";
 
 import { useRef } from "react";
 import { useCart } from "@/components/providers/CartProvider";
-import { useTheme } from "@/components/providers/ThemeProvider";
 import { usePathname } from "next/navigation";
 import { Logo } from "./Logo";
 
 /**
  * Navbar component for ITS-DONE TECH SOLUTION.
+ * Minimalist white header with a subtle border on scroll.
  */
 const Navbar = () => {
   const { data: session } = useSession();
   const pathname = usePathname();
-  
+
   const isSignedIn = !!session;
-  const { theme, toggleTheme } = useTheme();
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
@@ -35,7 +34,7 @@ const Navbar = () => {
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
-        menuRef.current && 
+        menuRef.current &&
         !menuRef.current.contains(event.target as Node) &&
         profileButtonRef.current &&
         !profileButtonRef.current.contains(event.target as Node)
@@ -47,24 +46,24 @@ const Navbar = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Handle scroll effect for glassmorphism
+  // Handle scroll effect for border + soft shadow
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
+      setIsScrolled(window.scrollY > 8);
     };
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const convexUser = useQuery(api.users.getUserByProviderId, 
-    session?.user?.id ? { 
+  const convexUser = useQuery(api.users.getUserByProviderId,
+    session?.user?.id ? {
       providerId: session.user.id,
-      email: session.user.email ?? undefined 
+      email: session.user.email ?? undefined
     } : "skip"
   );
-  
+
   const [isSwitching, setIsSwitching] = useState(false);
-  
+
   const updateUserRole = useMutation(api.users.updateUserRole);
 
   const handleSetRole = async (role: "learner" | "instructor") => {
@@ -94,40 +93,35 @@ const Navbar = () => {
   return (
     <header
       className={cn(
-        "fixed top-0 left-0 right-0 z-50 transition-all duration-300 px-6 md:px-12 py-4",
-        isScrolled 
-          ? "bg-white/80 dark:bg-slate-950/80 backdrop-blur-md shadow-sm" 
-          : "bg-transparent"
+        "fixed top-0 left-0 right-0 z-50 transition-all duration-200 px-4 sm:px-6 lg:px-8 h-16",
+        isScrolled
+          ? "bg-white/90 backdrop-blur-md border-b border-slate-200 shadow-[0_1px_3px_rgba(0,0,0,0.04)]"
+          : "bg-white border-b border-transparent"
       )}
     >
-      <div className="max-w-7xl mx-auto flex items-center justify-between">
+      <div className="max-w-7xl mx-auto h-full flex items-center justify-between gap-4">
         {/* Logo */}
-        <Link href="/" className="flex items-center group">
-          <Logo width={160} height={45} priority />
+        <Link href="/" className="flex items-center shrink-0" aria-label="ITZ-DONE TECH home">
+          <Logo width={140} height={40} priority />
         </Link>
 
         {/* Desktop Navigation */}
-        <nav className="hidden lg:flex items-center gap-8 text-sm font-medium">
-          <Link href="/courses" className="hover:text-cyan-600 transition-colors">Courses</Link>
-          {isSignedIn && <Link href="/dashboard" className="hover:text-cyan-600 transition-colors font-bold text-blue-800">Dashboard</Link>}
-          {convexUser?.role === "admin" && (
-            <Link href="/admin" className="px-3 py-1 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 rounded-lg text-xs font-bold hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors">
-              Admin
-            </Link>
-          )}
-          <Link href="/mentorship" className="hover:text-cyan-600 transition-colors">Mentorship</Link>
-
-          <Link href="/business" className="hover:text-cyan-600 transition-colors">For Business</Link>
+        <nav className="hidden lg:flex items-center gap-6 text-sm font-medium" aria-label="Main navigation">
+          <Link href="/courses" className="text-slate-600 hover:text-blue-600 transition-colors">Courses</Link>
+          {isSignedIn && <Link href="/dashboard" className="text-blue-600 hover:text-blue-700 transition-colors">Dashboard</Link>}
+          <Link href="/mentorship" className="text-slate-600 hover:text-blue-600 transition-colors">Mentorship</Link>
+          <Link href="/business" className="text-slate-600 hover:text-blue-600 transition-colors">For Business</Link>
         </nav>
 
         {/* Right Actions */}
-        <div className="flex items-center gap-4">
-          <div className="hidden md:flex items-center relative group">
-            <Search className="absolute left-3 w-4 h-4 text-muted-foreground" />
-            <input 
-              type="text" 
-              placeholder="Search courses..." 
-              className="pl-10 pr-4 py-2 bg-slate-100 dark:bg-slate-800 rounded-full text-sm w-48 focus:w-64 transition-all outline-none focus:ring-2 focus:ring-cyan-500/20"
+        <div className="flex items-center gap-2 sm:gap-3">
+          <div className="hidden md:flex items-center relative">
+            <Search className="absolute left-3 w-4 h-4 text-slate-400" aria-hidden="true" />
+            <input
+              type="text"
+              placeholder="Search courses..."
+              aria-label="Search courses"
+              className="pl-9 pr-4 py-2 bg-slate-50 border border-transparent focus:border-blue-500 rounded-lg text-sm w-44 focus:w-56 transition-all outline-none focus:ring-2 focus:ring-blue-500/20"
             />
           </div>
 
@@ -138,10 +132,10 @@ const Navbar = () => {
             onMouseEnter={() => setCartPreviewOpen(true)}
             onMouseLeave={() => setCartPreviewOpen(false)}
           >
-            <Link href="/cart" className="p-2 relative block hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors">
-              <ShoppingCart className="w-5 h-5" />
+            <Link href="/cart" aria-label={`Cart, ${itemCount} items`} className="p-2 relative block hover:bg-slate-100 rounded-lg transition-colors">
+              <ShoppingCart className="w-5 h-5 text-slate-600" />
               {itemCount > 0 && (
-                <span className="absolute top-0 right-0 w-4 h-4 bg-blue-800 text-[10px] text-white rounded-full flex items-center justify-center animate-in zoom-in duration-300">
+                <span className="absolute top-0.5 right-0.5 min-w-4 h-4 px-1 bg-blue-600 text-[10px] text-white rounded-full flex items-center justify-center font-semibold animate-in zoom-in duration-300">
                   {itemCount}
                 </span>
               )}
@@ -149,42 +143,43 @@ const Navbar = () => {
 
             {/* Floating Cart Preview */}
             {cartPreviewOpen && itemCount > 0 && (
-              <div className="absolute right-0 mt-2 w-80 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border border-slate-200 dark:border-slate-800 rounded-[24px] shadow-2xl p-4 animate-in fade-in zoom-in-95 duration-200 origin-top-right z-[110]">
-                <div className="flex items-center justify-between mb-4 px-2">
-                   <h3 className="font-black text-sm uppercase tracking-widest">Cart Preview</h3>
-                   <span className="text-[10px] font-bold text-muted-foreground">{itemCount} Items</span>
+              <div className="absolute right-0 mt-2 w-80 bg-white border border-slate-200 rounded-xl shadow-sm p-4 animate-in fade-in zoom-in-95 duration-150 origin-top-right z-[110]">
+                <div className="flex items-center justify-between mb-3 px-1">
+                   <h3 className="font-semibold text-sm">Cart</h3>
+                   <span className="text-xs text-slate-500">{itemCount} items</span>
                 </div>
-                
-                <div className="space-y-4 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar mb-4">
+
+                <div className="space-y-3 max-h-[280px] overflow-y-auto pr-1 custom-scrollbar mb-3">
                    {items.map((item) => (
-                     <div key={item.id} className="flex gap-3 group/item">
-                        <div className="w-16 aspect-video bg-slate-100 rounded-lg overflow-hidden shrink-0 relative">
-                           {item.image && <Image src={item.image} alt={item.title} fill className="object-cover" />}
-                        </div>
-                        <div className="flex-grow min-w-0">
-                           <p className="font-bold text-[11px] leading-tight truncate">{item.title}</p>
-                           <p className="text-[10px] text-muted-foreground mt-1">${item.price}</p>
-                        </div>
-                        <button 
-                          onClick={() => removeItem(item.id)}
-                          className="opacity-0 group-hover/item:opacity-100 transition-opacity p-1 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
-                     </div>
+                      <div key={item.id} className="flex gap-3 group/item">
+                         <div className="w-16 aspect-video bg-slate-100 rounded-md overflow-hidden shrink-0 relative">
+                            {item.image && <Image src={item.image} alt={item.title} fill className="object-cover" />}
+                         </div>
+                         <div className="flex-grow min-w-0">
+                            <p className="font-medium text-xs leading-snug truncate">{item.title}</p>
+                            <p className="text-xs text-slate-500 mt-1">${item.price}</p>
+                         </div>
+                         <button
+                           onClick={() => removeItem(item.id)}
+                           aria-label={`Remove ${item.title} from cart`}
+                           className="opacity-0 group-hover/item:opacity-100 focus:opacity-100 transition-opacity p-1 text-red-500 hover:bg-red-50 rounded-md"
+                         >
+                           <Trash2 className="w-3.5 h-3.5" />
+                         </button>
+                      </div>
                    ))}
                 </div>
 
-                <div className="pt-4 border-t border-slate-100 dark:border-slate-800 space-y-3">
+                <div className="pt-3 border-t border-slate-100 space-y-3">
                    <div className="flex justify-between items-center px-1">
-                      <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Subtotal</span>
-                      <span className="font-black">${totalPrice}</span>
+                      <span className="text-xs text-slate-500">Subtotal</span>
+                      <span className="font-semibold">${totalPrice}</span>
                    </div>
-                   <Link 
-                     href="/cart"
-                     className="w-full py-3 bg-blue-800 text-white rounded-xl text-xs font-black uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-blue-900 shadow-lg shadow-blue-800/10 transition-all active:scale-95"
+                   <Link
+                      href="/cart"
+                      className="w-full py-2.5 bg-blue-600 text-white rounded-lg text-sm font-medium flex items-center justify-center gap-2 hover:bg-blue-700 transition-colors"
                    >
-                     View Cart & Checkout
+                      View Cart & Checkout
                    </Link>
                 </div>
               </div>
@@ -192,136 +187,118 @@ const Navbar = () => {
           </div>
           )}
 
-          <div className="hidden sm:flex items-center gap-3">
+          <div className="hidden sm:flex items-center gap-2">
             {!isSignedIn ? (
               <>
-                <Link 
+                <Link
                   href="/login"
-                  className="px-4 py-2 text-sm font-medium hover:text-cyan-600 transition-colors"
+                  className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-blue-600 transition-colors"
                 >
                   Log In
                 </Link>
-                <Link 
-                  href="/register" 
-                  className="px-5 py-2.5 bg-blue-800 text-white text-sm font-medium rounded-xl hover:bg-blue-900 shadow-md shadow-blue-800/20 transition-all active:scale-95"
+                <Link
+                  href="/register"
+                  className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
                 >
                   Sign Up
                 </Link>
               </>
             ) : (
               <div className="relative">
-                <button 
+                <button
                   ref={profileButtonRef}
                   onClick={() => setUserMenuOpen(!userMenuOpen)}
+                  aria-label="Open account menu"
+                  aria-expanded={userMenuOpen}
                   className="flex items-center gap-2 group transition-all"
                 >
                   {session?.user?.image ? (
-                    <Image 
-                      src={session.user.image} 
-                      alt="User" 
-                      width={40} 
-                      height={40} 
-                      className="rounded-full ring-2 ring-blue-800/10 group-hover:ring-blue-800/30 transition-all" 
+                    <Image
+                      src={session.user.image}
+                      alt="User"
+                      width={34}
+                      height={34}
+                      className="rounded-full ring-2 ring-transparent group-hover:ring-blue-600/30 transition-all"
                     />
                   ) : (
-                    <UserCircle className="w-10 h-10 text-slate-400 group-hover:text-blue-800 transition-colors" />
+                    <UserCircle className="w-8 h-8 text-slate-400 group-hover:text-blue-600 transition-colors" />
                   )}
                 </button>
 
                 {/* User Dropdown Menu */}
                 {userMenuOpen && (
-                  <div 
+                  <div
                     ref={menuRef}
-                    className="absolute right-0 mt-4 w-72 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border border-slate-200 dark:border-slate-800 rounded-[24px] shadow-2xl p-2 animate-in fade-in zoom-in-95 duration-200 origin-top-right z-[100]"
+                    className="absolute right-0 mt-2 w-64 bg-white border border-slate-200 rounded-xl shadow-sm p-2 animate-in fade-in zoom-in-95 duration-150 origin-top-right z-[100]"
                   >
                     {/* User Header */}
-                    <div className="px-4 py-4 border-b border-slate-100 dark:border-slate-800 mb-2">
-                       <p className="font-bold text-sm truncate">{session?.user?.name}</p>
-                       <p className="text-xs text-muted-foreground truncate">{session?.user?.email}</p>
+                    <div className="px-3 py-3 border-b border-slate-100 mb-2">
+                       <p className="font-semibold text-sm truncate">{session?.user?.name}</p>
+                       <p className="text-xs text-slate-500 truncate">{session?.user?.email}</p>
                     </div>
 
                     {/* Role Toggle */}
                     <div className="p-1 mb-2">
-                       <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground px-3 mb-2">Switch Account</p>
-                        <div className="grid grid-cols-2 gap-1 bg-slate-100/50 dark:bg-slate-800/50 p-1 rounded-xl">
-                          <button 
+                       <p className="text-[11px] font-medium uppercase tracking-wide text-slate-400 px-2 mb-1.5">Switch Account</p>
+                        <div className="grid grid-cols-2 gap-1 bg-slate-100 p-1 rounded-lg">
+                          <button
                             onClick={() => handleSetRole("instructor")}
                             disabled={isSwitching}
                             className={cn(
-                              "flex items-center justify-center gap-2 py-1.5 rounded-lg text-[11px] font-bold transition-all",
-                              convexUser?.role === "instructor" 
-                                ? "bg-white dark:bg-slate-900 text-blue-800 dark:text-cyan-400 shadow-sm" 
-                                : "text-slate-500 hover:text-slate-700 dark:text-slate-400",
+                              "flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-medium transition-all",
+                              convexUser?.role === "instructor"
+                                ? "bg-white text-blue-600 shadow-sm"
+                                : "text-slate-500 hover:text-slate-700",
                               isSwitching && "opacity-50 cursor-not-allowed"
                             )}
                           >
-                            <GraduationCap className={cn("w-3 h-3", isSwitching && convexUser?.role !== "instructor" && "animate-spin")} />
+                            <GraduationCap className={cn("w-3.5 h-3.5", isSwitching && convexUser?.role !== "instructor" && "animate-spin")} />
                             Instructor
                           </button>
-                          <button 
+                          <button
                             onClick={() => handleSetRole("learner")}
                             disabled={isSwitching}
                             className={cn(
-                              "flex items-center justify-center gap-2 py-1.5 rounded-lg text-[11px] font-bold transition-all",
-                              convexUser?.role !== "instructor" 
-                                ? "bg-white dark:bg-slate-900 text-blue-800 dark:text-cyan-400 shadow-sm" 
-                                : "text-slate-500 hover:text-slate-700 dark:text-slate-400",
+                              "flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-medium transition-all",
+                              convexUser?.role !== "instructor"
+                                ? "bg-white text-blue-600 shadow-sm"
+                                : "text-slate-500 hover:text-slate-700",
                               isSwitching && "opacity-50 cursor-not-allowed"
                             )}
                           >
-                            <BookOpen className={cn("w-3 h-3", isSwitching && convexUser?.role === "instructor" && "animate-spin")} />
+                            <BookOpen className={cn("w-3.5 h-3.5", isSwitching && convexUser?.role === "instructor" && "animate-spin")} />
                             Learner
                           </button>
-                       </div>
+                        </div>
                     </div>
 
                     {/* Menu Items */}
                     <div className="space-y-0.5">
                       {convexUser?.role === "admin" && (
-                        <Link 
-                          href="/admin" 
-                          className="flex items-center gap-3 px-4 py-2.5 text-sm font-bold text-red-600 rounded-xl hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                        <Link
+                          href="/admin"
+                          className="flex items-center gap-3 px-3 py-2 text-sm font-medium text-red-600 rounded-lg hover:bg-red-50 transition-colors"
                           onClick={() => setUserMenuOpen(false)}
                         >
                           <ShieldCheck className="w-4 h-4" />
                           Admin Dashboard
                         </Link>
                       )}
-                      
-                      <Link 
-                        href="/profile" 
-                        className="flex items-center gap-3 px-4 py-2.5 text-sm font-medium rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+
+                      <Link
+                        href="/profile"
+                        className="flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg hover:bg-slate-100 transition-colors"
                         onClick={() => setUserMenuOpen(false)}
                       >
-                        <User className="w-4 h-4 text-slate-500" />
+                        <User className="w-4 h-4 text-slate-400" />
                         Profile Settings
                       </Link>
 
-                      
-                      <button 
-                        onClick={toggleTheme}
-                        className="w-full flex items-center justify-between px-4 py-2.5 text-sm font-medium rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-                      >
-                        <div className="flex items-center gap-3">
-                          {theme === "light" ? <Moon className="w-4 h-4 text-slate-500" /> : <Sun className="w-4 h-4 text-slate-500" />}
-                          <span>{theme === "light" ? "Dark Mode" : "Light Mode"}</span>
-                        </div>
-                        <div className={cn(
-                          "w-8 h-4 rounded-full relative transition-colors duration-200",
-                          theme === "dark" ? "bg-blue-600" : "bg-slate-300"
-                        )}>
-                          <div className={cn(
-                            "absolute top-0.5 w-3 h-3 bg-white rounded-full transition-transform duration-200",
-                            theme === "dark" ? "translate-x-4.5" : "translate-x-0.5"
-                          )} />
-                        </div>
-                      </button>
+                      <div className="h-px bg-slate-100 mx-2 my-1" />
 
-                      <div className="h-px bg-slate-100 dark:bg-slate-800 mx-2 my-1" />
-
-                      <button 
+                      <button
                         onClick={() => { signOut({ callbackUrl: "/login" }); setUserMenuOpen(false); }}
-                        className="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-red-600 rounded-xl hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                        className="w-full flex items-center gap-3 px-3 py-2 text-sm font-medium text-red-600 rounded-lg hover:bg-red-50 transition-colors"
                       >
                         <LogOut className="w-4 h-4" />
                         Sign Out
@@ -334,104 +311,95 @@ const Navbar = () => {
           </div>
 
           {/* Mobile Menu Button */}
-          <button 
-            className="lg:hidden p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+          <button
+            className="lg:hidden p-2 hover:bg-slate-100 rounded-lg transition-colors"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
+            aria-expanded={mobileMenuOpen}
           >
-            {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
         </div>
       </div>
 
       {/* Mobile Menu */}
       {mobileMenuOpen && (
-        <div className="lg:hidden absolute top-full left-0 right-0 bg-white dark:bg-slate-950 border-t border-slate-100 dark:border-slate-800 p-6 shadow-xl animate-in fade-in slide-in-from-top-4 max-h-[calc(100dvh-80px)] overflow-y-auto">
-          <nav className="flex flex-col gap-4 text-lg font-medium">
+        <div className="lg:hidden absolute top-full left-0 right-0 bg-white border-b border-slate-200 px-4 py-3 shadow-sm animate-in fade-in slide-in-from-top-2 max-h-[calc(100dvh-64px)] overflow-y-auto">
+          <nav className="flex flex-col gap-1 text-base font-medium" aria-label="Mobile navigation">
             {/* Mobile search */}
-            <div className="flex items-center relative mb-2">
-              <Search className="absolute left-3 w-4 h-4 text-muted-foreground" />
+            <div className="flex items-center relative mb-3">
+              <Search className="absolute left-3 w-4 h-4 text-slate-400" />
               <input
                 type="text"
                 placeholder="Search courses..."
-                className="w-full pl-10 pr-4 py-2.5 bg-slate-100 dark:bg-slate-800 rounded-full text-sm outline-none focus:ring-2 focus:ring-cyan-500/20"
+                aria-label="Search courses"
+                className="w-full pl-9 pr-4 py-2.5 bg-slate-50 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500/20"
               />
             </div>
-            <Link href="/courses" onClick={() => setMobileMenuOpen(false)}>Courses</Link>
+            <Link href="/courses" onClick={() => setMobileMenuOpen(false)} className="py-2.5 text-slate-700">Courses</Link>
             {isSignedIn && (
-              <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)} className="text-blue-800 dark:text-cyan-400 font-bold">
+              <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)} className="py-2.5 text-blue-600">
                 Dashboard
               </Link>
             )}
-            <Link href="/mentorship" onClick={() => setMobileMenuOpen(false)}>Mentorship</Link>
-            <Link href="/business" onClick={() => setMobileMenuOpen(false)}>For Business</Link>
+            <Link href="/mentorship" onClick={() => setMobileMenuOpen(false)} className="py-2.5 text-slate-700">Mentorship</Link>
+            <Link href="/business" onClick={() => setMobileMenuOpen(false)} className="py-2.5 text-slate-700">For Business</Link>
             {isSignedIn && (
-              <Link href="/profile" onClick={() => setMobileMenuOpen(false)}>Profile Settings</Link>
+              <Link href="/profile" onClick={() => setMobileMenuOpen(false)} className="py-2.5 text-slate-700">Profile Settings</Link>
             )}
             {convexUser?.role === "admin" && (
-              <Link href="/admin" onClick={() => setMobileMenuOpen(false)} className="text-red-600 font-bold">
+              <Link href="/admin" onClick={() => setMobileMenuOpen(false)} className="py-2.5 text-red-600">
                 Admin Dashboard
               </Link>
             )}
-            <div className="h-px bg-slate-100 dark:bg-slate-800 my-2" />
+            <div className="h-px bg-slate-100 my-2" />
 
             {!isSignedIn ? (
-              <>
-                <Link 
+              <div className="flex flex-col gap-2">
+                <Link
                   href="/login"
                   onClick={() => setMobileMenuOpen(false)}
+                  className="py-2.5 text-slate-700"
                 >
                   Log In
                 </Link>
-                <Link 
-                  href="/register" 
-                  className="text-cyan-600" 
+                <Link
+                  href="/register"
                   onClick={() => setMobileMenuOpen(false)}
+                  className="py-2.5 px-4 bg-blue-600 text-white rounded-lg text-center hover:bg-blue-700 transition-colors"
                 >
                   Sign Up
                 </Link>
-              </>
+              </div>
             ) : (
               <>
-                <div className="flex flex-col gap-2 mt-4">
-                  <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground px-1">Theme</p>
-                  <button 
-                    onClick={toggleTheme}
-                    className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-900 rounded-xl"
-                  >
-                    <div className="flex items-center gap-3">
-                      {theme === "light" ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
-                      <span className="text-sm font-medium">{theme === "light" ? "Dark Mode" : "Light Mode"}</span>
-                    </div>
-                  </button>
-                </div>
-
-                <div className="flex flex-col gap-2 mt-4">
-                  <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground px-1">Switch Role</p>
-                  <button 
+                <div className="flex flex-col gap-2 mt-2">
+                  <p className="text-[11px] font-medium uppercase tracking-wide text-slate-400 px-1">Switch Role</p>
+                  <button
                     onClick={() => {
                       const targetRole = convexUser?.role === "instructor" ? "learner" : "instructor";
                       handleSetRole(targetRole).then(() => setMobileMenuOpen(false));
                     }}
                     disabled={isSwitching}
-                    className="flex items-center gap-3 p-3 bg-slate-50 dark:bg-slate-900 rounded-xl disabled:opacity-50"
+                    className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg disabled:opacity-50"
                   >
-                    <ArrowRightLeft className={cn("w-5 h-5 text-blue-800", isSwitching && "animate-spin")} />
+                    <ArrowRightLeft className={cn("w-4 h-4 text-blue-600", isSwitching && "animate-spin")} />
                     <span className="text-sm font-medium">
                       {isSwitching ? "Switching..." : `Switch to ${convexUser?.role === "instructor" ? "Learner" : "Instructor"}`}
                     </span>
                   </button>
                 </div>
 
-                <div className="h-px bg-slate-100 dark:bg-slate-800 my-4" />
-                
-                <button 
+                <div className="h-px bg-slate-100 my-2" />
+
+                <button
                   onClick={() => {
                     signOut({ callbackUrl: "/login" });
                     setMobileMenuOpen(false);
                   }}
-                  className="flex items-center gap-3 p-3 text-red-600 font-bold"
+                  className="flex items-center gap-3 p-3 text-red-600 font-medium"
                 >
-                  <LogOut className="w-5 h-5" />
+                  <LogOut className="w-4 h-4" />
                   Sign Out
                 </button>
               </>

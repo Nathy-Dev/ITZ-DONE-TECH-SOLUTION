@@ -40,24 +40,24 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950 px-6 py-12">
+    <div className="min-h-screen flex items-center justify-center bg-slate-50 px-4 sm:px-6 py-12">
       <div className="w-full max-w-md">
         {/* Card */}
-        <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-xl shadow-blue-800/5 border border-slate-100 dark:border-slate-800 p-8 md:p-12">
+        <div className="bg-white rounded-2xl shadow-md shadow-blue-600/5 border border-slate-100 p-8 md:p-12">
           {/* Header */}
-          <div className="text-center mb-10">
+          <div className="text-center mb-6">
             <Link href="/" className="inline-flex justify-center mb-6">
               <Logo width={120} height={40} />
             </Link>
             <h1 className="text-3xl font-bold tracking-tight mb-2">Welcome Back</h1>
-            <p className="text-slate-500 dark:text-slate-400">
+            <p className="text-slate-500">
               Please enter your details to sign in
             </p>
           </div>
 
           {/* Error Message */}
           {error && (
-            <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-900/30 rounded-xl text-red-600 dark:text-red-400 text-sm font-medium">
+            <div className="mb-6 p-4 bg-red-50 border border-red-100 rounded-xl text-red-600 text-sm font-medium">
               {error}
             </div>
           )}
@@ -67,13 +67,13 @@ export default function LoginPage() {
             <div className="space-y-2">
               <label className="text-sm font-medium px-1">Email Address</label>
               <div className="relative group">
-                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-blue-800 transition-colors" />
+                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-blue-600 transition-colors" />
                 <input 
                   name="email"
                   type="email" 
                   required
                   placeholder="name@example.com"
-                  className="w-full pl-12 pr-4 py-3 bg-slate-50 dark:bg-slate-800 border-none rounded-2xl outline-none focus:ring-2 focus:ring-blue-800/20 transition-all"
+                  className="w-full pl-12 pr-4 py-3 bg-slate-50 border-none rounded-2xl outline-none focus:ring-2 focus:ring-blue-600/20 transition-all"
                 />
               </div>
             </div>
@@ -81,16 +81,16 @@ export default function LoginPage() {
             <div className="space-y-2">
               <div className="flex items-center justify-between px-1">
                 <label className="text-sm font-medium">Password</label>
-                <Link href="#" className="text-xs text-blue-800 hover:underline font-medium">Forgot password?</Link>
+                <Link href="#" className="text-xs text-blue-600 hover:underline font-medium">Forgot password?</Link>
               </div>
               <div className="relative group">
-                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-blue-800 transition-colors" />
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-blue-600 transition-colors" />
                 <input 
                   name="password"
                   type="password" 
                   required
                   placeholder="••••••••"
-                  className="w-full pl-12 pr-4 py-3 bg-slate-50 dark:bg-slate-800 border-none rounded-2xl outline-none focus:ring-2 focus:ring-blue-800/20 transition-all"
+                  className="w-full pl-12 pr-4 py-3 bg-slate-50 border-none rounded-2xl outline-none focus:ring-2 focus:ring-blue-600/20 transition-all"
                 />
               </div>
             </div>
@@ -98,7 +98,7 @@ export default function LoginPage() {
             <button 
               type="submit"
               disabled={loading}
-              className="w-full py-4 bg-blue-800 text-white font-bold rounded-2xl hover:bg-blue-900 shadow-lg shadow-blue-800/20 transition-all active:scale-[0.98] disabled:opacity-70 flex items-center justify-center gap-2"
+              className="w-full py-3 bg-blue-600 text-white font-bold rounded-2xl hover:bg-blue-700 shadow-sm shadow-blue-600/20 transition-all active:scale-[0.98] disabled:opacity-70 flex items-center justify-center gap-2"
             >
               {loading ? (
                 <Loader2 className="w-5 h-5 animate-spin" />
@@ -113,10 +113,10 @@ export default function LoginPage() {
           {/* Divider */}
           <div className="relative my-8">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-slate-100 dark:border-slate-800"></div>
+              <div className="w-full border-t border-slate-100"></div>
             </div>
             <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-white dark:bg-slate-900 px-4 text-slate-400">Or continue with</span>
+              <span className="bg-white px-4 text-slate-400">Or continue with</span>
             </div>
           </div>
 
@@ -124,7 +124,7 @@ export default function LoginPage() {
           <div className="grid grid-cols-2 gap-4">
             <button 
     onClick={() => signIn("google", { callbackUrl: "/dashboard" })}
-    className="flex items-center justify-center gap-2 py-3 border border-slate-100 dark:border-slate-800 rounded-2xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors font-medium text-sm"
+    className="flex items-center justify-center gap-2 py-3 border border-slate-100 rounded-2xl hover:bg-slate-50 transition-colors font-medium text-sm"
   >
     <svg viewBox="0 0 24 24" className="w-5 h-5">
       <path
@@ -148,16 +148,16 @@ export default function LoginPage() {
   </button>
             <button 
               onClick={() => signIn("github", { callbackUrl: "/dashboard" })}
-              className="flex items-center justify-center gap-2 py-3 border border-slate-100 dark:border-slate-800 rounded-2xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors font-medium text-sm"
+              className="flex items-center justify-center gap-2 py-3 border border-slate-100 rounded-2xl hover:bg-slate-50 transition-colors font-medium text-sm"
             >
               <Github className="w-4 h-4" /> GitHub
             </button>
           </div>
 
           {/* Footer Link */}
-          <p className="mt-10 text-center text-sm text-slate-500 dark:text-slate-400">
+          <p className="mt-10 text-center text-sm text-slate-500">
             Don&apos;t have an account?{" "}
-            <Link href="/register" className="text-blue-800 font-bold hover:underline">
+            <Link href="/register" className="text-blue-600 font-bold hover:underline">
               Sign up for free
             </Link>
           </p>
