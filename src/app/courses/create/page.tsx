@@ -201,46 +201,46 @@ export default function CreateCoursePage() {
     }
   };
 
-  const inputClass = "w-full px-5 py-3 bg-slate-50  border border-slate-200  rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition-all text-base";
-  const labelClass = "text-xs font-semibold uppercase tracking-widest text-slate-500 mb-2 block";
+  const inputClass = "w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition-all text-xs";
+  const labelClass = "text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-1.5 block";
 
   return (
-    <div className="min-h-screen bg-slate-50 pt-20 pb-12 md:pb-10">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6">
+    <div className="min-h-screen bg-slate-50 pt-16 pb-8">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6">
         <Link 
           href="/dashboard" 
-          className="inline-flex items-center gap-2 text-muted-foreground hover:text-blue-600 transition-colors mb-6 md:mb-8"
+          className="inline-flex items-center gap-1.5 text-xs text-slate-500 hover:text-blue-600 transition-colors mb-4"
         >
-          <ArrowLeft className="w-4 h-4" />
+          <ArrowLeft className="w-3.5 h-3.5" />
           Back to Dashboard
         </Link>
 
         {/* Step indicator */}
-        <div className="mb-8 md:mb-6">
-          <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight mb-2">Create New Course</h1>
-          <p className="text-muted-foreground text-sm md:text-base">Fill in the details below to start building your curriculum.</p>
+        <div className="mb-5">
+          <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 mb-1">Create New Course</h1>
+          <p className="text-xs text-slate-500">Fill in the details below to start building your curriculum.</p>
           
-          <div className="flex items-center gap-2 mt-6 overflow-x-auto pb-1 -mx-1 px-1">
+          <div className="flex items-center gap-2 mt-4 overflow-x-auto pb-1 -mx-1 px-1">
             {STEPS.map((step, idx) => (
               <React.Fragment key={step.id}>
                 <button
                   type="button"
                   onClick={() => goToStep(step.id)}
                   className={cn(
-                    "flex items-center gap-3 px-4 py-3 rounded-2xl shrink-0 transition-all text-left",
+                    "flex items-center gap-2 px-3 py-1.5 rounded-lg shrink-0 transition-all text-left",
                     currentStep === step.id
-                      ? "bg-blue-600 text-white shadow-sm shadow-blue-600/20"
+                      ? "bg-blue-600 text-white shadow-xs"
                       : currentStep > step.id
-                        ? "bg-emerald-50  text-emerald-700 "
-                        : "bg-white  text-slate-400 border border-slate-100 "
+                        ? "bg-emerald-50 text-emerald-700"
+                        : "bg-white text-slate-400 border border-slate-200"
                   )}
                 >
                   {currentStep > step.id ? (
-                    <CheckCircle2 className="w-5 h-5 shrink-0" />
+                    <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-600" />
                   ) : (
                     <span className={cn(
-                      "w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-semibold shrink-0",
-                      currentStep === step.id ? "bg-white/20" : "bg-slate-100 "
+                      "w-4 h-4 rounded-full flex items-center justify-center text-[10px] font-semibold shrink-0",
+                      currentStep === step.id ? "bg-white/20" : "bg-slate-100 text-slate-600"
                     )}>
                       {step.id}
                     </span>
@@ -257,8 +257,8 @@ export default function CreateCoursePage() {
                 </button>
                 {idx < STEPS.length - 1 && (
                   <div className={cn(
-                    "w-6 h-0.5 shrink-0 rounded-full",
-                    currentStep > step.id ? "bg-emerald-400" : "bg-slate-200 "
+                    "w-4 h-0.5 shrink-0 rounded-full",
+                    currentStep > step.id ? "bg-emerald-400" : "bg-slate-200"
                   )} />
                 )}
               </React.Fragment>
@@ -266,12 +266,12 @@ export default function CreateCoursePage() {
           </div>
         </div>
 
-        <div className="bg-white rounded-xl md:rounded-2xl p-5 sm:p-8 md:p-12 border border-slate-100 shadow-md shadow-blue-600/5">
-          <form onSubmit={(e) => { e.preventDefault(); handleSubmit(); }} className="space-y-8">
+        <div className="bg-white rounded-xl p-5 sm:p-6 border border-slate-200 shadow-sm">
+          <form onSubmit={(e) => { e.preventDefault(); handleSubmit(); }} className="space-y-5">
             {/* Step 1: Basics */}
             {currentStep === 1 && (
-              <div className="grid gap-6 animate-in fade-in slide-in-from-right-4 duration-300">
-                <div className="space-y-2">
+              <div className="grid gap-4 animate-in fade-in duration-200">
+                <div className="space-y-1">
                   <label htmlFor="title" className={labelClass}>Course Title</label>
                   <input 
                     id="title"
@@ -284,12 +284,12 @@ export default function CreateCoursePage() {
                   />
                 </div>
 
-                <div className="space-y-2">
+                <div className="space-y-1">
                   <label htmlFor="description" className={labelClass}>Description</label>
                   <textarea 
                     id="description"
                     required
-                    rows={5}
+                    rows={4}
                     placeholder="Tell your students what they will learn..."
                     className={cn(inputClass, "resize-none")}
                     value={formData.description}
@@ -301,11 +301,11 @@ export default function CreateCoursePage() {
 
             {/* Step 2: Details */}
             {currentStep === 2 && (
-              <div className="grid gap-6 animate-in fade-in slide-in-from-right-4 duration-300">
-                <div className="space-y-2">
+              <div className="grid gap-4 animate-in fade-in duration-200">
+                <div className="space-y-1">
                   <label htmlFor="price" className={labelClass}>Price in Naira — 0 for free</label>
                   <div className="relative">
-                    <span className="absolute left-4 top-1/2 -translate-y-1/2 font-semibold text-slate-400 pointer-events-none">₦</span>
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 font-semibold text-slate-400 pointer-events-none text-xs">₦</span>
                     <input
                       id="price"
                       required
@@ -314,50 +314,50 @@ export default function CreateCoursePage() {
                       min="0"
                       inputMode="numeric"
                       placeholder="25000"
-                      className={cn(inputClass, "pl-10")}
+                      className={cn(inputClass, "pl-7")}
                       value={formData.price}
                       onChange={(e) => setFormData({...formData, price: e.target.value})}
                     />
                   </div>
                   {formData.price !== "" && !isNaN(parseFloat(formData.price)) && parseFloat(formData.price) > 0 && (
-                    <div className="p-3 bg-blue-50 rounded-xl space-y-1">
+                    <div className="p-2.5 bg-blue-50 border border-blue-100 rounded-lg space-y-0.5">
                       <p className="text-xs font-bold text-blue-600">
                         ≈ {formatPrice(ngnToUsd(parseFloat(formData.price), fxRate), "USD")} for international students
                       </p>
-                      <p className="text-xs text-muted-foreground font-medium">
+                      <p className="text-[11px] text-slate-500">
                         You earn {formatPrice(Math.round(parseFloat(formData.price) * 0.6))} per sale (60% share).
                       </p>
                     </div>
                   )}
-                  <p className="text-[10px] text-slate-400 font-medium px-1">
+                  <p className="text-[10px] text-slate-400 font-medium px-0.5">
                     All payments are processed in Naira. USD is shown as a live reference (~₦{fxRate}/$).
                   </p>
                 </div>
 
-                <div className="space-y-2">
+                <div className="space-y-1">
                   <label htmlFor="duration" className={labelClass}>Duration</label>
                   <div className="relative">
-                    <Clock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 pointer-events-none" />
+                    <Clock className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 pointer-events-none" />
                     <input 
                       id="duration"
                       required
                       type="text" 
                       placeholder="e.g. 12h 30m"
-                      className={cn(inputClass, "pl-12")}
+                      className={cn(inputClass, "pl-8")}
                       value={formData.duration}
                       onChange={(e) => setFormData({...formData, duration: e.target.value})}
                     />
                   </div>
                 </div>
 
-                <div className="grid sm:grid-cols-2 gap-6">
-                  <div className="space-y-2">
+                <div className="grid sm:grid-cols-2 gap-4">
+                  <div className="space-y-1">
                     <label htmlFor="category" className={labelClass}>Category</label>
                     <div className="relative">
-                      <BookOpen className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 pointer-events-none z-10" />
+                      <BookOpen className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 pointer-events-none z-10" />
                       <select 
                         id="category"
-                        className={cn(inputClass, "pl-12 appearance-none")}
+                        className={cn(inputClass, "pl-8 appearance-none")}
                         value={formData.category}
                         onChange={(e) => setFormData({...formData, category: e.target.value})}
                       >
@@ -366,13 +366,13 @@ export default function CreateCoursePage() {
                     </div>
                   </div>
 
-                  <div className="space-y-2">
+                  <div className="space-y-1">
                     <label htmlFor="level" className={labelClass}>Difficulty Level</label>
                     <div className="relative">
-                      <Layers className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 pointer-events-none z-10" />
+                      <Layers className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 pointer-events-none z-10" />
                       <select 
                         id="level"
-                        className={cn(inputClass, "pl-12 appearance-none")}
+                        className={cn(inputClass, "pl-8 appearance-none")}
                         value={formData.level}
                         onChange={(e) => setFormData({...formData, level: e.target.value})}
                       >
@@ -386,7 +386,7 @@ export default function CreateCoursePage() {
 
             {/* Step 3: Thumbnail */}
             {currentStep === 3 && (
-              <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
+              <div className="space-y-3 animate-in fade-in duration-200">
                 <label className={labelClass}>Course Thumbnail</label>
                 
                 <input 
@@ -399,7 +399,7 @@ export default function CreateCoursePage() {
                 
                 <div 
                   onClick={handleThumbnailClick}
-                  className="aspect-video bg-slate-50 border-2 border-dashed border-slate-200 rounded-xl md:rounded-2xl flex flex-col items-center justify-center text-center p-6 md:p-8 group hover:border-blue-600 transition-all cursor-pointer overflow-hidden relative"
+                  className="aspect-video bg-slate-50 border border-dashed border-slate-300 rounded-lg flex flex-col items-center justify-center text-center p-4 group hover:border-blue-600 transition-all cursor-pointer overflow-hidden relative"
                 >
                   {previewUrl ? (
                     <>
@@ -407,30 +407,30 @@ export default function CreateCoursePage() {
                         src={previewUrl} 
                         alt="Thumbnail Preview" 
                         fill 
-                        className="object-cover group-hover:scale-105 transition-transform duration-500 opacity-80" 
+                        className="object-cover group-hover:scale-105 transition-transform duration-300 opacity-80" 
                       />
                       <div className="absolute inset-0 bg-slate-950/20 group-hover:bg-slate-950/40 transition-all flex flex-col items-center justify-center text-white">
-                        <div className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center mb-2">
-                           <Upload className="w-6 h-6" />
+                        <div className="w-9 h-9 bg-white/20 backdrop-blur-md rounded-lg flex items-center justify-center mb-1">
+                           <Upload className="w-4 h-4" />
                         </div>
-                        <p className="font-bold text-sm md:text-base">Change Image</p>
+                        <p className="font-semibold text-xs">Change Image</p>
                       </div>
                     </>
                   ) : (
                     <>
-                      <div className="w-14 h-14 md:w-16 md:h-16 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                         {isUploading ? <Loader2 className="w-7 h-7 animate-spin" /> : <Upload className="w-7 h-7" />}
+                      <div className="w-10 h-10 bg-blue-50 text-blue-600 rounded-lg flex items-center justify-center mb-2 group-hover:scale-105 transition-transform">
+                         {isUploading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Upload className="w-5 h-5" />}
                       </div>
-                      <h4 className="font-bold mb-1 text-sm md:text-base">Tap to upload thumbnail</h4>
-                      <p className="text-xs md:text-sm text-muted-foreground">PNG, JPG or WEBP (Max 5MB)</p>
+                      <h4 className="font-semibold mb-0.5 text-xs text-slate-800">Tap to upload thumbnail</h4>
+                      <p className="text-[10px] text-slate-400">PNG, JPG or WEBP (Max 5MB)</p>
                     </>
                   )}
                   
                   {isUploading && (
-                     <div className="absolute inset-0 bg-white/50 backdrop-blur-sm flex items-center justify-center">
-                        <div className="flex flex-col items-center gap-2">
-                           <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
-                           <p className="text-xs font-semibold uppercase tracking-widest text-blue-600">Uploading...</p>
+                     <div className="absolute inset-0 bg-white/80 backdrop-blur-sm flex items-center justify-center">
+                        <div className="flex flex-col items-center gap-1.5">
+                           <Loader2 className="w-5 h-5 animate-spin text-blue-600" />
+                           <p className="text-[10px] font-semibold uppercase tracking-wider text-blue-600">Uploading...</p>
                         </div>
                      </div>
                   )}
@@ -439,26 +439,26 @@ export default function CreateCoursePage() {
             )}
 
             {error && (
-              <div className="flex items-start gap-3 p-4 bg-red-500/10 border border-red-500/20 rounded-2xl text-red-600 text-sm font-bold">
-                <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
+              <div className="flex items-start gap-2 p-3 bg-red-50 border border-red-100 rounded-lg text-red-600 text-xs font-medium">
+                <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
                 {error}
               </div>
             )}
 
             {/* Step navigation */}
-            <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-4 pt-4 border-t border-slate-100">
+            <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-3 border-t border-slate-100">
               <button
                 type="button"
                 onClick={() => currentStep > 1 && setCurrentStep(currentStep - 1)}
                 disabled={currentStep === 1}
                 className={cn(
-                  "flex items-center justify-center gap-2 px-4 sm:px-6 py-3 rounded-2xl font-bold transition-all",
+                  "flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold transition-all",
                   currentStep === 1
-                    ? "text-slate-300  cursor-not-allowed"
-                    : "text-slate-600  hover:bg-slate-100 "
+                    ? "text-slate-300 cursor-not-allowed"
+                    : "text-slate-600 hover:bg-slate-100"
                 )}
               >
-                <ChevronLeft className="w-5 h-5" />
+                <ChevronLeft className="w-4 h-4" />
                 Back
               </button>
 
@@ -466,22 +466,22 @@ export default function CreateCoursePage() {
                 <button
                   type="button"
                   onClick={() => goToStep(currentStep + 1)}
-                  className="flex items-center justify-center gap-2 px-5 py-2.5 bg-blue-600 text-white rounded-2xl font-semibold hover:bg-blue-700 shadow-sm shadow-blue-600/20 transition-all active:scale-95"
+                  className="flex items-center justify-center gap-1.5 px-4 py-2 bg-blue-600 text-white rounded-lg text-xs font-semibold hover:bg-blue-700 shadow-sm shadow-blue-600/20 transition-all active:scale-95"
                 >
                   Continue
-                  <ChevronRight className="w-5 h-5" />
+                  <ChevronRight className="w-4 h-4" />
                 </button>
               ) : (
                 <button 
                   disabled={isSubmitting || isUploading}
                   type="submit"
-                  className="flex items-center justify-center gap-3 px-5 py-2.5 bg-blue-600 text-white rounded-2xl font-semibold text-base md:text-lg shadow-md shadow-blue-600/20 hover:bg-blue-700 transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed group"
+                  className="flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg text-xs font-semibold shadow-sm shadow-blue-600/20 hover:bg-blue-700 transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed group"
                 >
                   {isSubmitting ? (
-                    <Loader2 className="w-6 h-6 animate-spin" />
+                    <Loader2 className="w-4 h-4 animate-spin" />
                   ) : (
                     <>
-                      <Sparkles className="w-5 h-5 group-hover:rotate-12 transition-transform" />
+                      <Sparkles className="w-4 h-4 group-hover:rotate-12 transition-transform" />
                       Create Your Course
                     </>
                   )}

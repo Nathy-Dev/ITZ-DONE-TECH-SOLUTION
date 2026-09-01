@@ -76,48 +76,46 @@ export default function EarningsPanel() {
 
   if (earnings === undefined || payouts === undefined) {
     return (
-      <div className="bg-white rounded-2xl p-8 border border-slate-100 shadow-md shadow-blue-600/5 flex items-center justify-center min-h-[200px]">
-        <Loader2 className="w-8 h-8 text-blue-600 animate-spin" />
+      <div className="bg-white rounded-lg p-6 border border-slate-200 shadow-xs flex items-center justify-center min-h-[150px]">
+        <Loader2 className="w-6 h-6 text-blue-600 animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-4">
       {/* Balance cards */}
-      <div className="grid sm:grid-cols-3 gap-6">
-        <div className="bg-blue-600 text-white rounded-xl p-6 shadow-sm">
-          <div>
-            <div className="flex items-center gap-2 mb-3">
-              <Wallet className="w-5 h-5 text-blue-100" />
-              <p className="text-xs font-medium uppercase tracking-wide text-blue-100">
-                Available Balance
-              </p>
-            </div>
-            <p className="text-3xl font-bold">{formatPrice(earnings.available)}</p>
-            <p className="text-xs text-blue-100 mt-2">
-              Your 60% share, ready to withdraw
+      <div className="grid sm:grid-cols-3 gap-3">
+        <div className="bg-blue-600 text-white rounded-lg p-4 shadow-xs">
+          <div className="flex items-center gap-2 mb-2">
+            <Wallet className="w-4 h-4 text-blue-100" />
+            <p className="text-[10px] font-semibold uppercase tracking-wider text-blue-100">
+              Available Balance
             </p>
           </div>
-        </div>
-
-        <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm">
-          <div className="flex items-center gap-2 mb-3">
-            <TrendingUp className="w-5 h-5 text-emerald-500" />
-            <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
-              Lifetime Earnings
-            </p>
-          </div>
-          <p className="text-3xl font-semibold">{formatPrice(earnings.lifetime)}</p>
-          <p className="text-[10px] text-muted-foreground font-bold mt-2">
-            From {earnings.totalSales} course sale{earnings.totalSales === 1 ? "" : "s"}
+          <p className="text-2xl font-bold">{formatPrice(earnings.available)}</p>
+          <p className="text-[10px] text-blue-100 mt-1">
+            Your 60% share, ready to withdraw
           </p>
         </div>
 
-        <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm">
-          <div className="flex items-center gap-2 mb-3">
-            <CheckCircle2 className="w-5 h-5 text-blue-500" />
-            <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+        <div className="bg-white rounded-lg p-4 border border-slate-200 shadow-xs">
+          <div className="flex items-center gap-1.5 mb-2">
+            <TrendingUp className="w-4 h-4 text-emerald-500" />
+            <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+              Lifetime Earnings
+            </p>
+          </div>
+          <p className="text-2xl font-bold text-slate-900">{formatPrice(earnings.lifetime)}</p>
+          <p className="text-[10px] text-slate-400 mt-1">
+            From {earnings.totalSales} sale{earnings.totalSales === 1 ? "" : "s"}
+          </p>
+        </div>
+
+        <div className="bg-white rounded-lg p-4 border border-slate-200 shadow-xs">
+          <div className="flex items-center gap-1.5 mb-2">
+            <CheckCircle2 className="w-4 h-4 text-blue-500" />
+            <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">
               Total Paid Out
             </p>
           </div>
@@ -129,23 +127,23 @@ export default function EarningsPanel() {
       </div>
 
       {/* Withdraw card */}
-      <div className="bg-white rounded-2xl p-8 border border-slate-100 shadow-md shadow-blue-600/5">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div className="flex items-start gap-4">
-            <div className="w-12 h-12 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center shrink-0">
-              <ArrowDownToLine className="w-6 h-6" />
+      <div className="bg-white rounded-lg p-4 sm:p-5 border border-slate-200 shadow-xs">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex items-start gap-3">
+            <div className="w-9 h-9 bg-blue-50 text-blue-600 rounded-lg flex items-center justify-center shrink-0">
+              <ArrowDownToLine className="w-4 h-4" />
             </div>
             <div>
-              <h3 className="font-semibold text-lg">Withdraw Earnings</h3>
+              <h3 className="font-semibold text-sm text-slate-900">Withdraw Earnings</h3>
               {bankAccount ? (
-                <p className="text-sm text-muted-foreground font-medium mt-1 flex items-center gap-2">
-                  <Landmark className="w-4 h-4" />
+                <p className="text-xs text-slate-500 mt-0.5 flex items-center gap-1.5">
+                  <Landmark className="w-3.5 h-3.5 text-slate-400" />
                   {bankAccount.bankName} • {bankAccount.accountNumber} ({bankAccount.accountName})
                 </p>
               ) : (
-                <p className="text-sm text-amber-600 font-medium mt-1">
+                <p className="text-xs text-amber-600 mt-0.5">
                   Add your bank account in{" "}
-                  <Link href="/profile" className="underline font-bold">
+                  <Link href="/profile" className="underline font-semibold hover:text-amber-700">
                     Profile Settings
                   </Link>{" "}
                   to receive payouts.
@@ -163,20 +161,20 @@ export default function EarningsPanel() {
               earnings.available < 1000
             }
             className={cn(
-              "px-5 py-2.5 rounded-2xl font-semibold flex items-center gap-2 transition-all shrink-0",
+              "px-4 py-2 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition-all shrink-0",
               requesting || hasPendingRequest || !bankAccount || earnings.available < 1000
-                ? "bg-slate-200 text-slate-400 cursor-not-allowed"
-                : "bg-blue-600 text-white hover:bg-blue-700 shadow-md shadow-blue-600/20 active:scale-95"
+                ? "bg-slate-100 text-slate-400 cursor-not-allowed"
+                : "bg-blue-600 text-white hover:bg-blue-700 shadow-sm shadow-blue-600/20 active:scale-95"
             )}
           >
             {requesting ? (
               <>
-                <Loader2 className="w-5 h-5 animate-spin" />
+                <Loader2 className="w-3.5 h-3.5 animate-spin" />
                 Requesting…
               </>
             ) : (
               <>
-                <Wallet className="w-5 h-5" />
+                <Wallet className="w-3.5 h-3.5" />
                 Request Payout
               </>
             )}
@@ -184,57 +182,57 @@ export default function EarningsPanel() {
         </div>
 
         {hasPendingRequest && (
-          <p className="text-xs text-amber-600 font-bold mt-4 flex items-center gap-2">
-            <Clock className="w-4 h-4" />
+          <p className="text-xs text-amber-600 font-medium mt-3 flex items-center gap-1.5">
+            <Clock className="w-3.5 h-3.5" />
             You have a payout request being processed.
           </p>
         )}
         {!bankAccount && (
-          <p className="text-xs text-muted-foreground font-bold mt-4">
+          <p className="text-[10px] text-slate-400 mt-2">
             Minimum payout: ₦1,000
           </p>
         )}
         {error && (
-          <div className="flex items-start gap-3 p-4 mt-4 bg-red-500/10 border border-red-500/20 rounded-2xl text-red-600 text-xs font-bold">
-            <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+          <div className="flex items-start gap-2 p-3 mt-3 bg-red-50 border border-red-100 rounded-lg text-red-600 text-xs font-medium">
+            <AlertCircle className="w-3.5 h-3.5 shrink-0 mt-0.5" />
             {error}
           </div>
         )}
         {success && (
-          <div className="flex items-start gap-3 p-4 mt-4 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl text-emerald-600 text-xs font-bold">
-            <CheckCircle2 className="w-4 h-4 shrink-0 mt-0.5" />
+          <div className="flex items-start gap-2 p-3 mt-3 bg-emerald-50 border border-emerald-100 rounded-lg text-emerald-600 text-xs font-medium">
+            <CheckCircle2 className="w-3.5 h-3.5 shrink-0 mt-0.5" />
             {success}
           </div>
         )}
       </div>
 
       {/* Recent earnings */}
-      <div className="bg-white rounded-2xl p-8 border border-slate-100 shadow-md shadow-blue-600/5">
-        <h3 className="font-semibold text-xl mb-6">Recent Earnings</h3>
+      <div className="bg-white rounded-lg p-4 sm:p-5 border border-slate-200 shadow-xs">
+        <h3 className="font-semibold text-sm text-slate-900 mb-3">Recent Earnings</h3>
         {earnings.recent.length === 0 ? (
-          <div className="text-center py-10 border-2 border-dashed border-slate-100 rounded-2xl">
-            <p className="text-muted-foreground font-bold italic">
+          <div className="text-center py-6 border border-dashed border-slate-200 rounded-lg">
+            <p className="text-xs text-slate-400">
               No earnings yet. Publish a course and start earning 60% of every sale!
             </p>
           </div>
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-2">
             {earnings.recent.map((e) => (
               <div
                 key={e._id}
-                className="flex items-center justify-between gap-4 p-4 rounded-2xl bg-slate-50"
+                className="flex items-center justify-between gap-3 p-3 rounded-lg bg-slate-50 border border-slate-100"
               >
                 <div className="min-w-0">
-                  <p className="font-bold text-sm truncate">{e.courseTitle}</p>
-                  <p className="text-xs text-muted-foreground font-medium">
+                  <p className="font-medium text-xs text-slate-900 truncate">{e.courseTitle}</p>
+                  <p className="text-[11px] text-slate-500">
                     {e.studentName} • {new Date(e.createdAt).toLocaleDateString()}
                   </p>
                 </div>
                 <div className="text-right shrink-0">
-                  <p className="font-semibold text-emerald-600">
+                  <p className="font-semibold text-xs text-emerald-600">
                     +{formatPrice(e.amount)}
                   </p>
-                  <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest">
+                  <p className="text-[10px] text-slate-400 uppercase tracking-wider">
                     of {formatPrice(e.coursePrice)} sale
                   </p>
                 </div>
@@ -246,37 +244,37 @@ export default function EarningsPanel() {
 
       {/* Payout history */}
       {payouts.length > 0 && (
-        <div className="bg-white rounded-2xl p-8 border border-slate-100 shadow-md shadow-blue-600/5">
-          <h3 className="font-semibold text-xl mb-6">Payout History</h3>
-          <div className="space-y-3">
+        <div className="bg-white rounded-lg p-4 sm:p-5 border border-slate-200 shadow-xs">
+          <h3 className="font-semibold text-sm text-slate-900 mb-3">Payout History</h3>
+          <div className="space-y-2">
             {payouts.map((p) => (
               <div
                 key={p._id}
-                className="flex items-center justify-between gap-4 p-4 rounded-2xl bg-slate-50"
+                className="flex items-center justify-between gap-3 p-3 rounded-lg bg-slate-50 border border-slate-100"
               >
                 <div className="min-w-0">
-                  <p className="font-bold text-sm flex items-center gap-2">
-                    <Receipt className="w-4 h-4 text-slate-400" />
+                  <p className="font-medium text-xs text-slate-900 flex items-center gap-1.5">
+                    <Receipt className="w-3.5 h-3.5 text-slate-400" />
                     {formatPrice(p.amount)}
-                    <span className="text-xs text-muted-foreground font-medium">
+                    <span className="text-[11px] text-slate-500">
                       to {p.bankName}
                     </span>
                   </p>
-                  <p className="text-xs text-muted-foreground font-medium truncate">
+                  <p className="text-[11px] text-slate-400 truncate">
                     {p.reference} • {new Date(p.requestedAt).toLocaleDateString()}
                   </p>
                 </div>
                 <span
                   className={cn(
-                    "text-[10px] font-semibold uppercase tracking-widest px-3 py-1.5 rounded-full shrink-0",
+                    "text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded shrink-0",
                     p.status === "paid" &&
-                      "bg-emerald-100 text-emerald-700  ",
+                      "bg-emerald-50 text-emerald-700",
                     p.status === "requested" &&
-                      "bg-amber-100 text-amber-700  ",
+                      "bg-amber-50 text-amber-700",
                     p.status === "processing" &&
-                      "bg-blue-100 text-blue-700  ",
+                      "bg-blue-50 text-blue-700",
                     p.status === "failed" &&
-                      "bg-red-100 text-red-700  "
+                      "bg-red-50 text-red-700"
                   )}
                 >
                   {p.status}

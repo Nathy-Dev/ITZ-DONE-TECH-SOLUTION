@@ -67,64 +67,64 @@ export default function MentorRegister({ userId }: MentorRegisterProps) {
   };
 
   return (
-    <div className="bg-white rounded-2xl p-8 border border-slate-100 shadow-md max-w-2xl">
-      <div className="mb-8">
-        <h2 className="text-2xl font-semibold">Become a Mentor</h2>
-        <p className="text-sm text-muted-foreground font-medium mt-1">Share your expertise and guide others in their tech journey.</p>
+    <div className="bg-white rounded-lg p-4 sm:p-5 border border-slate-200 shadow-xs max-w-2xl">
+      <div className="mb-4">
+        <h2 className="text-base font-semibold text-slate-900">Become a Mentor</h2>
+        <p className="text-xs text-slate-500 mt-0.5">Share your expertise and guide others in their tech journey.</p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="space-y-2">
-          <label className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mx-4">Biography</label>
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="space-y-1">
+          <label className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">Biography</label>
           <textarea
             required
             placeholder="Tell us about your experience and how you can help..."
-            className="w-full h-32 px-4 sm:px-6 py-3 bg-slate-50 border-2 border-slate-100 rounded-2xl font-medium focus:border-blue-600 transition-colors outline-none text-sm resize-none"
+            className="w-full h-24 px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition-colors outline-none resize-none"
             value={formData.bio}
             onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
           />
         </div>
 
-        <div className="grid md:grid-cols-2 gap-6">
-          <div className="space-y-2">
-            <label className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mx-4">Expertise (comma separated)</label>
+        <div className="grid md:grid-cols-2 gap-3.5">
+          <div className="space-y-1">
+            <label className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">Expertise (comma separated)</label>
             <input
               type="text"
               required
               placeholder="React, Node.js, Architecture..."
-              className="w-full px-4 sm:px-6 py-3 bg-slate-50 border-2 border-slate-100 rounded-2xl font-bold focus:border-blue-600 transition-colors outline-none text-sm"
+              className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition-colors outline-none"
               value={formData.expertise}
               onChange={(e) => setFormData({ ...formData, expertise: e.target.value })}
             />
           </div>
 
-          <div className="space-y-2">
-            <label className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mx-4">Hourly Rate (₦)</label>
+          <div className="space-y-1">
+            <label className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">Hourly Rate (₦)</label>
             <input
               type="number"
               required
               min="0"
-              className="w-full px-4 sm:px-6 py-3 bg-slate-50 border-2 border-slate-100 rounded-2xl font-bold focus:border-blue-600 transition-colors outline-none text-sm"
+              className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition-colors outline-none"
               value={formData.hourlyRate}
               onChange={(e) => setFormData({ ...formData, hourlyRate: parseInt(e.target.value) })}
             />
           </div>
         </div>
 
-        <div className="flex items-center gap-4 p-4 bg-slate-50 rounded-2xl">
+        <div className="flex items-center gap-2.5 p-3 bg-slate-50 border border-slate-100 rounded-lg">
             <input 
                 type="checkbox"
                 id="isAvailable"
-                className="w-5 h-5 rounded border-slate-300 text-blue-600 focus:ring-blue-600"
+                className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-600"
                 checked={formData.isAvailable}
                 onChange={(e) => setFormData({ ...formData, isAvailable: e.target.checked })}
             />
-            <label htmlFor="isAvailable" className="text-sm font-bold cursor-pointer">Available for new mentorship requests</label>
+            <label htmlFor="isAvailable" className="text-xs font-medium text-slate-700 cursor-pointer">Available for new mentorship requests</label>
         </div>
 
         {error && (
-            <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-2xl flex items-center gap-2 text-red-600 text-xs font-bold">
-                <AlertCircle className="w-4 h-4" />
+            <div className="p-3 bg-red-50 border border-red-100 rounded-lg flex items-center gap-2 text-red-600 text-xs">
+                <AlertCircle className="w-3.5 h-3.5 shrink-0" />
                 {error}
             </div>
         )}
@@ -133,20 +133,20 @@ export default function MentorRegister({ userId }: MentorRegisterProps) {
           type="submit"
           disabled={isSaving}
           className={cn(
-            "w-full py-3 rounded-xl font-medium text-sm flex items-center justify-center gap-2 transition-colors",
-            success ? "bg-emerald-500 text-white" : "bg-blue-600 text-white hover:bg-blue-700"
+            "w-full py-2 rounded-lg font-medium text-xs flex items-center justify-center gap-1.5 transition-colors shadow-sm",
+            success ? "bg-emerald-600 text-white" : "bg-blue-600 text-white hover:bg-blue-700 shadow-blue-600/20"
           )}
         >
           {isSaving ? (
-            <Loader2 className="w-5 h-5 animate-spin" />
+            <Loader2 className="w-4 h-4 animate-spin" />
           ) : success ? (
             <>
-                <CheckCircle2 className="w-5 h-5" />
+                <CheckCircle2 className="w-4 h-4" />
                 Settings Saved
             </>
           ) : (
             <>
-                <Save className="w-5 h-5" />
+                <Save className="w-4 h-4" />
                 {existingProfile ? "Update Profile" : "Register as Mentor"}
             </>
           )}

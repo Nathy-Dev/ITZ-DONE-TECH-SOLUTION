@@ -82,12 +82,12 @@ export default function NotificationsBell() {
           if (!isOpen) setOpenedAt(Date.now());
           setIsOpen(!isOpen);
         }}
-        className="p-3 bg-white border border-slate-200 rounded-2xl hover:bg-slate-50 transition-all relative"
+        className="p-2 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-all relative text-slate-700"
         aria-label={`Notifications${unreadCount > 0 ? ` (${unreadCount} new)` : ""}`}
       >
-        <Bell className="w-6 h-6 text-slate-600" />
+        <Bell className="w-4 h-4 text-slate-600" />
         {unreadCount > 0 && (
-          <span className="absolute top-2 right-2 min-w-[16px] h-4 px-1 bg-red-500 text-[9px] text-white rounded-full flex items-center justify-center font-semibold border-2 border-white">
+          <span className="absolute -top-1 -right-1 min-w-[15px] h-3.5 px-1 bg-red-500 text-[8px] text-white rounded-full flex items-center justify-center font-bold border border-white">
             {unreadCount > 9 ? "9+" : unreadCount}
           </span>
         )}
@@ -96,53 +96,53 @@ export default function NotificationsBell() {
       {isOpen && (
         <div
           ref={menuRef}
-          className="absolute right-0 mt-3 w-[calc(100vw-2rem)] sm:w-96 max-h-[70vh] overflow-hidden bg-white border border-slate-200 rounded-xl shadow-sm z-50 animate-in fade-in zoom-in-95 duration-200 origin-top-right flex flex-col"
+          className="absolute right-0 mt-2 w-[calc(100vw-2rem)] sm:w-80 max-h-[70vh] overflow-hidden bg-white border border-slate-200 rounded-lg shadow-md z-50 animate-in fade-in duration-150 origin-top-right flex flex-col"
         >
-          <div className="p-4 border-b border-slate-100 flex items-center justify-between shrink-0">
-            <h3 className="font-semibold text-sm uppercase tracking-widest">Notifications</h3>
+          <div className="p-3 border-b border-slate-100 flex items-center justify-between shrink-0">
+            <h3 className="font-semibold text-xs uppercase tracking-wider text-slate-900">Notifications</h3>
             {unreadCount > 0 && (
-              <span className="text-[10px] font-bold text-muted-foreground">{unreadCount} new</span>
+              <span className="text-[10px] font-bold text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded">{unreadCount} new</span>
             )}
           </div>
 
           <div className="overflow-y-auto custom-scrollbar">
             {visible.length === 0 ? (
-              <div className="p-8 text-center">
-                <Bell className="w-8 h-8 text-slate-200 mx-auto mb-3" />
-                <p className="text-sm font-bold text-muted-foreground">You&#39;re all caught up!</p>
-                <p className="text-xs text-slate-400 mt-1">New activity will appear here.</p>
+              <div className="p-6 text-center">
+                <Bell className="w-6 h-6 text-slate-300 mx-auto mb-2" />
+                <p className="text-xs font-semibold text-slate-700">You&#39;re all caught up!</p>
+                <p className="text-[11px] text-slate-400 mt-0.5">New activity will appear here.</p>
               </div>
             ) : (
-              <div className="divide-y divide-slate-50">
+              <div className="divide-y divide-slate-100">
                 {visible.map((n: Notification) => (
-                  <div key={n.id} className="p-4 flex items-start gap-3 hover:bg-slate-50 transition-colors group">
+                  <div key={n.id} className="p-3 flex items-start gap-2.5 hover:bg-slate-50 transition-colors group">
                     <div
                       className={cn(
-                        "w-8 h-8 rounded-xl flex items-center justify-center shrink-0 mt-0.5",
-                        n.type === "success" && "bg-emerald-100  text-emerald-600",
-                        n.type === "warning" && "bg-amber-100  text-amber-600",
-                        n.type === "info" && "bg-blue-100  text-blue-600"
+                        "w-6 h-6 rounded flex items-center justify-center shrink-0 mt-0.5",
+                        n.type === "success" && "bg-emerald-50 text-emerald-600",
+                        n.type === "warning" && "bg-amber-50 text-amber-600",
+                        n.type === "info" && "bg-blue-50 text-blue-600"
                       )}
                     >
                       {n.type === "success" ? (
-                        <CheckCircle2 className="w-4 h-4" />
+                        <CheckCircle2 className="w-3.5 h-3.5" />
                       ) : n.type === "warning" ? (
-                        <AlertCircle className="w-4 h-4" />
+                        <AlertCircle className="w-3.5 h-3.5" />
                       ) : (
-                        <Info className="w-4 h-4" />
+                        <Info className="w-3.5 h-3.5" />
                       )}
                     </div>
                     <div className="min-w-0 flex-grow">
-                      <p className="text-sm font-bold leading-tight">{n.title}</p>
-                      <p className="text-xs text-muted-foreground mt-1 leading-relaxed">{n.message}</p>
-                      <p className="text-[10px] text-slate-400 font-bold mt-1.5">{timeAgo(n.createdAt)}</p>
+                      <p className="text-xs font-semibold text-slate-900 leading-tight">{n.title}</p>
+                      <p className="text-[11px] text-slate-500 mt-0.5 leading-relaxed">{n.message}</p>
+                      <p className="text-[9px] text-slate-400 font-medium mt-1">{timeAgo(n.createdAt)}</p>
                     </div>
                     <button
                       onClick={() => dismiss(n.id)}
-                      className="p-1.5 text-slate-300 hover:text-slate-500 hover:bg-slate-100 rounded-lg opacity-0 group-hover:opacity-100 transition-all shrink-0"
+                      className="p-1 text-slate-300 hover:text-slate-500 hover:bg-slate-100 rounded opacity-0 group-hover:opacity-100 transition-all shrink-0"
                       aria-label="Dismiss notification"
                     >
-                      <X className="w-3.5 h-3.5" />
+                      <X className="w-3 h-3" />
                     </button>
                   </div>
                 ))}

@@ -55,14 +55,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <AdminSidebar onNavigate={() => setSidebarOpen(false)} />
       </div>
 
-      <main className="flex-1 overflow-y-auto p-4 sm:p-8">
+      <main className="flex-1 overflow-y-auto p-3 sm:p-6">
         {/* Mobile menu toggle */}
         <button
           onClick={() => setSidebarOpen(true)}
-          className="lg:hidden mb-6 p-3 bg-white border border-slate-200 rounded-2xl shadow-sm"
+          className="lg:hidden mb-4 p-2 bg-white border border-slate-200 rounded-lg shadow-xs"
           aria-label="Open admin menu"
         >
-          <Menu className="w-5 h-5" />
+          <Menu className="w-4 h-4" />
         </button>
         <div className="max-w-6xl mx-auto">
           {children}

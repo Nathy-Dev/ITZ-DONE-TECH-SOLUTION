@@ -32,35 +32,35 @@ export default function BusinessPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white pt-20 pb-10">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-white pt-16 pb-8">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Hero Section */}
-        <div className="text-center max-w-3xl mx-auto mb-6">
-          <div className="w-16 h-16 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-8 shadow-md shadow-blue-600/10">
-            <Briefcase className="w-8 h-8" />
+        <div className="text-center max-w-2xl mx-auto mb-6">
+          <div className="w-11 h-11 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center mx-auto mb-4">
+            <Briefcase className="w-5 h-5" />
           </div>
-          <h1 className="text-5xl md:text-6xl font-semibold tracking-tight mb-6 leading-tight">
-            Upskill your entire <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-blue-500">engineering team</span>
+          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight mb-3 leading-tight text-slate-900">
+            Upskill your entire <span className="text-blue-600">engineering team</span>
           </h1>
-          <p className="text-xl text-slate-500 mb-6 font-medium leading-relaxed">
+          <p className="text-slate-500 mb-5 text-sm leading-relaxed">
             Get unlimited access to our premium course library, custom learning paths, and dedicated analytics for your organization.
           </p>
 
           {/* Waitlist Form */}
-          <div className="max-w-md mx-auto bg-slate-50 rounded-2xl p-2 border border-slate-100 shadow-sm relative">
+          <div className="max-w-sm mx-auto bg-slate-50 rounded-lg p-2 border border-slate-200 shadow-xs relative">
             {isSuccess ? (
-              <div className="p-8 text-center animate-in fade-in zoom-in duration-500">
-                <div className="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <CheckCircle2 className="w-8 h-8" />
+              <div className="p-6 text-center animate-in fade-in zoom-in duration-500">
+                <div className="w-10 h-10 bg-emerald-100 text-emerald-600 rounded-lg flex items-center justify-center mx-auto mb-3">
+                  <CheckCircle2 className="w-5 h-5" />
                 </div>
-                <h3 className="text-xl font-semibold mb-2">You&apos;re on the list!</h3>
-                <p className="text-sm font-medium text-slate-500">We&apos;ll be in touch soon with priority access.</p>
+                <h3 className="text-sm font-bold text-slate-900 mb-1">You&apos;re on the list!</h3>
+                <p className="text-xs text-slate-500">We&apos;ll be in touch soon with priority access.</p>
               </div>
             ) : (
-              <form onSubmit={handleSubmit} className="flex flex-col gap-4 p-4">
-                <div className="text-left mb-2">
-                  <h3 className="font-semibold">Join the Business Waitlist</h3>
-                  <p className="text-xs font-bold text-slate-500 mt-1 uppercase tracking-widest">Early access opening soon</p>
+              <form onSubmit={handleSubmit} className="flex flex-col gap-3 p-3">
+                <div className="text-left mb-1">
+                  <h3 className="font-semibold text-sm text-slate-900">Join the Business Waitlist</h3>
+                  <p className="text-[10px] font-semibold text-slate-500 mt-0.5 uppercase tracking-wider">Early access opening soon</p>
                 </div>
                 
                 <input
@@ -69,22 +69,22 @@ export default function BusinessPage() {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-4 sm:px-6 py-3 bg-white border-2 border-slate-200 rounded-2xl font-bold focus:border-blue-600 focus:outline-none transition-colors"
+                  className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 focus:outline-none transition-colors"
                 />
                 
-                {error && <p className="text-xs font-bold text-red-500 px-2 text-left">{error}</p>}
+                {error && <p className="text-xs text-red-500 px-1 text-left">{error}</p>}
                 
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full py-3 bg-blue-600 text-white font-semibold rounded-2xl hover:bg-blue-700 shadow-md shadow-blue-600/20 transition-all flex items-center justify-center gap-2 disabled:opacity-70 group"
+                  className="w-full py-2 bg-blue-600 text-white text-xs font-semibold rounded-lg hover:bg-blue-700 shadow-sm shadow-blue-600/20 transition-all flex items-center justify-center gap-1.5 disabled:opacity-70 group"
                 >
                   {isSubmitting ? (
-                    <Loader2 className="w-5 h-5 animate-spin" />
+                    <Loader2 className="w-4 h-4 animate-spin" />
                   ) : (
                     <>
                       Get Priority Access
-                      <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                      <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
                     </>
                   )}
                 </button>
@@ -94,7 +94,7 @@ export default function BusinessPage() {
         </div>
 
         {/* Features Grid */}
-        <div className="grid md:grid-cols-3 gap-8 mt-32">
+        <div className="grid md:grid-cols-3 gap-4 mt-16">
           {[
             {
               icon: Building2,
@@ -112,12 +112,12 @@ export default function BusinessPage() {
               desc: "Enterprise-grade security with SAML SSO integration and admin controls."
             }
           ].map((feature, i) => (
-            <div key={i} className="bg-slate-50 p-8 rounded-2xl border border-slate-100 hover:shadow-sm hover:-translate-y-2 transition-all duration-300">
-              <div className="w-12 h-12 bg-white text-blue-600 rounded-2xl flex items-center justify-center mb-6 shadow-sm">
-                <feature.icon className="w-6 h-6" />
+            <div key={i} className="bg-slate-50 p-5 rounded-lg border border-slate-200 hover:border-blue-200 hover:shadow-xs transition-all duration-200">
+              <div className="w-9 h-9 bg-white text-blue-600 rounded-lg flex items-center justify-center mb-3 shadow-xs border border-slate-100">
+                <feature.icon className="w-4 h-4" />
               </div>
-              <h3 className="text-xl font-semibold mb-3">{feature.title}</h3>
-              <p className="text-slate-500 font-medium leading-relaxed">{feature.desc}</p>
+              <h3 className="text-sm font-semibold text-slate-900 mb-1.5">{feature.title}</h3>
+              <p className="text-slate-500 text-xs leading-relaxed">{feature.desc}</p>
             </div>
           ))}
         </div>
