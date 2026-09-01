@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
+import { Doc, Id } from "../../../../convex/_generated/dataModel";
 import { useSession } from "next-auth/react";
 import { Search, Eye, CheckCircle, XCircle, X, PlayCircle, Video, FileText } from "lucide-react";
 import Image from "next/image";
@@ -13,7 +14,7 @@ export default function AdminCoursesPage() {
   const { data: session } = useSession();
   const [searchTerm, setSearchTerm] = useState("");
   const [reviewModalOpen, setReviewModalOpen] = useState(false);
-  const [selectedCourse, setSelectedCourse] = useState<any>(null);
+  const [selectedCourse, setSelectedCourse] = useState<Doc<"courses"> | null>(null);
   const [rejectionReason, setRejectionReason] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -23,7 +24,7 @@ export default function AdminCoursesPage() {
 
   const reviewCourse = useMutation(api.admin.reviewCourse);
 
-  const handleOpenReview = (course: any) => {
+  const handleOpenReview = (course: Doc<"courses">) => {
     setSelectedCourse(course);
     setRejectionReason(course.rejectionReason || "");
     setReviewModalOpen(true);
@@ -240,7 +241,7 @@ function AdminCourseThumbnail({ title, thumbnailUrl }: { title: string, thumbnai
   );
 }
 
-function CoursePreview({ courseId }: { courseId: any }) {
+function CoursePreview({ courseId }: { courseId: Id<"courses"> }) {
   const sections = useQuery(api.content.listSections, { courseId });
   const media = useQuery(api.files.listMedia, { courseId });
   const [previewResource, setPreviewResource] = useState<{ url: string, type: 'video' | 'document', title: string } | null>(null);
@@ -264,14 +265,14 @@ function CoursePreview({ courseId }: { courseId: any }) {
               Course Attachments
             </div>
             <div className="divide-y divide-slate-100">
-               {media.map((m: any) => (
+               {media.map((m) => (
                  <div key={m._id} className="p-3 pl-8 text-sm flex items-center justify-between group">
                    <span className="font-medium text-slate-700 flex items-center gap-2">
                      <FileText className="w-3.5 h-3.5 text-blue-500" />
                      {m.name}
                    </span>
                    {m.resolvedUrl && (
-                     <button onClick={() => setPreviewResource({ url: m.resolvedUrl, type: 'document', title: m.name })} className="text-xs text-blue-600 hover:underline flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                     <button onClick={() => setPreviewResource({ url: m.resolvedUrl!, type: 'document', title: m.name })} className="text-xs text-blue-600 hover:underline flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                        <Eye className="w-3 h-3" /> View
                      </button>
                    )}
@@ -301,7 +302,13 @@ function CoursePreview({ courseId }: { courseId: any }) {
   );
 }
 
-function SectionPreview({ section, setPreviewResource }: { section: any, setPreviewResource: any }) {
+function SectionPreview({ 
+  section, 
+  setPreviewResource 
+}: { 
+  section: Doc<"sections">; 
+  setPreviewResource: (res: { url: string; type: "video" | "document"; title: string } | null) => void;
+}) {
   const lessons = useQuery(api.content.listLessons, { sectionId: section._id });
 
   const getEmbedUrl = (url: string) => {
@@ -317,7 +324,7 @@ function SectionPreview({ section, setPreviewResource }: { section: any, setPrev
         return `https://player.vimeo.com/video/${videoId}`;
       }
       return url;
-    } catch (e) {
+    } catch {
       return url;
     }
   };
@@ -333,7 +340,7 @@ function SectionPreview({ section, setPreviewResource }: { section: any, setPrev
         ) : lessons.length === 0 ? (
           <div className="p-3 text-xs text-slate-400 pl-8">Empty section</div>
         ) : (
-          lessons.sort((a, b) => a.order - b.order).map((lesson: any) => (
+          lessons.sort((a, b) => a.order - b.order).map((lesson) => (
             <div key={lesson._id} className="p-3 pl-8 text-sm flex flex-col gap-1 group">
               <div className="flex items-center justify-between">
                 <span className="font-medium text-slate-700 flex items-center gap-2">
@@ -344,7 +351,7 @@ function SectionPreview({ section, setPreviewResource }: { section: any, setPrev
               </div>
               {lesson.videoUrl && (
                  <button 
-                   onClick={() => setPreviewResource({ url: getEmbedUrl(lesson.videoUrl), type: 'video', title: lesson.title })} 
+                   onClick={() => setPreviewResource({ url: getEmbedUrl(lesson.videoUrl!), type: 'video', title: lesson.title })} 
                    className="text-xs text-blue-600 hover:underline flex items-center gap-1 ml-5 mt-1 w-fit opacity-0 group-hover:opacity-100 transition-opacity"
                  >
                    <Video className="w-3 h-3" /> View Video

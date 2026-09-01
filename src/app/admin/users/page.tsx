@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
+import { Id } from "../../../../convex/_generated/dataModel";
 import { useSession } from "next-auth/react";
 import { Shield, ShieldAlert, ShieldCheck, Search } from "lucide-react";
 import Image from "next/image";
@@ -18,7 +19,7 @@ export default function AdminUsersPage() {
 
   const updateUserRole = useMutation(api.admin.updateUserRole);
 
-  const handleRoleChange = async (userId: any, newRole: string) => {
+  const handleRoleChange = async (userId: Id<"users">, newRole: string) => {
     if (!session?.user?.id) return;
     try {
       await updateUserRole({
