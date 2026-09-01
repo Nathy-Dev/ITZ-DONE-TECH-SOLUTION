@@ -63,101 +63,97 @@ export default function AdminPayoutsPage() {
 
   if (status === "loading" || overview === undefined) {
     return (
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <Loader2 className="w-10 h-10 text-blue-600 animate-spin" />
+      <div className="flex items-center justify-center min-h-[50vh]">
+        <Loader2 className="w-8 h-8 text-blue-600 animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-5 pb-8">
       <div>
-        <h1 className="text-3xl font-semibold tracking-tight mb-2">Payouts & Revenue</h1>
-        <p className="text-muted-foreground font-medium">
+        <h1 className="text-xl font-bold tracking-tight text-slate-900 mb-0.5">Payouts & Revenue</h1>
+        <p className="text-slate-500 text-xs">
           Review instructor payout requests and track platform revenue (40% share).
         </p>
       </div>
 
       {/* Revenue overview */}
-      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="bg-blue-600 text-white rounded-xl p-6 shadow-sm">
-          <div>
-            <div className="flex items-center gap-2 mb-3">
-              <TrendingUp className="w-5 h-5 text-blue-100" />
-              <p className="text-xs font-medium uppercase tracking-wide text-blue-100">
-                Platform Revenue
-              </p>
-            </div>
-            <p className="text-3xl font-bold">{formatPrice(overview.platformRevenue)}</p>
-            <p className="text-xs text-blue-100 mt-2">40% of all course sales</p>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <div className="bg-blue-600 text-white rounded-lg p-4 shadow-xs">
+          <div className="flex items-center gap-2 mb-2">
+            <TrendingUp className="w-4 h-4 text-blue-100" />
+            <p className="text-[10px] font-semibold uppercase tracking-wider text-blue-100">
+              Platform Revenue
+            </p>
           </div>
+          <p className="text-2xl font-bold">{formatPrice(overview.platformRevenue)}</p>
+          <p className="text-[10px] text-blue-100 mt-1">40% share of all sales</p>
         </div>
 
-        <div className="bg-white p-6 rounded-xl border border-slate-100 shadow-sm">
-          <div className="flex items-center gap-2 mb-3">
-            <Users className="w-5 h-5 text-emerald-500" />
-            <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+        <div className="bg-white p-4 rounded-lg border border-slate-200 shadow-xs">
+          <div className="flex items-center gap-1.5 mb-2">
+            <Users className="w-4 h-4 text-emerald-500" />
+            <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">
               Instructor Earnings
             </p>
           </div>
-          <p className="text-3xl font-semibold">{formatPrice(overview.instructorEarnings)}</p>
-          <p className="text-[10px] text-muted-foreground font-bold mt-2">
-            60% share owed to instructors
-          </p>
+          <p className="text-2xl font-bold text-slate-900">{formatPrice(overview.instructorEarnings)}</p>
+          <p className="text-[10px] text-slate-400 mt-1">60% share to instructors</p>
         </div>
 
-        <div className="bg-white p-6 rounded-xl border border-slate-100 shadow-sm">
-          <div className="flex items-center gap-2 mb-3">
-            <Receipt className="w-5 h-5 text-blue-500" />
-            <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
-              Successful Payments
+        <div className="bg-white p-4 rounded-lg border border-slate-200 shadow-xs">
+          <div className="flex items-center gap-1.5 mb-2">
+            <Receipt className="w-4 h-4 text-blue-500" />
+            <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+              Payments
             </p>
           </div>
-          <p className="text-3xl font-semibold">{overview.totalPayments}</p>
-          <p className="text-[10px] text-muted-foreground font-bold mt-2">All-time via Flutterwave</p>
+          <p className="text-2xl font-bold text-slate-900">{overview.totalPayments}</p>
+          <p className="text-[10px] text-slate-400 mt-1">All-time transactions</p>
         </div>
 
-        <div className="bg-white p-6 rounded-xl border border-slate-100 shadow-sm">
-          <div className="flex items-center gap-2 mb-3">
-            <Clock className="w-5 h-5 text-amber-500" />
-            <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+        <div className="bg-white p-4 rounded-lg border border-slate-200 shadow-xs">
+          <div className="flex items-center gap-1.5 mb-2">
+            <Clock className="w-4 h-4 text-amber-500" />
+            <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">
               Pending Payouts
             </p>
           </div>
-          <p className="text-3xl font-semibold">{overview.pendingPayoutCount}</p>
-          <p className="text-[10px] text-muted-foreground font-bold mt-2">
-            {formatPrice(overview.pendingPayoutAmount)} awaiting review
+          <p className="text-2xl font-bold text-slate-900">{overview.pendingPayoutCount}</p>
+          <p className="text-[10px] text-slate-400 mt-1">
+            {formatPrice(overview.pendingPayoutAmount)} awaiting
           </p>
         </div>
       </div>
 
       {/* Alerts */}
       {error && (
-        <div className="flex items-start gap-3 p-4 bg-red-500/10 border border-red-500/20 rounded-2xl text-red-600 text-xs font-bold">
-          <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+        <div className="flex items-start gap-2 p-3 bg-red-50 border border-red-100 rounded-lg text-red-600 text-xs font-medium">
+          <AlertCircle className="w-3.5 h-3.5 shrink-0 mt-0.5" />
           {error}
         </div>
       )}
       {success && (
-        <div className="flex items-start gap-3 p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl text-emerald-600 text-xs font-bold">
-          <CheckCircle2 className="w-4 h-4 shrink-0 mt-0.5" />
+        <div className="flex items-start gap-2 p-3 bg-emerald-50 border border-emerald-100 rounded-lg text-emerald-700 text-xs font-medium">
+          <CheckCircle2 className="w-3.5 h-3.5 shrink-0 mt-0.5" />
           {success}
         </div>
       )}
 
       {/* Payout requests */}
-      <div className="bg-white rounded-2xl p-8 border border-slate-100 shadow-md shadow-blue-600/5">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
-          <h2 className="text-2xl font-semibold">Payout Requests</h2>
-          <div className="flex bg-slate-100 p-1.5 rounded-2xl w-fit">
+      <div className="bg-white rounded-lg p-4 sm:p-5 border border-slate-200 shadow-xs">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+          <h2 className="text-base font-semibold text-slate-900">Payout Requests</h2>
+          <div className="flex bg-slate-100 p-0.5 rounded-lg w-fit">
             {["requested", "processing", "paid", "failed"].map((s) => (
               <button
                 key={s}
                 onClick={() => setStatusFilter(s)}
                 className={cn(
-                  "px-4 py-2 rounded-xl text-xs font-bold capitalize transition-all",
+                  "px-3 py-1 rounded-md text-xs font-medium capitalize transition-all",
                   statusFilter === s
-                    ? "bg-white  shadow-sm text-blue-600 "
+                    ? "bg-white shadow-xs text-blue-600"
                     : "text-slate-500 hover:text-slate-700"
                 )}
               >
@@ -168,73 +164,73 @@ export default function AdminPayoutsPage() {
         </div>
 
         {payouts === undefined ? (
-          <div className="flex items-center justify-center py-12">
-            <Loader2 className="w-8 h-8 text-blue-600 animate-spin" />
+          <div className="flex items-center justify-center py-8">
+            <Loader2 className="w-6 h-6 text-blue-600 animate-spin" />
           </div>
         ) : payouts.length === 0 ? (
-          <div className="text-center py-12 border-2 border-dashed border-slate-100 rounded-2xl">
-            <p className="text-muted-foreground font-bold italic">
+          <div className="text-center py-8 border border-dashed border-slate-200 rounded-lg">
+            <p className="text-xs text-slate-400">
               No {statusFilter} payout requests.
             </p>
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-2.5">
             {payouts.map((p) => (
               <div
                 key={p._id}
-                className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-5 border border-slate-50 rounded-2xl bg-slate-50/50"
+                className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 border border-slate-100 rounded-lg bg-slate-50/70"
               >
-                <div className="space-y-1">
-                  <div className="flex items-center gap-3">
-                    <p className="font-semibold text-lg">{formatPrice(p.amount)}</p>
+                <div className="space-y-0.5 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <p className="font-semibold text-sm text-slate-900">{formatPrice(p.amount)}</p>
                     <span
                       className={cn(
-                        "text-[10px] font-semibold uppercase tracking-widest px-3 py-1 rounded-full",
+                        "text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded",
                         p.status === "paid" &&
-                          "bg-emerald-100 text-emerald-700  ",
+                          "bg-emerald-50 text-emerald-700",
                         p.status === "requested" &&
-                          "bg-amber-100 text-amber-700  ",
+                          "bg-amber-50 text-amber-700",
                         p.status === "processing" &&
-                          "bg-blue-100 text-blue-700  ",
+                          "bg-blue-50 text-blue-700",
                         p.status === "failed" &&
-                          "bg-red-100 text-red-700  "
+                          "bg-red-50 text-red-700"
                       )}
                     >
                       {p.status}
                     </span>
                   </div>
-                  <p className="text-sm font-bold">{p.instructorName}</p>
-                  <p className="text-xs text-muted-foreground font-medium">
+                  <p className="text-xs font-medium text-slate-800">{p.instructorName}</p>
+                  <p className="text-[11px] text-slate-500">
                     {p.bankName} • {p.accountNumber} ({p.accountName})
                   </p>
                   <p className="text-[10px] text-slate-400 font-mono">
                     {p.reference} • requested {new Date(p.requestedAt).toLocaleString()}
                   </p>
                   {p.failureReason && (
-                    <p className="text-xs text-red-500 font-bold">Reason: {p.failureReason}</p>
+                    <p className="text-[11px] text-red-600 font-medium">Reason: {p.failureReason}</p>
                   )}
                 </div>
 
                 {p.status === "requested" && (
-                  <div className="flex items-center gap-3 shrink-0">
+                  <div className="flex items-center gap-2 shrink-0">
                     <button
                       onClick={() => handleAction(p._id, "approve")}
                       disabled={processingId === p._id}
-                      className="flex items-center gap-2 px-4 sm:px-6 py-3 bg-emerald-600 text-white font-semibold rounded-2xl hover:bg-emerald-700 transition-all shadow-sm shadow-emerald-800/20 active:scale-95 disabled:opacity-60 text-sm"
+                      className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 text-white font-medium rounded-lg hover:bg-emerald-700 transition-all shadow-xs active:scale-95 disabled:opacity-60 text-xs"
                     >
                       {processingId === p._id ? (
-                        <Loader2 className="w-4 h-4 animate-spin" />
+                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
                       ) : (
-                        <CheckCircle2 className="w-4 h-4" />
+                        <CheckCircle2 className="w-3.5 h-3.5" />
                       )}
                       Approve & Pay
                     </button>
                     <button
                       onClick={() => handleAction(p._id, "reject")}
                       disabled={processingId === p._id}
-                      className="flex items-center gap-2 px-4 sm:px-6 py-3 bg-red-50 text-red-600 font-semibold rounded-2xl hover:bg-red-100 transition-all active:scale-95 disabled:opacity-60 text-sm"
+                      className="flex items-center gap-1.5 px-3 py-1.5 bg-red-50 text-red-600 font-medium rounded-lg hover:bg-red-100 transition-all active:scale-95 disabled:opacity-60 text-xs"
                     >
-                      <XCircle className="w-4 h-4" />
+                      <XCircle className="w-3.5 h-3.5" />
                       Reject
                     </button>
                   </div>
@@ -246,28 +242,28 @@ export default function AdminPayoutsPage() {
       </div>
 
       {/* Recent payments */}
-      <div className="bg-white rounded-2xl p-8 border border-slate-100 shadow-md shadow-blue-600/5">
-        <h2 className="text-2xl font-semibold mb-6">Recent Payments</h2>
+      <div className="bg-white rounded-lg p-4 sm:p-5 border border-slate-200 shadow-xs">
+        <h2 className="text-base font-semibold text-slate-900 mb-3">Recent Payments</h2>
         {overview.recentPayments.length === 0 ? (
-          <div className="text-center py-12 border-2 border-dashed border-slate-100 rounded-2xl">
-            <p className="text-muted-foreground font-bold italic">No payments yet.</p>
+          <div className="text-center py-8 border border-dashed border-slate-200 rounded-lg">
+            <p className="text-xs text-slate-400">No payments yet.</p>
           </div>
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-2">
             {overview.recentPayments.map((p) => (
               <div
                 key={p._id}
-                className="flex items-center justify-between gap-4 p-4 rounded-2xl bg-slate-50"
+                className="flex items-center justify-between gap-3 p-3 rounded-lg bg-slate-50 border border-slate-100"
               >
                 <div className="min-w-0">
-                  <p className="font-bold text-sm">{p.studentName}</p>
-                  <p className="text-xs text-muted-foreground font-medium">
+                  <p className="font-medium text-xs text-slate-900">{p.studentName}</p>
+                  <p className="text-[11px] text-slate-500">
                     {p.itemCount} course{p.itemCount > 1 ? "s" : ""} •{" "}
                     {new Date(p.completedAt).toLocaleString()}
                   </p>
                 </div>
                 <div className="text-right shrink-0">
-                  <p className="font-semibold text-emerald-600">
+                  <p className="font-semibold text-xs text-emerald-600">
                     {formatPrice(p.amount)}
                   </p>
                   <p className="text-[10px] text-slate-400 font-mono">{p.txRef}</p>
