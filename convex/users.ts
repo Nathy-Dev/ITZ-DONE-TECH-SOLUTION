@@ -156,7 +156,7 @@ export const getUserByProviderId = query({
         .withIndex("by_email", (q) => q.eq("email", email))
         .unique();
     }
-    if (user && user.email && SUPER_ADMIN_EMAILS.includes(user.email)) {
+    if (user && user.email && SUPER_ADMIN_EMAILS.some((e) => e.toLowerCase() === user.email?.toLowerCase())) {
       return { ...user, role: "admin" };
     }
 
@@ -189,7 +189,7 @@ export const createOrUpdateUser = mutation({
 
     if (user) {
       // Update existing user
-      const isSuperAdmin = SUPER_ADMIN_EMAILS.includes(args.email);
+      const isSuperAdmin = SUPER_ADMIN_EMAILS.some((e) => e.toLowerCase() === args.email.toLowerCase());
       await ctx.db.patch(user._id, {
         name: args.name,
         email: args.email,
@@ -199,7 +199,7 @@ export const createOrUpdateUser = mutation({
       });
     } else {
       // Create new user
-      const isSuperAdmin = SUPER_ADMIN_EMAILS.includes(args.email);
+      const isSuperAdmin = SUPER_ADMIN_EMAILS.some((e) => e.toLowerCase() === args.email.toLowerCase());
       await ctx.db.insert("users", {
         providerId: args.providerId,
         name: args.name,
@@ -228,11 +228,13 @@ export const registerUser = mutation({
       throw new Error("User already exists");
     }
 
+    const isSuperAdmin = SUPER_ADMIN_EMAILS.some((e) => e.toLowerCase() === args.email.toLowerCase());
     return await ctx.db.insert("users", {
       email: args.email,
       password: args.password,
       name: args.name,
       providerId: args.email, // Use email as providerId for uniqueness
+      role: isSuperAdmin ? "admin" : "learner",
     });
   },
 });

@@ -14,7 +14,8 @@ export async function POST(req: NextRequest) {
   try {
     // 1. Authenticate + authorize admin
     const session = await auth();
-    if (!session?.user?.email || !SUPER_ADMIN_EMAILS.includes(session.user.email)) {
+    const userEmail = session?.user?.email;
+    if (!userEmail || !SUPER_ADMIN_EMAILS.some((e) => e.toLowerCase() === userEmail.toLowerCase())) {
       return NextResponse.json({ error: "Forbidden: admin only" }, { status: 403 });
     }
 

@@ -245,7 +245,7 @@ async function requireAdmin(ctx: QueryCtx) {
     .query("users")
     .withIndex("by_email", (q) => q.eq("email", email))
     .unique();
-  if (!user || !SUPER_ADMIN_EMAILS.includes(user.email)) {
+  if (!user || !user.email || !SUPER_ADMIN_EMAILS.some((e) => e.toLowerCase() === user.email?.toLowerCase())) {
     throw new Error("Forbidden: admin only");
   }
   return user;

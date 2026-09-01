@@ -7,6 +7,7 @@ import { Id } from "../../../convex/_generated/dataModel";
 import { MessageSquare, Send, Reply, Trash2, User, ChevronDown, ChevronUp } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { formatDistanceToNow } from "date-fns";
+import Image from "next/image";
 
 interface LessonDiscussionProps {
   lessonId: Id<"lessons">;
@@ -139,9 +140,9 @@ function MessageItem({ message, replies, onReply, onDelete }: MessageItemProps) 
   return (
     <div className="p-3 bg-white border border-slate-200 rounded-lg space-y-2.5">
       <div className="flex gap-2.5 group">
-        <div className="w-7 h-7 rounded-full bg-slate-100 flex items-center justify-center shrink-0 overflow-hidden">
+        <div className="w-7 h-7 rounded-full bg-slate-100 flex items-center justify-center shrink-0 overflow-hidden relative">
           {message.user?.profileImage ? (
-            <img src={message.user.profileImage} alt={message.user.name || "User"} className="w-full h-full object-cover" />
+            <Image src={message.user.profileImage} alt={message.user.name || "User"} fill unoptimized className="object-cover" />
           ) : (
             <User className="w-3.5 h-3.5 text-slate-400" />
           )}
@@ -189,9 +190,9 @@ function MessageItem({ message, replies, onReply, onDelete }: MessageItemProps) 
           
           {showReplies && replies.map((reply) => (
             <div key={reply._id} className="flex gap-2 group pt-1">
-              <div className="w-5 h-5 rounded-full bg-slate-100 flex items-center justify-center shrink-0 overflow-hidden">
+              <div className="w-5 h-5 rounded-full bg-slate-100 flex items-center justify-center shrink-0 overflow-hidden relative">
                 {reply.user?.profileImage ? (
-                  <img src={reply.user.profileImage} alt={reply.user.name || "User"} className="w-full h-full object-cover" />
+                  <Image src={reply.user.profileImage} alt={reply.user.name || "User"} fill unoptimized className="object-cover" />
                 ) : (
                   <User className="w-2.5 h-2.5 text-slate-400" />
                 )}

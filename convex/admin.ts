@@ -1,20 +1,19 @@
 import { v } from "convex/values";
-import { mutation, query } from "./_generated/server";
+import { mutation, query, QueryCtx, MutationCtx } from "./_generated/server";
 import { internal } from "./_generated/api";
 
 // List of emails that are always granted admin access
 import { SUPER_ADMIN_EMAILS } from "./constants";
 
-
 // Helper to check admin access
-async function checkAdmin(ctx: any, providerId: string) {
+async function checkAdmin(ctx: QueryCtx | MutationCtx, providerId: string) {
   const user = await ctx.db
     .query("users")
-    .withIndex("by_provider_id", (q: any) => q.eq("providerId", providerId))
+    .withIndex("by_provider_id", (q) => q.eq("providerId", providerId))
     .unique();
 
   // Always allow super admins
-  if (user && SUPER_ADMIN_EMAILS.includes(user.email)) {
+  if (user && user.email && SUPER_ADMIN_EMAILS.some((e) => e.toLowerCase() === user.email?.toLowerCase())) {
     return user;
   }
 
