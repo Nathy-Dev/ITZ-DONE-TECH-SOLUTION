@@ -26,28 +26,26 @@ const steps = [
 
 const HowItWorks = () => {
   return (
-    <section className="py-12 bg-white">
+    <section className="py-8 bg-slate-50/50 border-y border-slate-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center max-w-2xl mx-auto mb-10 space-y-3">
-          <h2 className="text-2xl md:text-3xl font-bold tracking-tight">The ITS-DONE Way</h2>
-          <p className="text-slate-500">Our methodology is designed for maximum retention and job-readiness. Here&apos;s how it works.</p>
+        <div className="text-center max-w-2xl mx-auto mb-6 space-y-1.5">
+          <h2 className="text-xl md:text-2xl font-bold tracking-tight text-slate-900">The ITS-DONE Way</h2>
+          <p className="text-xs sm:text-sm text-slate-500">Our methodology is designed for maximum retention and job-readiness.</p>
         </div>
 
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
            {steps.map((step, idx) => (
-             <div key={idx} className="space-y-4 group">
-                {/* Connector line for desktop */}
-                {idx < steps.length - 1 && (
-                  <div className="hidden lg:block absolute" aria-hidden="true" />
-                )}
-
-                <div className="w-11 h-11 bg-blue-50 rounded-xl flex items-center justify-center group-hover:bg-blue-100 transition-colors">
-                  <step.icon className="w-5 h-5 text-blue-600" />
+             <div key={idx} className="p-4 bg-white border border-slate-200 rounded-lg space-y-3 group hover:border-blue-400/40 transition-colors">
+                <div className="flex items-center justify-between">
+                  <div className="w-8 h-8 bg-blue-50 rounded-md flex items-center justify-center group-hover:bg-blue-100 transition-colors">
+                    <step.icon className="w-4 h-4 text-blue-600" />
+                  </div>
+                  <span className="text-xs font-mono font-semibold text-slate-300">0{idx + 1}</span>
                 </div>
 
-                <div className="space-y-2">
-                  <h3 className="text-lg font-semibold">{step.title}</h3>
-                  <p className="text-sm text-slate-500 leading-relaxed">{step.description}</p>
+                <div className="space-y-1">
+                  <h3 className="text-sm font-semibold text-slate-900">{step.title}</h3>
+                  <p className="text-xs text-slate-500 leading-relaxed">{step.description}</p>
                 </div>
              </div>
            ))}

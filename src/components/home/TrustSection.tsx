@@ -11,18 +11,18 @@ const companies = [
 
 const TrustSection = () => {
   return (
-    <section className="py-8 bg-white border-y border-slate-100">
+    <section className="py-5 bg-white border-y border-slate-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <p className="text-center text-xs font-medium text-slate-400 uppercase tracking-[0.15em] mb-6">
+        <p className="text-center text-[11px] font-medium text-slate-400 uppercase tracking-[0.12em] mb-4">
           Trusted by engineers at world-class companies
         </p>
-        <div className="flex flex-wrap justify-center items-center gap-8 md:gap-14 opacity-50">
+        <div className="flex flex-wrap justify-center items-center gap-6 md:gap-10 opacity-50">
            {companies.map((company) => (
-              <div key={company.name} className="flex items-center gap-2 cursor-default">
-                 <div className="w-7 h-7 rounded-md bg-slate-100 flex items-center justify-center font-semibold text-slate-400 text-sm">
+              <div key={company.name} className="flex items-center gap-1.5 cursor-default">
+                 <div className="w-6 h-6 rounded bg-slate-100 flex items-center justify-center font-semibold text-slate-500 text-xs">
                    {company.icon}
                  </div>
-                 <span className="font-semibold text-base text-slate-400">
+                 <span className="font-semibold text-sm text-slate-500">
                    {company.name}
                  </span>
               </div>
