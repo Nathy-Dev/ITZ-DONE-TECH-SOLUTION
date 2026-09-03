@@ -142,6 +142,7 @@ export const createLesson = mutation({
     title: v.string(),
     content: v.optional(v.string()),
     videoUrl: v.optional(v.string()),
+    videoAssetId: v.optional(v.id("mediaAssets")),
     duration: v.optional(v.string()),
     order: v.number(),
     isFree: v.boolean(),
@@ -161,6 +162,7 @@ export const updateLesson = mutation({
     title: v.optional(v.string()),
     content: v.optional(v.string()),
     videoUrl: v.optional(v.string()),
+    videoAssetId: v.optional(v.id("mediaAssets")),
     duration: v.optional(v.string()),
     order: v.optional(v.number()),
     isFree: v.optional(v.boolean()),
@@ -169,6 +171,14 @@ export const updateLesson = mutation({
     await requireLessonOwner(ctx, args.id, args.providerId);
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { id, providerId, ...updates } = args;
+    if (updates.videoAssetId) {
+      const media = await ctx.db.get(updates.videoAssetId);
+      if (!media || media.kind !== "video" || media.status !== "ready") throw new Error("Video is not ready");
+      const lesson = await ctx.db.get(id);
+      if (!lesson) throw new Error("Lesson not found");
+      const section = await ctx.db.get(lesson.sectionId);
+      if (!section || media.lessonId !== id || media.courseId !== section.courseId) throw new Error("Video does not belong to lesson");
+    }
     await ctx.db.patch(id, updates);
   },
 });

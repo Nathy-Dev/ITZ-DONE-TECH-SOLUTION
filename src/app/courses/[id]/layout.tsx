@@ -16,6 +16,10 @@ export async function generateMetadata({ params }: LayoutProps): Promise<Metadat
     const course = await fetchQuery(api.courses.getById, { id: courseId });
     if (!course) return { title: "Course Not Found" };
 
+    const thumbnail = (course.thumbnailMediaId as string | undefined) ?? course.thumbnailUrl;
+    const thumbnailUrl = thumbnail && !thumbnail.startsWith("http") && !thumbnail.startsWith("/") && typeof window === "undefined"
+      ? `${process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"}/api/media/${thumbnail}/thumbnail`
+      : thumbnail;
     return {
       title: course.title,
       description: course.description,
@@ -23,13 +27,13 @@ export async function generateMetadata({ params }: LayoutProps): Promise<Metadat
         title: course.title,
         description: course.description,
         type: "website",
-        images: course.thumbnailUrl ? [{ url: course.thumbnailUrl }] : undefined,
+        images: thumbnailUrl ? [{ url: thumbnailUrl }] : undefined,
       },
       twitter: {
         card: "summary_large_image",
         title: course.title,
         description: course.description,
-        images: course.thumbnailUrl ? [course.thumbnailUrl] : undefined,
+        images: thumbnailUrl ? [thumbnailUrl] : undefined,
       },
     };
   } catch {

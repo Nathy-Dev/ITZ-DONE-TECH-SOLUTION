@@ -19,6 +19,7 @@ import type * as discussions from "../discussions.js";
 import type * as emails from "../emails.js";
 import type * as enrollments from "../enrollments.js";
 import type * as files from "../files.js";
+import type * as media from "../media.js";
 import type * as mentors from "../mentors.js";
 import type * as migration from "../migration.js";
 import type * as payments from "../payments.js";
@@ -48,6 +49,7 @@ declare const fullApi: ApiFromModules<{
   emails: typeof emails;
   enrollments: typeof enrollments;
   files: typeof files;
+  media: typeof media;
   mentors: typeof mentors;
   migration: typeof migration;
   payments: typeof payments;

@@ -89,7 +89,7 @@ export default function DashboardPage() {
     );
   }
 
-  const isInstructor = convexUser?.role === "instructor";
+  const isInstructor = convexUser?.role === "instructor" || convexUser?.role === "admin";
 
   return (
     <div className="min-h-screen bg-slate-50 pt-16 pb-8">
@@ -138,18 +138,18 @@ export default function DashboardPage() {
 }
 
 function ThumbnailImage({ thumbnailUrl, title, className }: { thumbnailUrl: string | undefined; title: string; className?: string }) {
-  const isStorageId = thumbnailUrl && !thumbnailUrl.startsWith("http") && !thumbnailUrl.startsWith("/");
-  const resolvedUrl = useQuery(api.files.getImageUrl, isStorageId ? { storageId: thumbnailUrl } : "skip");
-  const displayImage = isStorageId ? resolvedUrl : thumbnailUrl;
+  const isMediaId = thumbnailUrl && !thumbnailUrl.startsWith("http") && !thumbnailUrl.startsWith("/");
+  const displayImage = isMediaId ? `/api/media/${thumbnailUrl}/thumbnail` : thumbnailUrl;
 
   if (!displayImage) return <div className="absolute inset-0 bg-gradient-to-br from-blue-600/40 to-blue-500/40" />;
 
   return (
-    <Image 
-      src={displayImage} 
-      alt={title} 
+    <Image
+      src={displayImage}
+      alt={title}
       fill
-      className={cn("object-cover", className)} 
+      className={cn("object-cover", className)}
+      unoptimized
     />
   );
 }
@@ -249,7 +249,10 @@ function LearnerDashboard({ enrolledCourses, allCourses }: {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {allCourses?.slice(0, 4).map((course) => (
+            {allCourses
+              ?.filter((course) => course.status === "published" || (!course.status && course.isPublished))
+              .slice(0, 4)
+              .map((course) => (
               <CourseCard 
                 key={course._id} 
                 {...course} 
@@ -311,7 +314,10 @@ function InstructorDashboard({ courses, stats }: {
   const [activeInstructorTab, setActiveInstructorTab] = useState<"courses" | "earnings" | "mentorship">("courses");
   const { data: session } = useSession();
   const convexUser = useQuery(api.users.getUserByProviderId, 
-    session?.user?.id ? { providerId: session.user.id } : "skip"
+    session?.user?.id ? { 
+      providerId: session.user.id,
+      email: session.user.email ?? undefined 
+    } : "skip"
   );
 
   return (

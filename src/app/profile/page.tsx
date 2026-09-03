@@ -36,7 +36,6 @@ export default function ProfilePage() {
 
   const updateProfile = useMutation(api.users.updateProfile);
   const changePassword = useMutation(api.users.changePassword);
-  const generateUploadUrl = useMutation(api.files.generateUploadUrl);
 
   const [name, setName] = useState("");
   const [bio, setBio] = useState("");
@@ -82,22 +81,19 @@ export default function ProfilePage() {
     setProfileError(null);
 
     try {
-      // 1. Get Convex upload URL
-      const postUrl = await generateUploadUrl();
-      // 2. Upload the file
-      const result = await fetch(postUrl, {
-        method: "POST",
-        headers: { "Content-Type": file.type },
-        body: file,
-      });
-      const { storageId } = await result.json();
-      // 3. Resolve the public URL and save to profile
-      const url = await fetch(`/api/files/url?storageId=${storageId}`).then(r => r.json());
-      if (!url?.url) throw new Error("Could not resolve image URL");
+      const init = await fetch("/api/media/file/upload-initiate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ kind: "avatar", name: file.name, mimeType: file.type, sizeBytes: file.size }) });
+      const data = await init.json();
+      if (!init.ok || !data.uploadUrl) throw new Error(data.error || "Could not initialize avatar upload");
+      const result = await fetch(data.uploadUrl, { method: "PUT", headers: { "Content-Type": file.type }, body: file });
+      if (!result.ok) throw new Error("Avatar upload failed");
+      const complete = await fetch("/api/media/file/complete", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ mediaId: data.mediaId, objectKey: data.objectKey }) });
+      if (!complete.ok) throw new Error("Could not verify avatar upload");
+      const url = { url: `/api/media/${data.mediaId}/avatar` };
 
       await updateProfile({
         providerId: session.user.id,
         profileImage: url.url,
+        userId: convexUser?._id,
       });
       await update({ image: url.url });
     } catch (err) {
@@ -121,7 +117,8 @@ export default function ProfilePage() {
       await updateProfile({
         providerId: session.user.id,
         name,
-        bio
+        bio,
+        userId: convexUser?._id,
       });
       
       // Update NextAuth session if name changed
@@ -161,6 +158,7 @@ export default function ProfilePage() {
         providerId: session.user.id,
         currentPassword,
         newPassword,
+        userId: convexUser?._id,
       });
       setPasswordChanged(true);
       setCurrentPassword("");
@@ -349,7 +347,7 @@ export default function ProfilePage() {
             </div>
 
             {/* Payout settings for instructors */}
-            {(convexUser.role === "instructor" || convexUser.role === "admin") && (
+            {(convexUser.role === "instructor" || convexUser.role === "admin" || convexUser.isAdmin) && (
               <PayoutSettings />
             )}
               </>

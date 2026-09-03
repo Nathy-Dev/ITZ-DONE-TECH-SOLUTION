@@ -33,7 +33,7 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { formatPrice, ngnToUsd } from "@/lib/format";
 import { useFxRate } from "@/hooks/useFxRate";
-import UploadCenter from "@/components/courses/UploadCenter";
+import MediaUpload from "@/components/courses/MediaUpload";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -113,7 +113,7 @@ export default function ManageCoursePage({ params }: PageProps) {
 
   // Ownership check: only the course owner (or an admin) can manage it
   const isOwner = course.instructorId === convexUser._id;
-  const isAdmin = convexUser.role === "admin";
+  const isAdmin = convexUser.role === "admin" || !!convexUser.isAdmin;
   if (!isOwner && !isAdmin) {
     return (
       <div className="min-h-screen bg-slate-50 pt-20 pb-10 px-4 sm:px-6">
@@ -431,15 +431,20 @@ export default function ManageCoursePage({ params }: PageProps) {
               </p>
             </div>
 
-            <UploadCenter courseId={courseId as Id<"courses">} />
+            <div className="bg-white rounded-lg p-4 border border-slate-200 shadow-sm space-y-3">
+              <h3 className="font-bold text-sm text-slate-900">Course materials</h3>
+              <p className="text-[10px] text-slate-500">Upload PDFs and images here. Videos belong to individual lessons.</p>
+              <MediaUpload kind="document" courseId={courseId} accept="application/pdf" label="Upload PDF resource" onReady={() => setActionError(null)} />
+            </div>
           </div>
         </div>
       </div>
 
       
       {editingLessonId && (
-        <LessonEditor 
-          lessonId={editingLessonId} 
+        <LessonEditor
+          courseId={courseId}
+          lessonId={editingLessonId}
           onClose={() => setEditingLessonId(null)}
           updateLesson={updateLesson}
           providerId={providerId}
@@ -465,7 +470,6 @@ function CourseSettingsModal({ course, onClose, providerId }: {
   providerId: string;
 }) {
   const updateCourse = useMutation(api.courses.updateCourse);
-  const generateUploadUrl = useMutation(api.files.generateUploadUrl);
 
   const [formData, setFormData] = useState({
     title: course.title,
@@ -474,7 +478,8 @@ function CourseSettingsModal({ course, onClose, providerId }: {
     duration: course.duration,
     category: course.category,
     level: course.level,
-    thumbnailUrl: course.thumbnailUrl,
+    thumbnailUrl: course.thumbnailMediaId || course.thumbnailUrl,
+    thumbnailMediaId: course.thumbnailMediaId || "",
   });
   const [isSaving, setIsSaving] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
@@ -488,14 +493,14 @@ function CourseSettingsModal({ course, onClose, providerId }: {
     setIsUploading(true);
     setError(null);
     try {
-      const postUrl = await generateUploadUrl();
-      const result = await fetch(postUrl, {
-        method: "POST",
-        headers: { "Content-Type": file.type },
-        body: file,
-      });
-      const { storageId } = await result.json();
-      setFormData(prev => ({ ...prev, thumbnailUrl: storageId }));
+      const init = await fetch("/api/media/file/upload-initiate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ kind: "image", courseId: course._id, name: file.name, mimeType: file.type, sizeBytes: file.size }) });
+      const data = await init.json();
+      if (!init.ok || !data.uploadUrl) throw new Error(data.error || "Failed to initialize image upload");
+      const result = await fetch(data.uploadUrl, { method: "PUT", headers: { "Content-Type": file.type }, body: file });
+      if (!result.ok) throw new Error("Image upload failed");
+      const complete = await fetch("/api/media/file/complete", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ mediaId: data.mediaId, objectKey: data.objectKey }) });
+      if (!complete.ok) throw new Error("Image verification failed");
+      setFormData(prev => ({ ...prev, thumbnailUrl: data.mediaId, thumbnailMediaId: data.mediaId }));
     } catch {
       setError("Failed to upload image. Please try again.");
     } finally {
@@ -516,7 +521,8 @@ function CourseSettingsModal({ course, onClose, providerId }: {
         duration: formData.duration,
         category: formData.category,
         level: formData.level,
-        thumbnailUrl: formData.thumbnailUrl,
+        thumbnailUrl: formData.thumbnailMediaId || formData.thumbnailUrl,
+        thumbnailMediaId: formData.thumbnailMediaId ? formData.thumbnailMediaId as never : undefined,
       });
       onClose();
     } catch (err) {
@@ -906,7 +912,8 @@ function SectionItem({
 
 // ─── Lesson Editor ───────────────────────────────────────────────────────
 
-function LessonEditor({ lessonId, onClose, updateLesson, providerId }: {
+function LessonEditor({ courseId, lessonId, onClose, updateLesson, providerId }: {
+  courseId: string;
   lessonId: string;
   onClose: () => void;
   updateLesson: ReturnType<typeof useMutation<typeof api.content.updateLesson>>;
@@ -915,14 +922,15 @@ function LessonEditor({ lessonId, onClose, updateLesson, providerId }: {
   return (
     <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center bg-slate-950/40 backdrop-blur-xs p-0 sm:p-4">
       <div className="bg-white w-full sm:max-w-xl rounded-t-xl sm:rounded-xl shadow-lg overflow-hidden animate-in fade-in duration-150">
-        <LessonEditorForm lessonId={lessonId} onClose={onClose} updateLesson={updateLesson} providerId={providerId} />
+        <LessonEditorForm lessonId={lessonId} courseId={courseId} onClose={onClose} updateLesson={updateLesson} providerId={providerId} />
       </div>
     </div>
   );
 }
 
-function LessonEditorForm({ lessonId, onClose, updateLesson, providerId }: {
+function LessonEditorForm({ lessonId, courseId, onClose, updateLesson, providerId }: {
   lessonId: string;
+  courseId: string;
   onClose: () => void;
   updateLesson: ReturnType<typeof useMutation<typeof api.content.updateLesson>>;
   providerId: string;
@@ -932,6 +940,7 @@ function LessonEditorForm({ lessonId, onClose, updateLesson, providerId }: {
     title: string;
     content: string;
     videoUrl: string;
+    videoAssetId: string;
     duration: string;
     isFree: boolean;
   } | null>(null);
@@ -944,6 +953,7 @@ function LessonEditorForm({ lessonId, onClose, updateLesson, providerId }: {
         title: lesson.title,
         content: lesson.content || "",
         videoUrl: lesson.videoUrl || "",
+        videoAssetId: lesson.videoAssetId || "",
         duration: lesson.duration || "",
         isFree: lesson.isFree || false,
       });
@@ -963,7 +973,12 @@ function LessonEditorForm({ lessonId, onClose, updateLesson, providerId }: {
       await updateLesson({
         providerId,
         id: lessonId as Id<"lessons">,
-        ...formData
+        title: formData.title,
+        content: formData.content,
+        duration: formData.duration,
+        isFree: formData.isFree,
+        videoUrl: formData.videoUrl || undefined,
+        videoAssetId: formData.videoAssetId ? formData.videoAssetId as never : undefined,
       });
       onClose();
     } catch (err) {
@@ -1001,7 +1016,12 @@ function LessonEditorForm({ lessonId, onClose, updateLesson, providerId }: {
 
         <div className="grid sm:grid-cols-2 gap-3">
           <div className="space-y-1">
-            <label className={labelClass}>Video URL</label>
+            <label className={labelClass}>Video</label>
+            <MediaUpload kind="video" courseId={courseId} lessonId={lesson._id} accept="video/mp4,video/quicktime,video/webm,video/x-matroska" label="Upload private video" onReady={(media) => setFormData((current) => current ? { ...current, videoAssetId: media.mediaId, videoUrl: "" } : current)} />
+            {formData.videoAssetId && <p className="text-[10px] text-amber-600 font-medium">Video uploaded. It is processing privately and will be playable once Cloudflare marks it ready.</p>}
+          </div>
+          <div className="space-y-1">
+            <label className={labelClass}>Legacy video URL</label>
             <div className="relative">
               <Video className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
               <input 

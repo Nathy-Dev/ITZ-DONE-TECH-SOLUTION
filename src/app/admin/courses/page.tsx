@@ -224,16 +224,13 @@ export default function AdminCoursesPage() {
 }
 
 function AdminCourseThumbnail({ title, thumbnailUrl }: { title: string, thumbnailUrl?: string }) {
-  const isStorageId = thumbnailUrl && !thumbnailUrl.startsWith("http") && !thumbnailUrl.startsWith("/");
-  const resolvedUrl = useQuery(api.files.getImageUrl, 
-    isStorageId ? { storageId: thumbnailUrl as string } : "skip"
-  );
-  const displayImage = isStorageId ? resolvedUrl : thumbnailUrl;
+  const isMediaId = thumbnailUrl && !thumbnailUrl.startsWith("http") && !thumbnailUrl.startsWith("/");
+  const displayImage = isMediaId ? `/api/media/${thumbnailUrl}/thumbnail` : thumbnailUrl;
 
   return (
     <div className="w-16 h-10 rounded-lg overflow-hidden bg-slate-200 flex-shrink-0 relative">
        {displayImage ? (
-          <Image src={displayImage} alt={title} fill className="object-cover" />
+          <Image src={displayImage} alt={title} fill unoptimized className="object-cover" />
        ) : (
           <div className="absolute inset-0 bg-blue-100 font-bold text-[8px] flex items-center justify-center text-blue-600/20 uppercase tracking-tighter">ITZ-DONE</div>
        )}

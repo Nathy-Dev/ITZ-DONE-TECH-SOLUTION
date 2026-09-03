@@ -27,6 +27,7 @@ import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import MarkdownRenderer from "@/components/courses/MarkdownRenderer";
+import SecureVideoPlayer from "@/components/courses/SecureVideoPlayer";
 import LessonDiscussion from "@/components/lessons/LessonDiscussion";
 import CertificateButton from "@/components/courses/CertificateButton";
 
@@ -297,9 +298,19 @@ export default function LessonViewerPage({ params }: PageProps) {
               <div className="bg-slate-900 p-2 sm:p-4 lg:p-6">
                 <div className="max-w-5xl mx-auto">
                   <div className="aspect-video w-full bg-slate-950 rounded-lg overflow-hidden shadow-md relative group">
-                    {lesson?.videoUrl ? (
-                      <VideoPlayer 
-                        url={lesson.videoUrl} 
+                    {lesson?.videoAssetId ? (
+                      <SecureVideoPlayer
+                        mediaId={lesson.videoAssetId}
+                        title={lesson.title}
+                        onEnded={() => {
+                            if (!completedLessonIds.includes(lesson._id)) {
+                                handleToggleComplete();
+                            }
+                        }}
+                      />
+                    ) : lesson?.videoUrl ? (
+                      <VideoPlayer
+                        url={lesson.videoUrl}
                         title={lesson.title}
                         onEnded={() => {
                             if (!completedLessonIds.includes(lesson._id)) {

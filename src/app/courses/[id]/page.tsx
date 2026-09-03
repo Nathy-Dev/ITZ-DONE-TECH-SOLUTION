@@ -55,13 +55,10 @@ export default function CourseDetailPage({ params }: PageProps) {
 
   const createEnrollment = useMutation(api.enrollments.createEnrollment);
 
-  // Thumbnail resolution (Top level to avoid conditional hook violation)
+  // Thumbnail resolution: media asset IDs resolve through the sessionless proxy endpoint.
   const rawImage = course?.thumbnailUrl;
-  const isStorageId = !!(rawImage && !rawImage.startsWith("http") && !rawImage.startsWith("/"));
-  const resolvedUrl = useQuery(api.files.getImageUrl, 
-    (isStorageId && rawImage) ? { storageId: rawImage } : "skip"
-  );
-  const displayImage = isStorageId ? resolvedUrl : rawImage;
+  const thumbnailMediaId = course?.thumbnailMediaId || (rawImage && !rawImage.startsWith("http") && !rawImage.startsWith("/") ? rawImage : undefined);
+  const displayImage = thumbnailMediaId ? `/api/media/${thumbnailMediaId}/thumbnail` : rawImage;
 
   // Load saved state from localStorage on mount (before early returns
   // to keep hook order stable)
@@ -78,6 +75,29 @@ export default function CourseDetailPage({ params }: PageProps) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50">
         <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-600 border-t-transparent"></div>
+      </div>
+    );
+  }
+
+  const isPublished = course.status === "published" || (!course.status && course.isPublished);
+  const isOwner = !!(convexUser?._id && course.instructorId === convexUser._id);
+  const isAdmin = convexUser?.role === "admin" || !!convexUser?.isAdmin;
+
+  if (!isPublished && !isOwner && !isAdmin) {
+    return (
+      <div className="min-h-screen bg-slate-50 pt-20 pb-10 px-4 sm:px-6">
+        <div className="max-w-md mx-auto text-center space-y-4">
+          <h1 className="text-2xl font-bold text-slate-900">Course Not Available</h1>
+          <p className="text-slate-500 text-sm">
+            This course is currently undergoing review and has not yet been published.
+          </p>
+          <Link
+            href="/courses"
+            className="inline-flex items-center gap-1.5 px-4 py-2 bg-blue-600 text-white rounded-lg text-xs font-medium hover:bg-blue-700 transition-colors"
+          >
+            Browse Published Courses
+          </Link>
+        </div>
       </div>
     );
   }
@@ -318,10 +338,11 @@ export default function CourseDetailPage({ params }: PageProps) {
             {/* Preview Section */}
             <div className="relative aspect-video bg-slate-900 flex items-center justify-center group overflow-hidden">
               {displayImage ? (
-                <Image 
-                  src={displayImage} 
-                  alt={course.title} 
-                  fill 
+                <Image
+                  src={displayImage}
+                  alt={course.title}
+                  fill
+                  unoptimized
                   className="object-cover opacity-60 group-hover:scale-105 transition-transform duration-700"
                 />
               ) : (

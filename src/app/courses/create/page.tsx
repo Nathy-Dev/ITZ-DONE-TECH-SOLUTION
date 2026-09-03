@@ -46,7 +46,6 @@ export default function CreateCoursePage() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const createCourse = useMutation(api.courses.create);
-  const generateUploadUrl = useMutation(api.files.generateUploadUrl);
   
   const convexUser = useQuery(api.users.getUserByProviderId, 
     session?.user?.id ? { 
@@ -66,7 +65,8 @@ export default function CreateCoursePage() {
     duration: "",
     category: CATEGORIES[0],
     level: LEVELS[0],
-    thumbnailUrl: ""
+    thumbnailUrl: "",
+    thumbnailMediaId: ""
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -118,18 +118,18 @@ export default function CreateCoursePage() {
     setIsUploading(true);
 
     try {
-      // 1. Get upload URL
-      const postUrl = await generateUploadUrl();
-      
-      // 2. POST file to Convex
-      const result = await fetch(postUrl, {
+      const init = await fetch("/api/media/file/upload-initiate", {
         method: "POST",
-        headers: { "Content-Type": file.type },
-        body: file,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ kind: "image", courseId: "", name: file.name, mimeType: file.type, sizeBytes: file.size }),
       });
-      const { storageId } = await result.json();
-      
-      setFormData(prev => ({ ...prev, thumbnailUrl: storageId }));
+      const data = await init.json();
+      if (!init.ok || !data.uploadUrl) throw new Error(data.error || "Failed to initialize image upload");
+      const result = await fetch(data.uploadUrl, { method: "PUT", headers: { "Content-Type": file.type }, body: file });
+      if (!result.ok) throw new Error("Image upload failed");
+      const complete = await fetch("/api/media/file/complete", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ mediaId: data.mediaId, objectKey: data.objectKey }) });
+      if (!complete.ok) throw new Error((await complete.json()).error || "Image verification failed");
+      setFormData(prev => ({ ...prev, thumbnailUrl: "", thumbnailMediaId: data.mediaId }));
     } catch (err) {
       console.error("Upload failed:", err);
       setError("Failed to upload image. Please try again.");
@@ -171,7 +171,7 @@ export default function CreateCoursePage() {
 
   const handleSubmit = async () => {
     if (!convexUser?._id || !session?.user?.id) return;
-    if (!formData.thumbnailUrl) {
+    if (!formData.thumbnailMediaId) {
       setError("Please upload a thumbnail first.");
       setCurrentStep(3);
       return;
@@ -187,7 +187,8 @@ export default function CreateCoursePage() {
         price: parseFloat(formData.price),
         instructorId: convexUser._id,
         duration: formData.duration,
-        thumbnailUrl: formData.thumbnailUrl,
+        thumbnailUrl: formData.thumbnailMediaId,
+        thumbnailMediaId: formData.thumbnailMediaId as never,
         category: formData.category,
         level: formData.level,
       });

@@ -32,7 +32,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   }
 
   // Strict role check
-  if (convexUser?.role !== "admin") {
+  if (convexUser?.role !== "admin" && !convexUser?.isAdmin) {
     redirect("/dashboard");
   }
 

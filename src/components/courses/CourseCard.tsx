@@ -53,14 +53,9 @@ const CourseCard = ({
   const { addItem, isInCart } = useCart();
   const inCart = isInCart(courseId);
 
-  // Check if rawImage is a external URL or a Convex storage ID
-  const isStorageId = rawImage && !rawImage.startsWith("http") && !rawImage.startsWith("/");
-
-  const resolvedUrl = useQuery(api.files.getImageUrl,
-    isStorageId ? { storageId: rawImage as string } : "skip"
-  );
-
-  const displayImage = isStorageId ? resolvedUrl : rawImage;
+  // rawImage is a stable display URL, a Convex storage ID (legacy), or a media asset ID.
+  const isNonUrl = rawImage && !rawImage.startsWith("http") && !rawImage.startsWith("/");
+  const displayImage = isNonUrl ? `/api/media/${rawImage}/thumbnail` : rawImage;
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -86,6 +81,7 @@ const CourseCard = ({
                src={displayImage}
                alt={title}
                fill
+               unoptimized
                className="object-cover group-hover:scale-105 transition-transform duration-300"
              />
           ) : (

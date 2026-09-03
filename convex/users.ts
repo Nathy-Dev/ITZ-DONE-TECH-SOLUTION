@@ -156,11 +156,15 @@ export const getUserByProviderId = query({
         .withIndex("by_email", (q) => q.eq("email", email))
         .unique();
     }
-    if (user && user.email && SUPER_ADMIN_EMAILS.some((e) => e.toLowerCase() === user.email?.toLowerCase())) {
-      return { ...user, role: "admin" };
-    }
+    if (!user) return null;
 
-    return user;
+    const isSuperAdmin = !!(user.email && SUPER_ADMIN_EMAILS.some((e) => e.toLowerCase() === user.email?.toLowerCase()));
+    const isAdmin = isSuperAdmin || user.role === "admin";
+
+    return {
+      ...user,
+      isAdmin,
+    };
   },
 });
 
@@ -188,14 +192,12 @@ export const createOrUpdateUser = mutation({
     }
 
     if (user) {
-      // Update existing user
-      const isSuperAdmin = SUPER_ADMIN_EMAILS.some((e) => e.toLowerCase() === args.email.toLowerCase());
+      // Update existing user without wiping selected role
       await ctx.db.patch(user._id, {
         name: args.name,
         email: args.email,
         profileImage: args.profileImage,
         providerId: args.providerId,
-        ...(isSuperAdmin ? { role: "admin" } : {}),
       });
     } else {
       // Create new user
@@ -205,7 +207,7 @@ export const createOrUpdateUser = mutation({
         name: args.name,
         email: args.email,
         profileImage: args.profileImage,
-        role: isSuperAdmin ? "admin" : (args.role ?? "learner"),
+        role: args.role ?? (isSuperAdmin ? "instructor" : "learner"),
       });
     }
 
@@ -256,13 +258,26 @@ export const deleteUser = mutation({
 export const updateUserRole = mutation({
   args: { 
     providerId: v.string(),
-    role: v.string() 
+    role: v.string(),
+    userId: v.optional(v.id("users")),
   },
   handler: async (ctx, args) => {
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_provider_id", (q) => q.eq("providerId", args.providerId))
-      .unique();
+    let user = null;
+    if (args.userId) {
+      user = await ctx.db.get(args.userId);
+    }
+    if (!user) {
+      user = await ctx.db
+        .query("users")
+        .withIndex("by_provider_id", (q) => q.eq("providerId", args.providerId))
+        .unique();
+    }
+    if (!user) {
+      user = await ctx.db
+        .query("users")
+        .withIndex("by_email", (q) => q.eq("email", args.providerId))
+        .unique();
+    }
 
     if (!user) {
       throw new Error("User not found");
@@ -285,12 +300,25 @@ export const changePassword = mutation({
     providerId: v.string(),
     currentPassword: v.string(),
     newPassword: v.string(),
+    userId: v.optional(v.id("users")),
   },
   handler: async (ctx, args) => {
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_provider_id", (q) => q.eq("providerId", args.providerId))
-      .unique();
+    let user = null;
+    if (args.userId) {
+      user = await ctx.db.get(args.userId);
+    }
+    if (!user) {
+      user = await ctx.db
+        .query("users")
+        .withIndex("by_provider_id", (q) => q.eq("providerId", args.providerId))
+        .unique();
+    }
+    if (!user) {
+      user = await ctx.db
+        .query("users")
+        .withIndex("by_email", (q) => q.eq("email", args.providerId))
+        .unique();
+    }
 
     if (!user) throw new Error("User not found");
     if (!user.password) {
@@ -318,12 +346,25 @@ export const updateProfile = mutation({
     name: v.optional(v.string()),
     bio: v.optional(v.string()),
     profileImage: v.optional(v.string()),
+    userId: v.optional(v.id("users")),
   },
   handler: async (ctx, args) => {
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_provider_id", (q) => q.eq("providerId", args.providerId))
-      .unique();
+    let user = null;
+    if (args.userId) {
+      user = await ctx.db.get(args.userId);
+    }
+    if (!user) {
+      user = await ctx.db
+        .query("users")
+        .withIndex("by_provider_id", (q) => q.eq("providerId", args.providerId))
+        .unique();
+    }
+    if (!user) {
+      user = await ctx.db
+        .query("users")
+        .withIndex("by_email", (q) => q.eq("email", args.providerId))
+        .unique();
+    }
 
     if (!user) {
       throw new Error("User not found");

@@ -39,7 +39,8 @@ async function requireCourseOwner(
 export const list = query({
   args: {},
   handler: async (ctx) => {
-    return await ctx.db.query("courses").collect();
+    const courses = await ctx.db.query("courses").collect();
+    return courses.filter((c) => c.status === "published" || (!c.status && c.isPublished));
   },
 });
 
@@ -94,6 +95,7 @@ export const create = mutation({
     instructorId: v.id("users"),
     duration: v.string(),
     thumbnailUrl: v.string(),
+    thumbnailMediaId: v.optional(v.id("mediaAssets")),
     category: v.string(),
     level: v.string(),
   },
@@ -130,6 +132,7 @@ export const updateCourse = mutation({
     price: v.optional(v.number()),
     duration: v.optional(v.string()),
     thumbnailUrl: v.optional(v.string()),
+    thumbnailMediaId: v.optional(v.id("mediaAssets")),
     category: v.optional(v.string()),
     level: v.optional(v.string()),
   },

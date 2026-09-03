@@ -66,15 +66,19 @@ const Navbar = () => {
 
   const updateUserRole = useMutation(api.users.updateUserRole);
 
+  const isInstructor = convexUser?.role === "instructor" || convexUser?.role === "admin";
+
   const handleSetRole = async (role: "learner" | "instructor") => {
     if (!session?.user?.id || !convexUser || isSwitching) return;
-    if (convexUser.role === role) return;
+    if (role === "instructor" && isInstructor) return;
+    if (role === "learner" && convexUser.role === "learner") return;
 
     setIsSwitching(true);
     try {
       await updateUserRole({
         providerId: session.user.id,
         role: role,
+        userId: convexUser._id,
       });
       setUserMenuOpen(false);
     } catch (error) {
@@ -126,7 +130,7 @@ const Navbar = () => {
           </div>
 
           {/* Cart is a learner feature — hidden for instructor accounts */}
-          {convexUser?.role !== "instructor" && (
+          {!isInstructor && (
           <div
             className="relative"
             onMouseEnter={() => setCartPreviewOpen(true)}
@@ -246,13 +250,13 @@ const Navbar = () => {
                             disabled={isSwitching}
                             className={cn(
                               "flex items-center justify-center gap-1 py-1 rounded text-xs font-medium transition-all",
-                              convexUser?.role === "instructor"
+                              isInstructor
                                 ? "bg-white text-blue-600 shadow-sm"
                                 : "text-slate-500 hover:text-slate-700",
                               isSwitching && "opacity-50 cursor-not-allowed"
                             )}
                           >
-                            <GraduationCap className={cn("w-3 h-3", isSwitching && convexUser?.role !== "instructor" && "animate-spin")} />
+                            <GraduationCap className={cn("w-3 h-3", isSwitching && !isInstructor && "animate-spin")} />
                             Instructor
                           </button>
                           <button
@@ -260,13 +264,13 @@ const Navbar = () => {
                             disabled={isSwitching}
                             className={cn(
                               "flex items-center justify-center gap-1 py-1 rounded text-xs font-medium transition-all",
-                              convexUser?.role !== "instructor"
+                              !isInstructor
                                 ? "bg-white text-blue-600 shadow-sm"
                                 : "text-slate-500 hover:text-slate-700",
                               isSwitching && "opacity-50 cursor-not-allowed"
                             )}
                           >
-                            <BookOpen className={cn("w-3 h-3", isSwitching && convexUser?.role === "instructor" && "animate-spin")} />
+                            <BookOpen className={cn("w-3 h-3", isSwitching && isInstructor && "animate-spin")} />
                             Learner
                           </button>
                         </div>
@@ -274,7 +278,7 @@ const Navbar = () => {
 
                     {/* Menu Items */}
                     <div className="space-y-0.5">
-                      {convexUser?.role === "admin" && (
+                      {(convexUser?.isAdmin || convexUser?.role === "admin") && (
                         <Link
                           href="/admin"
                           className="flex items-center gap-3 px-3 py-2 text-sm font-medium text-red-600 rounded-lg hover:bg-red-50 transition-colors"
@@ -347,7 +351,7 @@ const Navbar = () => {
             {isSignedIn && (
               <Link href="/profile" onClick={() => setMobileMenuOpen(false)} className="py-2 text-slate-700 hover:text-blue-600">Profile Settings</Link>
             )}
-            {convexUser?.role === "admin" && (
+            {(convexUser?.isAdmin || convexUser?.role === "admin") && (
               <Link href="/admin" onClick={() => setMobileMenuOpen(false)} className="py-2 text-red-600">
                 Admin Dashboard
               </Link>
@@ -377,7 +381,7 @@ const Navbar = () => {
                   <p className="text-[10px] font-medium uppercase tracking-wide text-slate-400 px-1">Switch Role</p>
                   <button
                     onClick={() => {
-                      const targetRole = convexUser?.role === "instructor" ? "learner" : "instructor";
+                      const targetRole = isInstructor ? "learner" : "instructor";
                       handleSetRole(targetRole).then(() => setMobileMenuOpen(false));
                     }}
                     disabled={isSwitching}
@@ -385,7 +389,7 @@ const Navbar = () => {
                   >
                     <ArrowRightLeft className={cn("w-3.5 h-3.5 text-blue-600", isSwitching && "animate-spin")} />
                     <span className="font-medium text-slate-700">
-                      {isSwitching ? "Switching..." : `Switch to ${convexUser?.role === "instructor" ? "Learner" : "Instructor"}`}
+                      {isSwitching ? "Switching..." : `Switch to ${isInstructor ? "Learner" : "Instructor"}`}
                     </span>
                   </button>
                 </div>

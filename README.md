@@ -4,150 +4,130 @@ A course marketplace built with Next.js, Convex, and Flutterwave.
 
 ## Getting Started
 
-First, run the development server:
-
 ```bash
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open http://localhost:3000.
 
-## Payments & Payouts (Flutterwave)
+## Media architecture
 
-This platform uses [Flutterwave](https://flutterwave.com) for course payments and instructor payouts.
+Course media is intentionally split from Convex:
 
-### Business Model
+- **Cloudflare Stream** stores, processes, and privately streams lesson videos.
+- **Cloudflare R2** stores PDFs, course images, thumbnails, and avatars.
+- **Convex** stores media metadata and enforces ownership, enrollment, and lesson access.
 
-When a student pays for a course, the revenue is split automatically:
+There are no course assets to migrate. New uploads must use the media API routes; the legacy Convex upload functions in [`convex/files.ts`](convex/files.ts) are retained only for development compatibility and must not be used for new course content.
 
-| Share   | Recipient           |
-| ------- | ------------------- |
-| **60%** | Course instructor   |
-| **40%** | ITZ-DONE (platform) |
+### Video protection model
 
-### Environment Variables
+Videos are never offered as downloadable MP4 files. Playback requires a short-lived Cloudflare Stream signed token, and the application checks enrollment or free-lesson access before issuing it. Browser playback cannot technically prevent screen recording or a determined user from capturing streamed bytes; signed playback is intended to prevent public links and casual sharing.
 
-Add these to `.env.local` (or your hosting provider's environment settings):
+### Required media environment variables
+
+Copy [`.env.example`](.env.example) to `.env.local` and configure:
 
 ```bash
-# Flutterwave API keys — https://app.flutterwave.com/dashboard/settings/apis
-FLUTTERWAVE_SECRET_KEY=FLWSECK-xxxxxxxxxxxxxxxxxxxxx-X
-
-# Webhook signature hash — set the SAME value in
-# Flutterwave Dashboard > Settings > Webhooks
-FLUTTERWAVE_SECRET_HASH=your-secret-hash
-
-# Public app URL (payment redirect URLs) — set to your production domain
-NEXT_PUBLIC_APP_URL=https://yourdomain.com
-
-# USD→NGN fallback rate if the live FX feed is unreachable
-# (live rates come automatically from ExchangeRate-API via /api/fx-rate)
-NEXT_PUBLIC_USD_TO_NGN_RATE=1550
-
-# Shared secret guarding server-to-server Convex mutations (payment
-# completion, payout processing). Generate one with:
-#   node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
-# Set the SAME value in your Convex deployment env vars
-# (Dashboard > Settings > Environment Variables).
-CONVEX_MUTATION_SECRET=<random-64-char-hex>
+CLOUDFLARE_ACCOUNT_ID=...
+CLOUDFLARE_STREAM_API_TOKEN=...
+CLOUDFLARE_STREAM_CUSTOMER_SUBDOMAIN=...
+CLOUDFLARE_STREAM_WEBHOOK_SECRET=...
+CLOUDFLARE_STREAM_MAX_DURATION_SECONDS=7200
+R2_BUCKET_NAME=...
+R2_ACCESS_KEY_ID=...
+R2_SECRET_ACCESS_KEY=...
+MEDIA_MUTATION_SECRET=...
 ```
 
-### Flutterwave Dashboard Setup (Production)
+`MEDIA_MUTATION_SECRET` protects the server-to-server Convex media mutations.
+Generate one with `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`,
+set it in your hosting provider, and set the **same value** in the Convex deployment
+environment (Dashboard → Settings → Environment Variables). If it is not set, the code
+falls back to `CONVEX_MUTATION_SECRET`.
 
-1. **API Keys**: Copy your **Secret Key** (live mode) into `FLUTTERWAVE_SECRET_KEY`.
-2. **Webhooks**: In Dashboard → Settings → Webhooks, set the secret hash to match
-   `FLUTTERWAVE_SECRET_HASH`, and register these webhook URLs:
-   - Payment confirmations: `https://yourdomain.com/api/payments/webhook`
-   - Payout transfer updates: `https://yourdomain.com/api/payouts/webhook`
-3. **Transfers**: Payouts use Flutterwave Transfers. Ensure your Flutterwave balance
-   is funded and your account is approved for live transfers.
+Keep all media credentials server-only. Do not prefix them with `NEXT_PUBLIC_`.
 
-### Currency Model (NGN + USD display)
+### Cloudflare setup (step by step)
 
-All prices are **set and charged in Naira (₦)** — Flutterwave processes the
-payment and instructor payouts in NGN, so there is a single settlement
-currency and no conversion conflicts. To serve international students,
-USD equivalents (e.g. "₦25,000 (~$16.13)") are shown as **reference only**
-next to prices on the course page, checkout, and course creation form.
+**Cloudflare dashboard — Stream**
 
-- **Live rates are automatic**: [`/api/fx-rate`](src/app/api/fx-rate/route.ts)
-  proxies ExchangeRate-API's free open endpoint (no API key, refreshed
-  daily) with 6-hour server-side caching. `NEXT_PUBLIC_USD_TO_NGN_RATE` is
-  only a fallback if the feed is ever unreachable.
-- Instructors set prices in ₦ and see their 60% earnings share per sale.
-- Students always pay the exact ₦ amount shown at Flutterwave checkout.
+1. Create a Cloudflare Stream-enabled account.
+2. Create a Stream API token with the minimum Stream upload/read/delete permissions used by this application. Put the token in `CLOUDFLARE_STREAM_API_TOKEN`.
+3. Stream → your account subdomain → copy the customer subdomain value only into `CLOUDFLARE_STREAM_CUSTOMER_SUBDOMAIN`.
+4. Stream → Settings → Webhook: register `https://your-domain.example/api/webhooks/cloudflare-stream`.
+5. Generate a signing secret and paste it into both the Stream webhook settings and `CLOUDFLARE_STREAM_WEBHOOK_SECRET`.
+6. In the app upload-initiate call, signed URLs are always required and downloads are not exposed. Set the `maxDurationSeconds` policy through `CLOUDFLARE_STREAM_MAX_DURATION_SECONDS` (default 7200).
 
-### Role-Based Feature Separation
+**Cloudflare dashboard — R2**
 
-The platform enforces a clean learner/instructor split — each account type
-only sees features relevant to it:
+7. Create a private R2 bucket (e.g. `itzdone-media`), never make it public. Set `R2_BUCKET_NAME`.
+8. R2 → Manage R2 API Tokens → create an S3 API token scoped to that bucket with object read/write (and delete where policy permits). Put the access key and secret in `R2_ACCESS_KEY_ID` / `R2_SECRET_ACCESS_KEY`.
+9. Configure bucket CORS so a browser can `PUT` directly to the presigned URL from your local and production origins, allowing `Content-Type` and the `x-amz-meta-mediaid` header. No `GET` CORS is needed because media is never fetched cross-origin by browser JS.
+10. Leave `R2_PUBLIC_BASE_URL` unset. Public course thumbnails are delivered through the sessionless proxy endpoint `/api/media/:mediaId/thumbnail`, which issues short-lived signed R2 URLs per request without requiring a login. Private avatars are served through `/api/media/:mediaId/avatar` to the owner only.
 
-| Feature                      | Learner | Instructor               |
-| ---------------------------- | ------- | ------------------------ |
-| Browse/search courses        | ✅      | ✅                       |
-| Cart, checkout, payments     | ✅      | ❌ (hidden + redirected) |
-| "Add to Cart" buttons        | ✅      | ❌                       |
-| Enroll & take lessons        | ✅      | ✅ (for reference)       |
-| Create/manage courses        | ❌      | ✅                       |
-| Earnings & payouts dashboard | ❌      | ✅                       |
-| Payout bank account settings | ❌      | ✅                       |
-| Admin dashboard              | ❌      | admin only               |
+### Media API flows
 
-Users can switch between Learner and Instructor modes from the profile menu —
-the UI and available features update accordingly. All instructor-only
-mutations (course CRUD, curriculum editing, payouts) are additionally
-protected by **server-side role and ownership checks** in Convex.
+- `POST /api/media/video/upload-initiate` creates a Stream direct-upload session after instructor/course ownership checks.
+- `POST /api/media/file/upload-initiate` creates an R2 presigned upload for a PDF, image, or avatar.
+- `POST /api/media/file/complete` verifies the uploaded object with `HEAD`, including size and content type.
+- `GET /api/media/:mediaId/access` authorizes either signed Stream playback or a short-lived R2 resource URL.
+- `GET /api/media/:mediaId/thumbnail` redirects to a short-lived R2 URL for a public course image (no session required for marketplace browsing).
+- `GET /api/media/:mediaId/avatar` redirects to a short-lived R2 URL for a private user avatar (owner or admin only).
+- `DELETE /api/media` marks and removes an owned asset from its provider.
+- `POST /api/webhooks/cloudflare-stream` updates processing status idempotently after signature validation.
 
-### How It Works
+Media status is separate from upload success: a Stream upload remains unavailable until processing reports `ready`.
 
-**Student pays for a course:**
+### Product limits
 
-1. Student clicks _Complete Enrollment_ on `/checkout`.
-2. The server ([`src/app/api/payments/initiate/route.ts`](src/app/api/payments/initiate/route.ts))
-   re-computes prices from the database (client totals are never trusted), creates a
-   `pending` payment record, and requests a Flutterwave hosted-checkout link.
-3. Student pays on Flutterwave (card, transfer, USSD, etc.).
-4. Flutterwave calls our webhook
-   ([`src/app/api/payments/webhook/route.ts`](src/app/api/payments/webhook/route.ts)),
-   which verifies the SHA-256 signature **and** re-verifies the transaction against
-   Flutterwave's API before granting access.
-5. [`convex/payments.ts`](convex/payments.ts) then (idempotently):
-   - marks the payment `successful`,
-   - enrolls the student,
-   - splits revenue — 60% instructor earning, 40% platform earning.
-6. The success page also self-verifies via
-   [`src/app/api/payments/verify/route.ts`](src/app/api/payments/verify/route.ts)
-   as a fallback if the webhook is delayed.
+The current server-side limits are defined in [`src/lib/media.ts`](src/lib/media.ts): avatars 5 MB, images 10 MB, PDFs 100 MB, and videos 5 GB. Review these limits against the selected Cloudflare plan before production launch.
 
-**Tutor receives payouts:**
+## Payments and payouts
 
-1. Tutor adds their local bank account in **Profile → Payout Account**
-   ([`src/components/profile/PayoutSettings.tsx`](src/components/profile/PayoutSettings.tsx)).
-   The account name is resolved and verified via Flutterwave's bank lookup.
-2. Tutor requests a payout from **Dashboard → Earnings & Payouts**
-   ([`src/components/dashboard/EarningsPanel.tsx`](src/components/dashboard/EarningsPanel.tsx))
-   — withdraws their full available balance (min ₦1,000).
-3. Admin reviews the request at **Admin → Payouts**
-   ([`src/app/admin/payouts/page.tsx`](src/app/admin/payouts/page.tsx)) and clicks
-   _Approve & Pay_, which executes a real Flutterwave transfer
-   ([`src/app/api/admin/payouts/route.ts`](src/app/api/admin/payouts/route.ts)).
-4. Transfer status updates arrive via the payouts webhook and earnings are marked `paid`.
+The platform uses Flutterwave for course payments and instructor payouts. Add the existing payment variables described below to `.env.local`:
 
-### Security Notes
+```bash
+FLUTTERWAVE_SECRET_KEY=...
+FLUTTERWAVE_SECRET_HASH=...
+NEXT_PUBLIC_APP_URL=https://yourdomain.com
+NEXT_PUBLIC_USD_TO_NGN_RATE=1550
+CONVEX_MUTATION_SECRET=...
+```
 
-- All amounts are computed **server-side** from the database.
-- Webhooks are rejected unless the `verif-hash` signature matches, and successful
-  charges are re-verified against Flutterwave's API before enrollment.
-- Payment completion is **idempotent** — duplicate webhooks can't double-enroll or
-  double-credit earnings.
-- Admin payout operations are restricted to `SUPER_ADMIN_EMAILS`
-  (see [`convex/constants.ts`](convex/constants.ts)).
-- Card details never touch our servers — Flutterwave handles the entire checkout.
+Run `npx convex deploy` after Convex changes and configure all variables in both the hosting provider and Convex deployment where applicable.
+
+## Production checklist
+
+**Environment**
+
+- Configure every variable in `.env.example`, including `MEDIA_MUTATION_SECRET` (or the shared `CONVEX_MUTATION_SECRET` fallback) in both Vercel and Convex.
+- Keep Cloudflare credentials server-only. Never use `NEXT_PUBLIC_` for them.
+
+**Cloudflare**
+
+- Stream API token, customer subdomain, signed URL policy, webhook URL, and webhook signing secret are configured.
+- R2 bucket is private, S3 API token is scoped, and CORS allows direct browser `PUT` from local and production origins.
+- `R2_PUBLIC_BASE_URL` is unset.
+
+**Application tests**
+
+- Instructor creates a course and uploads a thumbnail; the thumbnail renders on the public course listing and detail pages without a login.
+- Instructor uploads a PDF resource; it is listed and downloadable only after the upload completes.
+- Instructor uploads a lesson video in the lesson editor; it transitions through `processing` to `ready` via the Stream webhook, and the lesson can then be saved with the video attached.
+- An enrolled learner can play a paid lesson through the signed HLS player.
+- An unenrolled learner receives no playback token and no direct video URL.
+- A logged-out visitor cannot access a private avatar via `/api/media/:id/avatar`.
+- A direct Stream URL without a signed token fails.
+- PDF access is denied without entitlement and uses a short-lived URL when authorized.
+- Re-sending a duplicate Stream webhook is harmless (idempotent).
+- No legacy Convex file-upload mutation is used for new course content.
+
+**Monitoring**
+
+- Track Stream minutes, R2 storage and operations, upload failures, video processing latency, playback authorization failures, and webhook retries.
+- Alert on upload-initiation failures, webhook signature rejections, processing failures, and orphaned asset counts above an agreed threshold.
 
 ## Deploy on Vercel
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new).
-
-Remember to set all environment variables (including the Convex and Flutterwave keys)
-in your hosting provider's dashboard, and run `npx convex deploy` to push the latest
-Convex functions to production.
+Set all environment variables in Vercel, deploy the application, and run `npx convex deploy` for the production Convex deployment. Ensure the production webhook URL and application origins are configured in Cloudflare.

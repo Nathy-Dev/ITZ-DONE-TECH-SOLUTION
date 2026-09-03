@@ -8,7 +8,8 @@ export default defineSchema({
     price: v.number(),
     instructorId: v.id("users"),
     duration: v.string(),
-    thumbnailUrl: v.string(),
+    thumbnailUrl: v.string(), // Legacy URL or media asset ID
+    thumbnailMediaId: v.optional(v.id("mediaAssets")),
     category: v.string(),
     level: v.string(),
     studentsEnrolled: v.number(),
@@ -64,11 +65,40 @@ export default defineSchema({
     sectionId: v.id("sections"),
     title: v.string(),
     content: v.optional(v.string()), // Markdown or HTML content
-    videoUrl: v.optional(v.string()),
+    videoUrl: v.optional(v.string()), // Legacy external URL; new uploads use videoAssetId
+    videoAssetId: v.optional(v.id("mediaAssets")),
     duration: v.optional(v.string()),
     order: v.number(),
     isFree: v.boolean(),
   }).index("by_section", ["sectionId"]),
+  // Provider-neutral media metadata. Binary content is never stored in Convex.
+  mediaAssets: defineTable({
+    courseId: v.optional(v.id("courses")),
+    lessonId: v.optional(v.id("lessons")),
+    ownerId: v.id("users"),
+    kind: v.string(), // video | document | image | avatar
+    provider: v.string(), // cloudflare_stream | cloudflare_r2
+    providerAssetId: v.optional(v.string()),
+    objectKey: v.optional(v.string()),
+    originalName: v.string(),
+    mimeType: v.string(),
+    sizeBytes: v.number(),
+    durationSeconds: v.optional(v.number()),
+    status: v.string(), // pending | processing | ready | failed | deleting | deleted
+    visibility: v.string(), // private | public
+    checksum: v.optional(v.string()),
+    failureReason: v.optional(v.string()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+    completedAt: v.optional(v.number()),
+    deletedAt: v.optional(v.number()),
+  })
+    .index("by_course", ["courseId"])
+    .index("by_lesson", ["lessonId"])
+    .index("by_owner", ["ownerId"])
+    .index("by_provider_asset", ["provider", "providerAssetId"])
+    .index("by_status", ["status"]),
+  // Retained only for compatibility with pre-media-schema development records.
   courseMedia: defineTable({
     courseId: v.id("courses"),
     storageId: v.id("_storage"),
